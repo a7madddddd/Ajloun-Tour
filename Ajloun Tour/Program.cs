@@ -87,6 +87,8 @@ builder.Services.AddAuthentication(options =>
 //scoped here
 builder.Services.AddScoped<IApplicationBuilder, ApplicationBuilder>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<INewsLattersRepository, NewsLattersRepository>();
 
 
 builder.Services.AddAuthorization();
