@@ -1,8 +1,9 @@
-﻿using Ajloun_Tour.Reposetories;
+﻿using Ajloun_Tour.DTOs.ContactDTOs;
+using Ajloun_Tour.Reposetories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Ajloun_Tour.DTOs.ContactDTOs
+namespace Ajloun_Tour.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -34,22 +35,25 @@ namespace Ajloun_Tour.DTOs.ContactDTOs
         }
 
         [HttpPost]
-        internal async Task<ActionResult<ContactDTO>> AddContactAsync([FromForm] CreateContact createContact) { 
-        
+        internal async Task<ActionResult<ContactDTO>> AddContactAsync([FromForm] CreateContact createContact)
+        {
+
             var addContact = await _contactRepository.AddContactAsync(createContact);
             return Ok(addContact);
         }
 
         [HttpPut("id")]
-        internal async Task<ActionResult<ContactDTO>> UpdateContactAsync(int id, [FromBody]CreateContact createContact) {
-        
+        internal async Task<ActionResult<ContactDTO>> UpdateContactAsync(int id, [FromBody] CreateContact createContact)
+        {
+
             var updateContact = await _contactRepository.UpdateContactAsync(id, createContact);
             return Ok(updateContact);
         }
 
         [HttpDelete("id")]
-        internal async void DeleteContactById(int id) { 
-        
+        internal async void DeleteContactById(int id)
+        {
+
             await _contactRepository.DeleteContactById(id);
 
         }
