@@ -66,14 +66,41 @@ namespace Ajloun_Tour.Implementations
             };
         }
 
-        public Task<NewsDTO> UpdateNewsAsync(int id, CreateNews createNews)
+        public async Task<NewsDTO> UpdateNewsAsync(int id, CreateNews createNews)
         {
-            throw new NotImplementedException();
+            var updatedNews = await _context.NewsletterSubscribers.FindAsync(id);
+
+            if (updatedNews == null) {
+
+                throw new Exception("This News Is Not Defined");
+            }
+
+            updatedNews.Email = createNews.Email ?? updatedNews.Email;
+            updatedNews.SubscribedAt = createNews?.SubscribedAt ?? updatedNews.SubscribedAt;
+
+
+            _context.NewsletterSubscribers.Update(updatedNews);
+            await _context.SaveChangesAsync();
+
+            return new NewsDTO { 
+            
+                Email = updatedNews.Email,
+                SubscribedAt = updatedNews.SubscribedAt,
+                SubscriberId = updatedNews.SubscriberId
+            };
         }
 
-        public Task DeleteNewsByIdAsync(int id)
+        public async Task DeleteNewsByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var Deletenews = await _context.NewsletterSubscribers.FindAsync(id);
+
+            if (Deletenews == null) {
+
+                throw new Exception("This News Is Not Defined");
+            }
+
+            _context.NewsletterSubscribers.Remove(Deletenews);
+            await _context.SaveChangesAsync();
         }
 
     }
