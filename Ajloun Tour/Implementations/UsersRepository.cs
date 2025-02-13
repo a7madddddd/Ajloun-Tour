@@ -137,7 +137,7 @@ namespace Ajloun_Tour.Implementations
             };
         }
 
-        public async Task<UsersDTO> AddUserAsync(CreateUsers createUsers)
+        public async Task<UsersDTO> AddUserAsync( CreateUsers createUsers)
         {
             if (createUsers.ImageFile == null)
             {
@@ -177,7 +177,7 @@ namespace Ajloun_Tour.Implementations
             };
         }
 
-        public async Task<UsersDTO> UpdateUsersAsync(int id, CreateUsers createUsers)
+        public async Task<UsersDTO> UpdateUsersAsync(int id,  CreateUsers createUsers)
         {
 
             var user = await _context.Users.FindAsync(id);
@@ -186,7 +186,6 @@ namespace Ajloun_Tour.Implementations
                 throw new KeyNotFoundException($"User with ID {id} not found.");
             }
 
-            // Keep old values if new values are null
             user.FullName = createUsers.FullName ?? user.FullName;
             user.Phone = createUsers.Phone ?? user.Phone;
             user.Email = createUsers.Email ?? user.Email;
@@ -194,7 +193,6 @@ namespace Ajloun_Tour.Implementations
             user.Password = createUsers.Password ?? user.Password;
 
 
-            // Handle Image Update (If a new image is provided, delete the old one)
             if (createUsers.ImageFile != null)
             {
                 if (!string.IsNullOrEmpty(user.UserImage))

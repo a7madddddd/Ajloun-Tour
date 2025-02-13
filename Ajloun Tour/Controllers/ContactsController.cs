@@ -1,7 +1,8 @@
 ﻿using Ajloun_Tour.DTOs.ContactDTOs;
 using Ajloun_Tour.Reposetories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Ajloun_Tour.Controllers
 {
@@ -17,7 +18,7 @@ namespace Ajloun_Tour.Controllers
         }
 
         [HttpGet]
-        internal async Task<ActionResult<IEnumerable<ContactDTO>>> GetContactsAsync()
+        public async Task<ActionResult<IEnumerable<ContactDTO>>> GetContactsAsync()
         {
 
             var contacts = await _contactRepository.GetALLContact();
@@ -27,7 +28,7 @@ namespace Ajloun_Tour.Controllers
         }
 
         [HttpGet("id")]
-        internal async Task<ActionResult<ContactDTO>> GetContactById(int id)
+        public async Task<ActionResult<ContactDTO>> GetContactById(int id)
         {
 
             var contact = await _contactRepository.GetContactById(id);
@@ -35,7 +36,7 @@ namespace Ajloun_Tour.Controllers
         }
 
         [HttpPost]
-        internal async Task<ActionResult<ContactDTO>> AddContactAsync([FromForm] CreateContact createContact)
+        public async Task<ActionResult<ContactDTO>> AddContactAsync([FromForm] CreateContact createContact)
         {
 
             var addContact = await _contactRepository.AddContactAsync(createContact);
@@ -43,7 +44,7 @@ namespace Ajloun_Tour.Controllers
         }
 
         [HttpPut("id")]
-        internal async Task<ActionResult<ContactDTO>> UpdateContactAsync(int id, [FromBody] CreateContact createContact)
+        public async Task<ActionResult<ContactDTO>> UpdateContactAsync(int id, [FromBody] CreateContact createContact)
         {
 
             var updateContact = await _contactRepository.UpdateContactAsync(id, createContact);
@@ -51,7 +52,7 @@ namespace Ajloun_Tour.Controllers
         }
 
         [HttpDelete("id")]
-        internal async void DeleteContactById(int id)
+        public async void DeleteContactById(int id)
         {
 
             await _contactRepository.DeleteContactById(id);

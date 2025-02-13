@@ -1,4 +1,6 @@
-﻿using Ajloun_Tour.DTOs.UsersDTOs;
+﻿using Ajloun_Tour.DTOs.AdminsDTOs;
+using Ajloun_Tour.DTOs.UsersDTOs;
+using Ajloun_Tour.Implementations;
 using Ajloun_Tour.Reposetories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -32,10 +34,15 @@ namespace Ajloun_Tour.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<UsersDTO>> AddUsersAsync([FromForm]CreateUsers createUsers) {
-        
-            var AddUser = await _usersRepository.AddUserAsync(createUsers);
-            return Ok(AddUser);
+        public async Task<IActionResult> AddUserAsync([FromForm] CreateUsers createUsers)
+        {
+            if (createUsers.ImageFile == null)
+            {
+                return BadRequest("User image is required.");
+            }
+
+            var admin = await _usersRepository.AddUserAsync(createUsers);
+            return Ok(admin);
         }
         [Authorize]
         [HttpPut]

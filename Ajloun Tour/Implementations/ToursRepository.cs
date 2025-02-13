@@ -16,7 +16,7 @@ namespace Ajloun_Tour.Implementations
         public ToursRepository(MyDbContext context)
         {
             _context = context;
-            _imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "TourssImages");
+            _imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ToursImages");
             EnsureImageDirectoryExists();
         }
 
@@ -143,10 +143,8 @@ namespace Ajloun_Tour.Implementations
                 throw new KeyNotFoundException($"User with ID {id} not found.");
             }
 
-            // Keep old values if new values are null
             if (createTours.TourImage != null)
             {
-                // Save the new image and update the path
                 tour.TourImage = await SaveImageFileAsync(createTours.TourImage);
             }
 
@@ -156,7 +154,6 @@ namespace Ajloun_Tour.Implementations
             tour.Duration = createTours.Duration ?? tour.Duration;
 
 
-            // Handle Image Update (If a new image is provided, delete the old one)
             if (createTours.TourImage != null)
             {
                 if (!string.IsNullOrEmpty(tour.TourImage))

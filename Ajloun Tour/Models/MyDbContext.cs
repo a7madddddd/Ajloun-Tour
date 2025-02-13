@@ -20,6 +20,7 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Booking> Bookings { get; set; } = null!;
         public virtual DbSet<ContactMessage> ContactMessages { get; set; } = null!;
         public virtual DbSet<NewsletterSubscriber> NewsletterSubscribers { get; set; } = null!;
+        public virtual DbSet<Project> Projects { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
 
@@ -28,7 +29,7 @@ namespace Ajloun_Tour.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=DESKTOP-E98DOJ0;Database=AjlounTour;Trusted_Connection=True;TrustServerCertificate=True;");
+                optionsBuilder.UseSqlServer("Server=A7MAD;Database=AjlounTour;Trusted_Connection=True;TrustServerCertificate=True;");
             }
         }
 
@@ -36,7 +37,7 @@ namespace Ajloun_Tour.Models
         {
             modelBuilder.Entity<Admin>(entity =>
             {
-                entity.HasIndex(e => e.Email, "UQ__Admins__A9D10534FA8AA19C")
+                entity.HasIndex(e => e.Email, "UQ__Admins__A9D10534A0BEF8DF")
                     .IsUnique();
 
                 entity.Property(e => e.AdminId).HasColumnName("AdminID");
@@ -71,18 +72,18 @@ namespace Ajloun_Tour.Models
                 entity.HasOne(d => d.Tour)
                     .WithMany(p => p.Bookings)
                     .HasForeignKey(d => d.TourId)
-                    .HasConstraintName("FK__Bookings__TourID__412EB0B6");
+                    .HasConstraintName("FK__Bookings__TourID__4AB81AF0");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Bookings)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Bookings__UserID__4222D4EF");
+                    .HasConstraintName("FK__Bookings__UserID__4BAC3F29");
             });
 
             modelBuilder.Entity<ContactMessage>(entity =>
             {
                 entity.HasKey(e => e.MessageId)
-                    .HasName("PK__ContactM__C87C037C773D9E94");
+                    .HasName("PK__ContactM__C87C037C71194994");
 
                 entity.Property(e => e.MessageId).HasColumnName("MessageID");
 
@@ -102,9 +103,9 @@ namespace Ajloun_Tour.Models
             modelBuilder.Entity<NewsletterSubscriber>(entity =>
             {
                 entity.HasKey(e => e.SubscriberId)
-                    .HasName("PK__Newslett__7DFEB634A2AED870");
+                    .HasName("PK__Newslett__7DFEB6343D56CCE9");
 
-                entity.HasIndex(e => e.Email, "UQ__Newslett__A9D10534CFBE192D")
+                entity.HasIndex(e => e.Email, "UQ__Newslett__A9D10534589F2127")
                     .IsUnique();
 
                 entity.Property(e => e.SubscriberId).HasColumnName("SubscriberID");
@@ -114,6 +115,24 @@ namespace Ajloun_Tour.Models
                 entity.Property(e => e.SubscribedAt)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+            });
+
+            modelBuilder.Entity<Project>(entity =>
+            {
+                entity.Property(e => e.ProjectId).HasColumnName("projectId");
+
+                entity.Property(e => e.AdminId).HasColumnName("AdminID");
+
+                entity.Property(e => e.ProjectImage).HasColumnName("projectImage");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(100)
+                    .HasColumnName("status");
+
+                entity.HasOne(d => d.Admin)
+                    .WithMany(p => p.Projects)
+                    .HasForeignKey(d => d.AdminId)
+                    .HasConstraintName("FK__Projects__AdminI__5EBF139D");
             });
 
             modelBuilder.Entity<Tour>(entity =>
@@ -131,7 +150,7 @@ namespace Ajloun_Tour.Models
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasIndex(e => e.Email, "UQ__Users__A9D10534703FE199")
+                entity.HasIndex(e => e.Email, "UQ__Users__A9D10534DCECE833")
                     .IsUnique();
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");

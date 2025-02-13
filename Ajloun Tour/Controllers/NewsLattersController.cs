@@ -47,10 +47,10 @@ namespace Ajloun_Tour.Controllers
             return Ok(updatedNews);
         }
         [HttpDelete("id")]
-        public async Task<ActionResult> DeleteNewsAsync(int id)
+        public async void DeleteNewsAsync(int id)
         {
             await _newsLattersRepository.DeleteNewsByIdAsync(id);
-            return Ok();
+           
         }
     }
 }

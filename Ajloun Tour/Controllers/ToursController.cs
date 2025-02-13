@@ -1,8 +1,11 @@
-﻿using Ajloun_Tour.DTOs.ToursDTOs;
+﻿using Ajloun_Tour.DTOs.AdminsDTOs;
+using Ajloun_Tour.DTOs.ToursDTOs;
+using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ajloun_Tour.Controllers
 {
@@ -33,10 +36,14 @@ namespace Ajloun_Tour.Controllers
             return Ok(Tour);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost]
         public async Task<ActionResult<ToursDTO>> AddToursAsync([FromForm] CreateTours createTours)
         {
+            if (createTours.TourImage == null)
+            {
+                return BadRequest("Tour image is required.");
+            }
 
             var newTour = await _toursRepository.AddToursAsync(createTours);
             return Ok(newTour);
@@ -62,3 +69,5 @@ namespace Ajloun_Tour.Controllers
         }
     }
 }
+
+

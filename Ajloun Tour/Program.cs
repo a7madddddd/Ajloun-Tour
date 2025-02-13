@@ -17,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<MyDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("YourConnectionString")));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 
 //// Add CORS policy
@@ -28,6 +29,12 @@ builder.Services.AddCors(options =>
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
+});
+
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 104857600; // ÇáÓãÇÍ ÈÑÝÚ ãáÝÇÊ ÍÊì 100MB
 });
 
 
@@ -87,8 +94,12 @@ builder.Services.AddAuthentication(options =>
 //scoped here
 builder.Services.AddScoped<IApplicationBuilder, ApplicationBuilder>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IToursRepository, ToursRepository>();
 builder.Services.AddScoped<INewsLattersRepository, NewsLattersRepository>();
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IAdminsRepository, AdminsRepository>();
+builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();
 
 
 builder.Services.AddAuthorization();
