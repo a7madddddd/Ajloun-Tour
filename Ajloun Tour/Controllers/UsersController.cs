@@ -1,10 +1,13 @@
 ﻿using Ajloun_Tour.DTOs.AdminsDTOs;
+using Ajloun_Tour.DTOs.LoginDTOs;
 using Ajloun_Tour.DTOs.UsersDTOs;
 using Ajloun_Tour.Implementations;
+using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Ajloun_Tour.Controllers
 {
@@ -36,14 +39,39 @@ namespace Ajloun_Tour.Controllers
         [HttpPost]
         public async Task<IActionResult> AddUserAsync([FromForm] CreateUsers createUsers)
         {
-            if (createUsers.ImageFile == null)
-            {
-                return BadRequest("User image is required.");
-            }
+
 
             var admin = await _usersRepository.AddUserAsync(createUsers);
             return Ok(admin);
         }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginDTO loginDTO)
+        {
+            try
+            {
+                var response = await _usersRepository.LoginAsync(loginDTO);
+                return Ok(response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "An error occurred during login" });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("profile")]
+        public async Task<ActionResult<User>> GetProfile()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            // Implement get profile logic
+            return Ok();
+        }
+
         [Authorize]
         [HttpPut]
         public async Task<ActionResult<UsersDTO>> UpdateUserAsync(int id,[FromBody] CreateUsers createUsers) {

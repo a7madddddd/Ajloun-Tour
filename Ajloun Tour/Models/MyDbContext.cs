@@ -21,6 +21,7 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<ContactMessage> ContactMessages { get; set; } = null!;
         public virtual DbSet<NewsletterSubscriber> NewsletterSubscribers { get; set; } = null!;
         public virtual DbSet<Project> Projects { get; set; } = null!;
+        public virtual DbSet<Testomonial> Testomonials { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
 
@@ -125,6 +126,10 @@ namespace Ajloun_Tour.Models
 
                 entity.Property(e => e.ProjectImage).HasColumnName("projectImage");
 
+                entity.Property(e => e.ProjectName)
+                    .HasMaxLength(100)
+                    .HasColumnName("projectName");
+
                 entity.Property(e => e.Status)
                     .HasMaxLength(100)
                     .HasColumnName("status");
@@ -133,6 +138,25 @@ namespace Ajloun_Tour.Models
                     .WithMany(p => p.Projects)
                     .HasForeignKey(d => d.AdminId)
                     .HasConstraintName("FK__Projects__AdminI__5EBF139D");
+            });
+
+            modelBuilder.Entity<Testomonial>(entity =>
+            {
+                entity.HasKey(e => e.TestomoId)
+                    .HasName("PK__testomon__135984F43F86520D");
+
+                entity.ToTable("testomonials");
+
+                entity.Property(e => e.TestomoId).HasColumnName("testomoId");
+
+                entity.Property(e => e.Message)
+                    .HasMaxLength(255)
+                    .HasColumnName("message");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Testomonials)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK__testomoni__UserI__619B8048");
             });
 
             modelBuilder.Entity<Tour>(entity =>

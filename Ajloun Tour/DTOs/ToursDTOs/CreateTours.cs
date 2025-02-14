@@ -13,6 +13,8 @@ namespace Ajloun_Tour.DTOs.ToursDTOs
         [FromForm]
         public string? Duration { get; set; }
         [FromForm]
+        public string? Details { get; set; }
+        [FromForm]
         public bool? IsActive { get; set; }
         [FromForm]
         public IFormFile? TourImage { get; set; }

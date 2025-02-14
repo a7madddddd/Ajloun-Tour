@@ -1,5 +1,6 @@
 ﻿using Ajloun_Tour.DTOs.BookingsDTOs;
 using Ajloun_Tour.Reposetories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

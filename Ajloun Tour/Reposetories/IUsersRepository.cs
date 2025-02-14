@@ -1,4 +1,5 @@
-﻿using Ajloun_Tour.DTOs.UsersDTOs;
+﻿using Ajloun_Tour.DTOs.LoginDTOs;
+using Ajloun_Tour.DTOs.UsersDTOs;
 
 namespace Ajloun_Tour.Reposetories
 {
@@ -13,5 +14,11 @@ namespace Ajloun_Tour.Reposetories
         Task<UsersDTO> UpdateUsersAsync(int id, CreateUsers createUsers);
 
         Task DeleteUserByIdAsync(int id);
+
+
+        //login
+        Task<LoginResponseDTO> LoginAsync(LoginDTO loginDTO);
+
+
     }
 }

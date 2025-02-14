@@ -17,6 +17,7 @@ namespace Ajloun_Tour.Models
         public string? Duration { get; set; }
         public bool? IsActive { get; set; }
         public string? TourImage { get; set; }
+        public string? Details { get; set; }
 
         public virtual ICollection<Booking> Bookings { get; set; }
     }

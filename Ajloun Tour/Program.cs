@@ -4,6 +4,7 @@ using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -34,7 +35,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 104857600; // ÇáÓãÇÍ ÈÑÝÚ ãáÝÇÊ ÍÊì 100MB
+    options.MultipartBodyLengthLimit = 104857600; 
 });
 
 
@@ -63,10 +64,19 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+// Add JWT settings configuration
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
-//// Add authentication services
-var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:Secret"]);
+// Get JWT settings
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+if (string.IsNullOrEmpty(jwtSettings?.Secret))
+{
+    throw new InvalidOperationException("JWT Secret is not configured");
+}
 
+var key = Encoding.ASCII.GetBytes(jwtSettings.Secret);
+
+// Add authentication configuration (only once)
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -88,11 +98,9 @@ builder.Services.AddAuthentication(options =>
 
 
 
-
-
-
 //scoped here
 builder.Services.AddScoped<IApplicationBuilder, ApplicationBuilder>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IToursRepository, ToursRepository>();
 builder.Services.AddScoped<INewsLattersRepository, NewsLattersRepository>();
@@ -100,6 +108,8 @@ builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IAdminsRepository, AdminsRepository>();
 builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();
+builder.Services.AddScoped<ITestomonialsRepository, TestomonialsRepository>();
+
 
 
 builder.Services.AddAuthorization();

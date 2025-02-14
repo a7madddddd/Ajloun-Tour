@@ -8,6 +8,7 @@ namespace Ajloun_Tour.Models
         public User()
         {
             Bookings = new HashSet<Booking>();
+            Testomonials = new HashSet<Testomonial>();
         }
 
         public int UserId { get; set; }
@@ -19,5 +20,6 @@ namespace Ajloun_Tour.Models
         public string? UserImage { get; set; }
 
         public virtual ICollection<Booking> Bookings { get; set; }
+        public virtual ICollection<Testomonial> Testomonials { get; set; }
     }
 }

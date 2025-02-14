@@ -62,6 +62,7 @@ namespace Ajloun_Tour.Implementations
                 TourName = t.TourName,
                 Description = t.Description,
                 Duration = t.Duration,
+                Details = t.Details,
                 IsActive = t.IsActive,
                 Price = t.Price,
                 TourImage = t.TourImage,
@@ -85,6 +86,7 @@ namespace Ajloun_Tour.Implementations
                 TourName = tour.TourName,
                 Description = tour.Description,
                 Duration = tour.Duration,
+                Details = tour.Details,
                 IsActive = tour.IsActive,
                 Price = tour.Price,
                 TourImage = tour.TourImage,
@@ -108,6 +110,7 @@ namespace Ajloun_Tour.Implementations
                 TourName = createTours.TourName,
                 Description = createTours.Description,
                 Duration = createTours.Duration,
+                Details = createTours.Details,
                 IsActive = createTours.IsActive,
                 Price = (decimal)createTours.Price,
                 TourImage = fileName
@@ -124,6 +127,7 @@ namespace Ajloun_Tour.Implementations
                 TourName = tour.TourName,
                 Description = tour.Description,
                 Duration = tour.Duration,
+                Details = tour.Details,
                 IsActive = tour.IsActive,
                 Price = tour.Price,
                 TourImage = fileName
@@ -152,7 +156,7 @@ namespace Ajloun_Tour.Implementations
             tour.Description = createTours.Description ?? tour.Description;
             tour.Price = createTours.Price ?? tour.Price;
             tour.Duration = createTours.Duration ?? tour.Duration;
-
+            tour.Details = createTours.Details ?? createTours.Details;
 
             if (createTours.TourImage != null)
             {
@@ -173,6 +177,7 @@ namespace Ajloun_Tour.Implementations
                 TourName = tour.TourName,
                 Description = tour.Description,
                 Duration = tour.Duration,
+                Details = tour.Details,
                 Price = tour.Price,
                 IsActive = tour.IsActive,
                 TourImage = tour.TourImage,

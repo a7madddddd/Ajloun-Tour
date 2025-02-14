@@ -14,7 +14,6 @@ namespace Ajloun_Tour.DTOs.UsersDTOs
         public string? Phone { get; set; }
         [FromForm]
         public DateTime? CreatedAt { get; set; }
-        [FromForm]
-        public IFormFile? ImageFile { get; set; }
+
     }
 }

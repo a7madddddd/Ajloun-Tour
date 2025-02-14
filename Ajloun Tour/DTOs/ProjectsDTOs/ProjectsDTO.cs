@@ -8,6 +8,8 @@ namespace Ajloun_Tour.DTOs.ProjectsDTOs
         public string? Status { get; set; }
         public string? ProjectImage { get; set; }
         public int? AdminId { get; set; }
+        public string? ProjectName { get; set; }
+
 
     }
 }

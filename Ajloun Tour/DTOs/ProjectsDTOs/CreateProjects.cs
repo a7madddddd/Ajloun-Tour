@@ -11,6 +11,9 @@ namespace Ajloun_Tour.DTOs.ProjectsDTOs
         public IFormFile? ProjectImage { get; set; }
         [FromForm]
         public int? AdminId { get; set; }
+        [FromForm]
+        public string? ProjectName { get; set; }
+
 
     }
 }

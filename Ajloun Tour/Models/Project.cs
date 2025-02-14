@@ -9,6 +9,7 @@ namespace Ajloun_Tour.Models
         public string? Status { get; set; }
         public string? ProjectImage { get; set; }
         public int? AdminId { get; set; }
+        public string? ProjectName { get; set; }
 
         public virtual Admin? Admin { get; set; }
     }

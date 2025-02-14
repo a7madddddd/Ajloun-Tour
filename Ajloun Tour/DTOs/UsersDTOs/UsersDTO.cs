@@ -8,6 +8,6 @@
         public string FullName { get; set; } = null!;
         public string? Phone { get; set; }
         public DateTime? CreatedAt { get; set; }
-        public string? UserImage { get; set; }
+
     }
 }

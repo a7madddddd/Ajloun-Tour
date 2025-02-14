@@ -1,4 +1,5 @@
-﻿using Ajloun_Tour.DTOs.UsersDTOs;
+﻿using Ajloun_Tour.DTOs.LoginDTOs;
+using Ajloun_Tour.DTOs.UsersDTOs;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
 using Microsoft.AspNetCore.Identity;
@@ -15,12 +16,15 @@ namespace Ajloun_Tour.Implementations
         private readonly MyDbContext _context;
         private readonly string _imageDirectory;
         private readonly IConfiguration _configuration;
-        public UsersRepository(MyDbContext context, IConfiguration configuration)
+        private readonly IPasswordHasher<User> _passwordHasher;
+
+        public UsersRepository(MyDbContext context, IConfiguration configuration, IPasswordHasher<User> passwordHasher)
         {
             _context = context;
             _imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "UsersImages");
             EnsureImageDirectoryExists();
             _configuration = configuration;
+            _passwordHasher = passwordHasher;
         }
 
 
@@ -85,12 +89,14 @@ namespace Ajloun_Tour.Implementations
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.FullName)
-        }),
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.FullName)
+            }),
                 Expires = DateTime.UtcNow.AddHours(Convert.ToInt32(_configuration["JwtSettings:ExpiryInHours"])),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -110,7 +116,6 @@ namespace Ajloun_Tour.Implementations
                 Password = u.Password,
                 Phone = u.Phone,
                 CreatedAt = DateTime.UtcNow,
-                UserImage = u.UserImage,
             });
         }
 
@@ -129,7 +134,6 @@ namespace Ajloun_Tour.Implementations
                 UserId = user.UserId,
                 Email = user.Email,
                 FullName = user.FullName,
-                UserImage = user.UserImage,
                 CreatedAt = user.CreatedAt,
                 Password = user.Password,
                 Phone = user.Phone,
@@ -137,15 +141,10 @@ namespace Ajloun_Tour.Implementations
             };
         }
 
-        public async Task<UsersDTO> AddUserAsync( CreateUsers createUsers)
+        public async Task<UsersDTO> AddUserAsync(CreateUsers createUsers)
         {
-            if (createUsers.ImageFile == null)
-            {
-                throw new ArgumentNullException(nameof(createUsers.ImageFile), "Image file is required.");
-            }
 
             var passwordHasher = new PasswordHasher<User>();
-            var fileName = await SaveImageFileAsync(createUsers.ImageFile);
 
             var user = new User
             {
@@ -154,7 +153,6 @@ namespace Ajloun_Tour.Implementations
                 Email = createUsers.Email,
                 Phone = createUsers.Phone,
                 CreatedAt = createUsers.CreatedAt,
-                UserImage = fileName
 
             };
 
@@ -171,13 +169,12 @@ namespace Ajloun_Tour.Implementations
                 CreatedAt = user.CreatedAt,
                 Phone = user.Phone,
                 Email = user.Email,
-                UserImage = fileName,
-                Password = passwordHasher.HashPassword(user, user.Password),
+                Password = user.Password
 
             };
         }
 
-        public async Task<UsersDTO> UpdateUsersAsync(int id,  CreateUsers createUsers)
+        public async Task<UsersDTO> UpdateUsersAsync(int id, CreateUsers createUsers)
         {
 
             var user = await _context.Users.FindAsync(id);
@@ -193,15 +190,6 @@ namespace Ajloun_Tour.Implementations
             user.Password = createUsers.Password ?? user.Password;
 
 
-            if (createUsers.ImageFile != null)
-            {
-                if (!string.IsNullOrEmpty(user.UserImage))
-                {
-                    await DeleteImageFileAsync(user.UserImage);
-                }
-                var fileName = await SaveImageFileAsync(createUsers.ImageFile);
-                user.UserImage = fileName;
-            }
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
@@ -214,8 +202,7 @@ namespace Ajloun_Tour.Implementations
                 Phone = user.Phone,
                 Password = user.Password,
                 CreatedAt = user.CreatedAt,
-                UserImage = user.UserImage,
-               
+
             };
         }
 
@@ -228,5 +215,41 @@ namespace Ajloun_Tour.Implementations
                 await _context.SaveChangesAsync();
             }
         }
+
+
+        //login
+        public async Task<LoginResponseDTO> LoginAsync(LoginDTO loginDTO)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginDTO.Email);
+
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("Invalid email or password");
+            }
+
+            var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(
+                user,
+                user.Password,
+                loginDTO.Password
+            );
+
+            if (passwordVerificationResult == PasswordVerificationResult.Failed)
+            {
+                throw new UnauthorizedAccessException("Invalid email or password");
+            }
+
+            var token = GenerateJwtToken(user);
+
+            return new LoginResponseDTO
+            {                                                                                                                                           
+                UserId = user.UserId,
+                FullName = user.FullName,
+                Email = user.Email,
+                UserImage = user.UserImage,
+                Token = token
+            };
+        }
     }
 }
+
+

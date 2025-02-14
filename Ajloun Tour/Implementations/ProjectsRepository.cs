@@ -63,6 +63,7 @@ namespace Ajloun_Tour.Implementations
 
                 ProjectId = p.ProjectId,
                 AdminId = p.AdminId,
+                ProjectName = p.ProjectName,
                 Status = p.Status,
                 ProjectImage = p.ProjectImage
             });
@@ -83,6 +84,7 @@ namespace Ajloun_Tour.Implementations
 
                 ProjectId = project.ProjectId,
                 AdminId = project.AdminId,
+                ProjectName = project.ProjectName,
                 Status = project.Status,
                 ProjectImage = project.ProjectImage
             };
@@ -100,6 +102,7 @@ namespace Ajloun_Tour.Implementations
             var project = new Project
             {
                 AdminId = createProjects.AdminId,
+                ProjectName = createProjects.ProjectName,
                 Status = createProjects.Status,
                 ProjectImage = fileName
             };
@@ -112,6 +115,7 @@ namespace Ajloun_Tour.Implementations
             {
                 ProjectId = project.ProjectId,
                 AdminId = project.AdminId,
+                ProjectName = project.ProjectName,
                 Status = project.Status,
                 ProjectImage = fileName
 
@@ -129,6 +133,7 @@ namespace Ajloun_Tour.Implementations
             }
 
             updatedProject.AdminId = createProjects.AdminId ?? updatedProject.AdminId;
+            updatedProject.ProjectName = createProjects.ProjectName?? updatedProject.ProjectName;
             updatedProject.Status = createProjects.Status ?? updatedProject.Status;
 
 
@@ -150,6 +155,7 @@ namespace Ajloun_Tour.Implementations
             {
                 ProjectId = updatedProject.ProjectId,
                 AdminId = updatedProject.AdminId,
+                ProjectName = updatedProject.ProjectName,
                 Status = updatedProject.Status,
                 ProjectImage = updatedProject.ProjectImage,
 
