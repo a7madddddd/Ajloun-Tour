@@ -61,7 +61,7 @@ namespace Ajloun_Tour.Implementations
         {
             var option = await _context.BookingOptions.FindAsync(id);
             if (option == null)
-                return null; // or throw an exception
+                return null; 
 
             option.OptionName = createBookingOption.OptionName;
 

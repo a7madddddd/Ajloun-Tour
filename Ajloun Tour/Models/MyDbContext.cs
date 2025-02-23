@@ -20,6 +20,8 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Booking> Bookings { get; set; } = null!;
         public virtual DbSet<BookingOption> BookingOptions { get; set; } = null!;
         public virtual DbSet<BookingOptionSelection> BookingOptionSelections { get; set; } = null!;
+        public virtual DbSet<Cart> Carts { get; set; } = null!;
+        public virtual DbSet<CartItem> CartItems { get; set; } = null!;
         public virtual DbSet<ContactMessage> ContactMessages { get; set; } = null!;
         public virtual DbSet<NewsletterSubscriber> NewsletterSubscribers { get; set; } = null!;
         public virtual DbSet<Offer> Offers { get; set; } = null!;
@@ -119,6 +121,97 @@ namespace Ajloun_Tour.Models
                     .WithMany(p => p.BookingOptionSelections)
                     .HasForeignKey(d => d.OptionId)
                     .HasConstraintName("FK__BookingOp__Optio__151B244E");
+            });
+
+            modelBuilder.Entity<Cart>(entity =>
+            {
+                entity.HasIndex(e => e.UserId, "IX_Carts_UserID");
+
+                entity.Property(e => e.CartId).HasColumnName("CartID");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasDefaultValueSql("('active')");
+
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Carts)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Carts__UserID__282DF8C2");
+            });
+
+            modelBuilder.Entity<CartItem>(entity =>
+            {
+                entity.HasIndex(e => e.CartId, "IX_CartItems_CartID");
+
+                entity.HasIndex(e => e.TourId, "IX_CartItems_TourID");
+
+                entity.Property(e => e.CartItemId).HasColumnName("CartItemID");
+
+                entity.Property(e => e.BikeRentPrice)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.CartId).HasColumnName("CartID");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DinnerPrice)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.HasBikeRent).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.HasDinner).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.HasInsurance).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.HasTourGuide).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.InsurancePrice)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.Quantity).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.SelectedDate).HasColumnType("date");
+
+                entity.Property(e => e.TourGuidePrice)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.TourId).HasColumnName("TourID");
+
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Cart)
+                    .WithMany(p => p.CartItems)
+                    .HasForeignKey(d => d.CartId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__CartItems__CartI__3587F3E0");
+
+                entity.HasOne(d => d.Tour)
+                    .WithMany(p => p.CartItems)
+                    .HasForeignKey(d => d.TourId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__CartItems__TourI__367C1819");
             });
 
             modelBuilder.Entity<ContactMessage>(entity =>

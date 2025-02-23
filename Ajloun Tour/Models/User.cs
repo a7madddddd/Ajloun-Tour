@@ -8,6 +8,7 @@ namespace Ajloun_Tour.Models
         public User()
         {
             Bookings = new HashSet<Booking>();
+            Carts = new HashSet<Cart>();
             Reviews = new HashSet<Review>();
             Testomonials = new HashSet<Testomonial>();
         }
@@ -21,6 +22,7 @@ namespace Ajloun_Tour.Models
         public string? UserImage { get; set; }
 
         public virtual ICollection<Booking> Bookings { get; set; }
+        public virtual ICollection<Cart> Carts { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<Testomonial> Testomonials { get; set; }
     }
