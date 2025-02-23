@@ -28,9 +28,10 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Review> Reviews { get; set; } = null!;
         public virtual DbSet<Testomonial> Testomonials { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
-        public virtual DbSet<User> Users { get; set; } = null!;
         public virtual DbSet<TourOffer> TourOffers { get; set; } = null!;
         public virtual DbSet<TourPackage> TourPackages { get; set; } = null!;
+        public virtual DbSet<TourProgram> TourPrograms { get; set; } = null!;
+        public virtual DbSet<User> Users { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -336,6 +337,23 @@ namespace Ajloun_Tour.Models
                             j.Property(tp => tp.PackageId).HasColumnName("package_id");
                         });
             });
+            modelBuilder.Entity<TourProgram>(entity =>
+            {
+                entity.HasKey(e => e.ProgramId)
+                    .HasName("PK__TourProg__75256058F9824B24");
+
+                entity.Property(e => e.ProgramDate)
+                    .HasColumnType("date")
+                    .HasColumnName("programDate");
+
+                entity.Property(e => e.Title).HasMaxLength(255);
+
+                entity.HasOne(d => d.Tour)
+                    .WithMany(p => p.TourPrograms)
+                    .HasForeignKey(d => d.TourId)
+                    .HasConstraintName("FK__TourProgr__TourI__17F790F9");
+            });
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasIndex(e => e.Email, "UQ__Users__A9D10534DCECE833")
