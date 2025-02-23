@@ -19,24 +19,27 @@ namespace Ajloun_Tour.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ToursOffersDTO>>> GetAllOffersAsync() {
-        
-            
+        public async Task<ActionResult<IEnumerable<ToursOffersDTO>>> GetAllOffersAsync()
+        {
+
+
             var ToursOffers = await _toursOffersRepository.GetAllToursOffers();
 
             return Ok(ToursOffers);
         }
 
         [HttpGet("id")]
-        public async Task<ActionResult<ToursOffersDTO>> GetTourOfferAsync(int tourId, int offerId) {
-        
+        public async Task<ActionResult<ToursOffersDTO>> GetTourOfferAsync(int tourId, int offerId)
+        {
+
             var tourOffer = await _toursOffersRepository.GetTourOfferById(tourId, offerId);
             return Ok(tourOffer);
         }
 
         [HttpGet("Activate")]
-        public async Task<ActionResult<ToursOffersDTO>> GetActivateToursOffers() { 
-        
+        public async Task<ActionResult<ToursOffersDTO>> GetActivateToursOffers()
+        {
+
             var activateOffers = await _toursOffersRepository.GetActiveOffers();
             return Ok(activateOffers);
         }

@@ -8,6 +8,7 @@ namespace Ajloun_Tour.Models
         public Package()
         {
             Tours = new HashSet<Tour>();
+            TourPackages = new HashSet<TourPackage>();
         }
 
         public int Id { get; set; }
@@ -16,5 +17,7 @@ namespace Ajloun_Tour.Models
         public decimal? Price { get; set; }
 
         public virtual ICollection<Tour> Tours { get; set; }
+        public virtual ICollection<TourPackage> TourPackages { get; set; }
+
     }
 }

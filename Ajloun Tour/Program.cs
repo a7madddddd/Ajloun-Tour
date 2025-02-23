@@ -111,6 +111,7 @@ builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();
 builder.Services.AddScoped<ITestomonialsRepository, TestomonialsRepository>();
 builder.Services.AddScoped<IReviewsRepository, ReviewsRepository>();
 builder.Services.AddScoped<IToursOffersRepository, ToursOffersRepository>();
+builder.Services.AddScoped<IToursPackagesRepository, ToursPackagesRepository>();
 
 
 
