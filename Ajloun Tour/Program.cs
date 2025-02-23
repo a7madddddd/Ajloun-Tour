@@ -114,6 +114,7 @@ builder.Services.AddScoped<IToursOffersRepository, ToursOffersRepository>();
 builder.Services.AddScoped<IToursPackagesRepository, ToursPackagesRepository>();
 builder.Services.AddScoped<IBookingOptionRepository, BookingOptionRepository>();
 builder.Services.AddScoped<IBookingOptionsSelectionRepository, BookingOptionsSelectionRepository>();
+builder.Services.AddScoped<IToursProgramRepository, ToursProgramRepository>();
 
 
 
