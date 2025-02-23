@@ -5,6 +5,11 @@ namespace Ajloun_Tour.Models
 {
     public partial class Booking
     {
+        public Booking()
+        {
+            BookingOptionSelections = new HashSet<BookingOptionSelection>();
+        }
+
         public int BookingId { get; set; }
         public int? TourId { get; set; }
         public int? UserId { get; set; }
@@ -16,5 +21,6 @@ namespace Ajloun_Tour.Models
 
         public virtual Tour? Tour { get; set; }
         public virtual User? User { get; set; }
+        public virtual ICollection<BookingOptionSelection> BookingOptionSelections { get; set; }
     }
 }

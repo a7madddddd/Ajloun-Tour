@@ -8,7 +8,6 @@ namespace Ajloun_Tour.Models
         public Offer()
         {
             Tours = new HashSet<Tour>();
-            TourOffers = new HashSet<TourOffer>();
         }
 
         public int Id { get; set; }
@@ -18,7 +17,5 @@ namespace Ajloun_Tour.Models
         public DateTime? EndDate { get; set; }
 
         public virtual ICollection<Tour> Tours { get; set; }
-        public virtual ICollection<TourOffer> TourOffers { get; set; }
-
     }
 }

@@ -64,7 +64,7 @@ namespace Ajloun_Tour.Controllers
         }
 
 
-        [HttpPut("{tourId}")]
+        [HttpPut("{TourId}")]
         public async Task<ActionResult<ToursPackagesDTO>> UpdatePackage(int TourId, CreateToursPackages createToursPackages)
         {
             try
@@ -86,8 +86,8 @@ namespace Ajloun_Tour.Controllers
             }
         }
 
-        [HttpDelete("{tourId}/{offerId}")]
-        public async Task<ActionResult<bool>> DeleteToursPackage(int TourId, int PackageIdPackageId)
+        [HttpDelete("{TourId}/{PackageId}")]
+        public async Task<ActionResult<bool>> DeleteToursPackage(int TourId, int PackageId)
         {
             try
             {

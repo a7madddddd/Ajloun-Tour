@@ -18,6 +18,8 @@ namespace Ajloun_Tour.Models
 
         public virtual DbSet<Admin> Admins { get; set; } = null!;
         public virtual DbSet<Booking> Bookings { get; set; } = null!;
+        public virtual DbSet<BookingOption> BookingOptions { get; set; } = null!;
+        public virtual DbSet<BookingOptionSelection> BookingOptionSelections { get; set; } = null!;
         public virtual DbSet<ContactMessage> ContactMessages { get; set; } = null!;
         public virtual DbSet<NewsletterSubscriber> NewsletterSubscribers { get; set; } = null!;
         public virtual DbSet<Offer> Offers { get; set; } = null!;
@@ -27,8 +29,6 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Testomonial> Testomonials { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
-        public virtual DbSet<TourOffer> TourOffers { get; set; } = null!;
-        public virtual DbSet<TourPackage> TourPackages { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -84,6 +84,38 @@ namespace Ajloun_Tour.Models
                     .WithMany(p => p.Bookings)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK__Bookings__UserID__4BAC3F29");
+            });
+
+            modelBuilder.Entity<BookingOption>(entity =>
+            {
+                entity.HasKey(e => e.OptionId)
+                    .HasName("PK__BookingO__92C7A1DF7595E8AA");
+
+                entity.Property(e => e.OptionId).HasColumnName("OptionID");
+
+                entity.Property(e => e.OptionName).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<BookingOptionSelection>(entity =>
+            {
+                entity.HasKey(e => e.SelectionId)
+                    .HasName("PK__BookingO__7F17912F1A501E7A");
+
+                entity.Property(e => e.SelectionId).HasColumnName("SelectionID");
+
+                entity.Property(e => e.BookingId).HasColumnName("BookingID");
+
+                entity.Property(e => e.OptionId).HasColumnName("OptionID");
+
+                entity.HasOne(d => d.Booking)
+                    .WithMany(p => p.BookingOptionSelections)
+                    .HasForeignKey(d => d.BookingId)
+                    .HasConstraintName("FK__BookingOp__Booki__14270015");
+
+                entity.HasOne(d => d.Option)
+                    .WithMany(p => p.BookingOptionSelections)
+                    .HasForeignKey(d => d.OptionId)
+                    .HasConstraintName("FK__BookingOp__Optio__151B244E");
             });
 
             modelBuilder.Entity<ContactMessage>(entity =>
@@ -260,44 +292,36 @@ namespace Ajloun_Tour.Models
 
                 entity.HasMany(d => d.Offers)
                     .WithMany(p => p.Tours)
-                    .UsingEntity<TourOffer>(
-                        j => j.HasOne(to => to.Offer)
-                              .WithMany()
-                              .HasForeignKey(to => to.OfferId)
-                              .HasConstraintName("FK_TourOffer_Offer"),
-                        j => j.HasOne(to => to.Tour)
-                              .WithMany()
-                              .HasForeignKey(to => to.TourId)
-                              .HasConstraintName("FK_TourOffer_Tour"),
+                    .UsingEntity<Dictionary<string, object>>(
+                        "TourOffer",
+                        l => l.HasOne<Offer>().WithMany().HasForeignKey("OfferId").HasConstraintName("FK__TourOffer__offer__0F624AF8"),
+                        r => r.HasOne<Tour>().WithMany().HasForeignKey("TourId").HasConstraintName("FK__TourOffer__tour___0E6E26BF"),
                         j =>
                         {
-                            j.HasKey(t => new { t.TourId, t.OfferId }).HasName("PK_TourOffer");
+                            j.HasKey("TourId", "OfferId").HasName("PK__TourOffe__7B2B8E4A3F82AF83");
 
                             j.ToTable("TourOffers");
 
-                            j.Property(t => t.TourId).HasColumnName("tour_id");
-                            j.Property(t => t.OfferId).HasColumnName("offer_id");
+                            j.IndexerProperty<int>("TourId").HasColumnName("tour_id");
+
+                            j.IndexerProperty<int>("OfferId").HasColumnName("offer_id");
                         });
 
                 entity.HasMany(d => d.Packages)
                     .WithMany(p => p.Tours)
-                    .UsingEntity<TourPackage>(
-                        j => j.HasOne(tp => tp.Package)
-                              .WithMany()
-                              .HasForeignKey(tp => tp.PackageId)
-                              .HasConstraintName("FK_TourPackage_Package"),
-                        j => j.HasOne(tp => tp.Tour)
-                              .WithMany()
-                              .HasForeignKey(tp => tp.TourId)
-                              .HasConstraintName("FK_TourPackage_Tour"),
+                    .UsingEntity<Dictionary<string, object>>(
+                        "TourPackage",
+                        l => l.HasOne<Package>().WithMany().HasForeignKey("PackageId").HasConstraintName("FK__TourPacka__packa__0B91BA14"),
+                        r => r.HasOne<Tour>().WithMany().HasForeignKey("TourId").HasConstraintName("FK__TourPacka__tour___0A9D95DB"),
                         j =>
                         {
-                            j.HasKey(t => new { t.TourId, t.PackageId }).HasName("PK_TourPackage");
+                            j.HasKey("TourId", "PackageId").HasName("PK__TourPack__DD2EFF48ADCDAF59");
 
                             j.ToTable("TourPackages");
 
-                            j.Property(t => t.TourId).HasColumnName("tour_id");
-                            j.Property(t => t.PackageId).HasColumnName("package_id");
+                            j.IndexerProperty<int>("TourId").HasColumnName("tour_id");
+
+                            j.IndexerProperty<int>("PackageId").HasColumnName("package_id");
                         });
             });
 
