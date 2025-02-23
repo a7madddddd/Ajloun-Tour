@@ -29,6 +29,8 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Testomonial> Testomonials { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
+        public virtual DbSet<TourOffer> TourOffers { get; set; } = null!;
+        public virtual DbSet<TourPackage> TourPackages { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -281,50 +283,59 @@ namespace Ajloun_Tour.Models
             modelBuilder.Entity<Tour>(entity =>
             {
                 entity.Property(e => e.TourId).HasColumnName("TourID");
-
                 entity.Property(e => e.Duration).HasMaxLength(50);
-
                 entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
-
                 entity.Property(e => e.TourName).HasMaxLength(100);
 
                 entity.HasMany(d => d.Offers)
                     .WithMany(p => p.Tours)
-                    .UsingEntity<Dictionary<string, object>>(
-                        "TourOffer",
-                        l => l.HasOne<Offer>().WithMany().HasForeignKey("OfferId").HasConstraintName("FK__TourOffer__offer__0F624AF8"),
-                        r => r.HasOne<Tour>().WithMany().HasForeignKey("TourId").HasConstraintName("FK__TourOffer__tour___0E6E26BF"),
+                    .UsingEntity<TourOffer>(
                         j =>
                         {
-                            j.HasKey("TourId", "OfferId").HasName("PK__TourOffe__7B2B8E4A3F82AF83");
+                            j.HasOne(to => to.Offer)
+                                .WithMany()
+                                .HasForeignKey(to => to.OfferId)
+                                .HasConstraintName("FK__TourOffer__offer__0F624AF8");
+
+                            j.HasOne(to => to.Tour)
+                                .WithMany()
+                                .HasForeignKey(to => to.TourId)
+                                .HasConstraintName("FK__TourOffer__tour___0E6E26BF");
+
+                            j.HasKey(to => new { to.TourId, to.OfferId })
+                                .HasName("PK__TourOffe__7B2B8E4A3F82AF83");
 
                             j.ToTable("TourOffers");
 
-                            j.IndexerProperty<int>("TourId").HasColumnName("tour_id");
-
-                            j.IndexerProperty<int>("OfferId").HasColumnName("offer_id");
+                            j.Property(to => to.TourId).HasColumnName("tour_id");
+                            j.Property(to => to.OfferId).HasColumnName("offer_id");
                         });
 
                 entity.HasMany(d => d.Packages)
                     .WithMany(p => p.Tours)
-                    .UsingEntity<Dictionary<string, object>>(
-                        "TourPackage",
-                        l => l.HasOne<Package>().WithMany().HasForeignKey("PackageId").HasConstraintName("FK__TourPacka__packa__0B91BA14"),
-                        r => r.HasOne<Tour>().WithMany().HasForeignKey("TourId").HasConstraintName("FK__TourPacka__tour___0A9D95DB"),
+                    .UsingEntity<TourPackage>(
                         j =>
                         {
-                            j.HasKey("TourId", "PackageId").HasName("PK__TourPack__DD2EFF48ADCDAF59");
+                            j.HasOne(tp => tp.Package)
+                                .WithMany()
+                                .HasForeignKey(tp => tp.PackageId)
+                                .HasConstraintName("FK__TourPacka__packa__0B91BA14");
+
+                            j.HasOne(tp => tp.Tour)
+                                .WithMany()
+                                .HasForeignKey(tp => tp.TourId)
+                                .HasConstraintName("FK__TourPacka__tour___0A9D95DB");
+
+                            j.HasKey(tp => new { tp.TourId, tp.PackageId })
+                                .HasName("PK__TourPack__DD2EFF48ADCDAF59");
 
                             j.ToTable("TourPackages");
 
-                            j.IndexerProperty<int>("TourId").HasColumnName("tour_id");
-
-                            j.IndexerProperty<int>("PackageId").HasColumnName("package_id");
+                            j.Property(tp => tp.TourId).HasColumnName("tour_id");
+                            j.Property(tp => tp.PackageId).HasColumnName("package_id");
                         });
             });
-
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasIndex(e => e.Email, "UQ__Users__A9D10534DCECE833")

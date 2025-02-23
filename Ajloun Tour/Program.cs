@@ -113,7 +113,7 @@ builder.Services.AddScoped<IReviewsRepository, ReviewsRepository>();
 builder.Services.AddScoped<IToursOffersRepository, ToursOffersRepository>();
 builder.Services.AddScoped<IToursPackagesRepository, ToursPackagesRepository>();
 builder.Services.AddScoped<IBookingOptionRepository, BookingOptionRepository>();
-builder.Services.AddScoped<IBookingOptionsSelectionRepository, IBookingOptionsSelectionRepository>();
+builder.Services.AddScoped<IBookingOptionsSelectionRepository, BookingOptionsSelectionRepository>();
 
 
 

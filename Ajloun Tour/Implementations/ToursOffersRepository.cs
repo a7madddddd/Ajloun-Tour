@@ -17,19 +17,19 @@ namespace Ajloun_Tour.Implementations
         public async Task<IEnumerable<ToursOffersDTO>> GetAllToursOffers()
         {
             return await _context.TourOffers
-                       .Include(to => to.Tour)
-                       .Include(to => to.Offer)
-                       .Select(to => new ToursOffersDTO
-                       {
-                           TourId = to.TourId,
-                           OfferId = to.OfferId,
-                           TourName = to.Tour.TourName,
-                           OfferTitle = to.Offer.Title,
-                           DiscountPercentage = (decimal)to.Offer.DiscountPercentage,
-                           StartDate = (DateTime)to.Offer.StartDate,
-                           EndDate = (DateTime)to.Offer.EndDate
-                       })
-                       .ToListAsync();
+              .Include(to => to.Tour)
+              .Include(to => to.Offer)
+              .Select(to => new ToursOffersDTO
+              {
+                  TourId = to.TourId,
+                  OfferId = to.OfferId,
+                  TourName = to.Tour.TourName,
+                  OfferTitle = to.Offer.Title,
+                  DiscountPercentage = to.Offer.DiscountPercentage ?? 0,  
+                  StartDate = to.Offer.StartDate ?? DateTime.MinValue,   
+                  EndDate = to.Offer.EndDate ?? DateTime.MinValue       
+              })
+              .ToListAsync();           
         }
         public async Task<ToursOffersDTO> GetTourOfferById(int tourId, int offerId)
         {
