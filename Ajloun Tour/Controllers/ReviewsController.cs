@@ -17,7 +17,8 @@ namespace Ajloun_Tour.Controllers
         }
 
         [HttpGet]
-        public async Task <ActionResult<IEnumerable<ReviewsDTO>>> GetAllReviews () {
+        public async Task<ActionResult<IEnumerable<ReviewsDTO>>> GetAllReviews()
+        {
 
             var reviews = await _reviewsRepository.GetAllReviews();
 
@@ -25,24 +26,26 @@ namespace Ajloun_Tour.Controllers
         }
 
         [HttpGet("id")]
-        public async Task<ActionResult<ReviewsDTO>> GetReviewById(int id) { 
-            
+        public async Task<ActionResult<ReviewsDTO>> GetReviewById(int id)
+        {
+
             var review = await _reviewsRepository.getReviewById(id);
 
             return Ok(review);
-        
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddReviewAsync(CreateReview createReview) {
-        
+        public async Task<ActionResult> AddReviewAsync(CreateReview createReview)
+        {
+
             var addReview = await _reviewsRepository.AddReviewAsync(createReview);
             return Ok(addReview);
         }
 
         [HttpDelete("id")]
-        public async void DeleteReviewById(int id) { 
-        
+        public async void DeleteReviewById(int id)
+        {
+
             await _reviewsRepository.DeleteReviewById(id);
         }
     }

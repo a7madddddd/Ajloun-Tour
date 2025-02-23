@@ -1,0 +1,157 @@
+﻿using Ajloun_Tour.DTOs.ToursOffersDTOs;
+using Ajloun_Tour.Models;
+using Ajloun_Tour.Reposetories;
+using Microsoft.EntityFrameworkCore;
+
+namespace Ajloun_Tour.Implementations
+{
+    public class ToursOffersRepository : IToursOffersRepository
+    {
+
+        private readonly MyDbContext _context;
+
+        public ToursOffersRepository(MyDbContext context)
+        {
+            _context = context;
+        }
+        public async Task<IEnumerable<ToursOffersDTO>> GetAllToursOffers()
+        {
+            return await _context.TourOffers
+                       .Include(to => to.Tour)
+                       .Include(to => to.Offer)
+                       .Select(to => new ToursOffersDTO
+                       {
+                           TourId = to.TourId,
+                           OfferId = to.OfferId,
+                           TourName = to.Tour.TourName,
+                           OfferTitle = to.Offer.Title,
+                           DiscountPercentage = (decimal)to.Offer.DiscountPercentage,
+                           StartDate = (DateTime)to.Offer.StartDate,
+                           EndDate = (DateTime)to.Offer.EndDate
+                       })
+                       .ToListAsync();
+        }
+        public async Task<ToursOffersDTO> GetTourOfferById(int tourId, int offerId)
+        {
+            return await _context.TourOffers
+                       .Include(to => to.Tour)
+                       .Include(to => to.Offer)
+                       .Where(to => to.TourId == tourId && to.OfferId == offerId)
+                       .Select(to => new ToursOffersDTO
+                       {
+                           TourId = to.TourId,
+                           OfferId = to.OfferId,
+                           TourName = to.Tour.TourName,
+                           OfferTitle = to.Offer.Title,
+                           DiscountPercentage = (decimal)to.Offer.DiscountPercentage,
+                           StartDate = (DateTime)to.Offer.StartDate,
+                           EndDate = (DateTime)to.Offer.EndDate
+                       })
+                       .FirstOrDefaultAsync();
+        }
+        public async Task<IEnumerable<ToursOffersDTO>> GetActiveOffers()
+        {
+            var currentDate = DateTime.UtcNow.Date;
+            return await _context.TourOffers
+                .Include(to => to.Tour)
+                .Include(to => to.Offer)
+                .Where(to => to.Offer.StartDate <= currentDate && to.Offer.EndDate >= currentDate)
+                .Select(to => new ToursOffersDTO
+                {
+                    TourId = to.TourId,
+                    OfferId = to.OfferId,
+                    TourName = to.Tour.TourName,
+                    OfferTitle = to.Offer.Title,
+                    DiscountPercentage = (decimal)to.Offer.DiscountPercentage,
+                    StartDate = (DateTime)to.Offer.StartDate,
+                    EndDate = (DateTime)to.Offer.EndDate
+                })
+                .ToListAsync();
+        }
+
+        public async Task<bool> AddTourOffer(TourOffer tourOffer)
+        {
+            try
+            {
+                await _context.TourOffers.AddAsync(tourOffer);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<ToursOffersDTO> UpdateTourOffer(int tourId, CreateToursOffer createToursOffer)
+        {
+            var existingTourOffer = await _context.TourOffers
+                .FirstOrDefaultAsync(to => to.TourId == tourId);
+
+            if (existingTourOffer == null)
+            {
+                throw new KeyNotFoundException($"No tour offer found with tour ID: {tourId}");
+            }
+
+            var offerExists = await _context.Offers
+                .AnyAsync(o => o.Id == createToursOffer.OfferId);
+
+            if (!offerExists)
+            {
+                throw new InvalidOperationException($"Offer with ID {createToursOffer.OfferId} does not exist");
+            }
+
+            var duplicateExists = await _context.TourOffers
+                .AnyAsync(to =>
+                    to.TourId == createToursOffer.TourId &&
+                    to.OfferId == createToursOffer.OfferId &&
+                    to.TourId != tourId);
+
+            if (duplicateExists)
+            {
+                throw new InvalidOperationException("This Tour-Offer relationship already exists");
+            }
+
+            existingTourOffer.OfferId = createToursOffer.OfferId;
+
+            if (createToursOffer.TourId != tourId)
+            {
+                var newTourExists = await _context.Tours
+                    .AnyAsync(t => t.TourId == createToursOffer.TourId);
+
+                if (!newTourExists)
+                {
+                    throw new InvalidOperationException($"Tour with ID {createToursOffer.TourId} does not exist");
+                }
+
+                existingTourOffer.TourId = createToursOffer.TourId;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new ToursOffersDTO
+            {
+                TourId = existingTourOffer.TourId,
+                OfferId = existingTourOffer.OfferId
+            };
+        }
+
+
+
+
+        public async Task<bool> DeleteTourOffer(int tourId, int offerId)
+        {
+            var tourOffer = await _context.TourOffers
+                        .FirstOrDefaultAsync(to => to.TourId == tourId && to.OfferId == offerId);
+
+            if (tourOffer == null)
+                return false;
+
+            _context.TourOffers.Remove(tourOffer);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
+    }
+}

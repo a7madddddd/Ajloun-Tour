@@ -248,22 +248,16 @@ namespace Ajloun_Tour.Models
 
             modelBuilder.Entity<Tour>(entity =>
             {
-                // TourID column
                 entity.Property(e => e.TourId).HasColumnName("TourID");
 
-                // Duration column
                 entity.Property(e => e.Duration).HasMaxLength(50);
 
-                // IsActive column with a default value
                 entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
 
-                // Price column with the decimal type
                 entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
 
-                // TourName column with max length
                 entity.Property(e => e.TourName).HasMaxLength(100);
 
-                // Define many-to-many relationship between Tour and Offer
                 entity.HasMany(d => d.Offers)
                     .WithMany(p => p.Tours)
                     .UsingEntity<TourOffer>(
@@ -279,15 +273,12 @@ namespace Ajloun_Tour.Models
                         {
                             j.HasKey(t => new { t.TourId, t.OfferId }).HasName("PK_TourOffer");
 
-                            // Explicitly setting the table name
                             j.ToTable("TourOffers");
 
-                            // Column names for the foreign key properties
                             j.Property(t => t.TourId).HasColumnName("tour_id");
                             j.Property(t => t.OfferId).HasColumnName("offer_id");
                         });
 
-                // Define many-to-many relationship between Tour and Package
                 entity.HasMany(d => d.Packages)
                     .WithMany(p => p.Tours)
                     .UsingEntity<TourPackage>(
@@ -303,10 +294,8 @@ namespace Ajloun_Tour.Models
                         {
                             j.HasKey(t => new { t.TourId, t.PackageId }).HasName("PK_TourPackage");
 
-                            // Explicitly setting the table name
                             j.ToTable("TourPackages");
 
-                            // Column names for the foreign key properties
                             j.Property(t => t.TourId).HasColumnName("tour_id");
                             j.Property(t => t.PackageId).HasColumnName("package_id");
                         });

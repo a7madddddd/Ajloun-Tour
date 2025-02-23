@@ -24,6 +24,7 @@ namespace Ajloun_Tour.Controllers
             var Admins = await _adminsRepository.GetAdminsAsync();
             return Ok(Admins);
         }
+
         [HttpGet("id")]
         public async Task<ActionResult<AdminsDTO>> GetAdminsById(int id) {
         
@@ -44,13 +45,13 @@ namespace Ajloun_Tour.Controllers
         }
 
 
-
         [HttpPut("id")]
         public async Task<ActionResult<AdminsDTO>> UpdeteAdminAsync(int id, [FromBody] CreateAdmins createAdmins) {
 
             var updateAdmin = await _adminsRepository.UpdeteAdminAsync(id, createAdmins);
             return Ok(updateAdmin);
         }
+
         [HttpDelete("id")]
         public async void DeleteAdminAsync(int id) {
 
