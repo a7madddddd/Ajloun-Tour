@@ -1,5 +1,8 @@
-﻿namespace Ajloun_Tour.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Ajloun_Tour.Models
 {
+    [Table("TourPackages")]
     public class TourPackage
     {
         public int TourId { get; set; }

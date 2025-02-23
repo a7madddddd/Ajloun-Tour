@@ -430,6 +430,7 @@ namespace Ajloun_Tour.Models
                             j.Property(tp => tp.PackageId).HasColumnName("package_id");
                         });
             });
+
             modelBuilder.Entity<TourProgram>(entity =>
             {
                 entity.HasKey(e => e.ProgramId)
@@ -463,6 +464,45 @@ namespace Ajloun_Tour.Models
                 entity.Property(e => e.FullName).HasMaxLength(100);
 
                 entity.Property(e => e.Phone).HasMaxLength(20);
+            });
+
+            modelBuilder.Entity<TourOffer>(entity =>
+            {
+                entity.HasKey(e => new { e.TourId, e.OfferId });
+                entity.ToTable("TourOffers");
+
+                entity.HasOne(d => d.Tour)
+                    .WithMany()
+                    .HasForeignKey(d => d.TourId);
+
+                entity.HasOne(d => d.Offer)
+                    .WithMany()
+                    .HasForeignKey(d => d.OfferId);
+            });
+
+            modelBuilder.Entity<TourPackage>(entity =>
+            {
+                // Set the composite primary key
+                entity.HasKey(e => new { e.TourId, e.PackageId });
+
+                // Explicitly specify the table name
+                entity.ToTable("TourPackages");
+
+                // Configure the relationship with Tour
+                entity.HasOne(d => d.Tour)
+                    .WithMany()
+                    .HasForeignKey(d => d.TourId)
+                    .OnDelete(DeleteBehavior.Cascade); // Optional: specify delete behavior
+
+                // Configure the relationship with Package
+                entity.HasOne(d => d.Package)
+                    .WithMany()
+                    .HasForeignKey(d => d.PackageId)
+                    .OnDelete(DeleteBehavior.Cascade); // Optional: specify delete behavior
+
+                // If you want to specify column names explicitly
+                entity.Property(e => e.TourId).HasColumnName("tour_id");
+                entity.Property(e => e.PackageId).HasColumnName("package_id");
             });
 
             OnModelCreatingPartial(modelBuilder);
