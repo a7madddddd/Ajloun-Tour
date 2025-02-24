@@ -10,5 +10,7 @@
         public string? Duration { get; set; }
         public bool? IsActive { get; set; }
         public string? TourImage { get; set; }
+        public string? Location { get; set; }
+
     }
 }

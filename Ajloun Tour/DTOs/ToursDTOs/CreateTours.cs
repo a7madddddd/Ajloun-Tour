@@ -18,5 +18,7 @@ namespace Ajloun_Tour.DTOs.ToursDTOs
         public bool? IsActive { get; set; }
         [FromForm]
         public IFormFile? TourImage { get; set; }
+        [FromForm]
+        public string? Location { get; set; }
     }
 }

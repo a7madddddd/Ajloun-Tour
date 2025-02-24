@@ -16,5 +16,7 @@ namespace Ajloun_Tour.Models
         public decimal? Price { get; set; }
 
         public virtual ICollection<Tour> Tours { get; set; }
+        public virtual ICollection<TourPackage> TourPackages { get; set; } = new List<TourPackage>(); // ✅ Add this
+
     }
 }

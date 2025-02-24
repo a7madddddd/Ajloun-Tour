@@ -23,6 +23,7 @@ namespace Ajloun_Tour.Models
         public bool? IsActive { get; set; }
         public string? TourImage { get; set; }
         public string? Details { get; set; }
+        public string? Location { get; set; }
 
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<CartItem> CartItems { get; set; }
@@ -31,5 +32,10 @@ namespace Ajloun_Tour.Models
 
         public virtual ICollection<Offer> Offers { get; set; }
         public virtual ICollection<Package> Packages { get; set; }
+
+        public virtual ICollection<TourOffer> TourOffers { get; set; } = new List<TourOffer>(); // ✅ Add this
+        public virtual ICollection<TourPackage> TourPackages { get; set; } = new List<TourPackage>(); // ✅ Add this
+
+
     }
 }

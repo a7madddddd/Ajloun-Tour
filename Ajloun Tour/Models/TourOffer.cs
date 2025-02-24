@@ -10,5 +10,9 @@ namespace Ajloun_Tour.Models
 
         public Tour? Tour { get; set; }
         public Offer? Offer { get; set; }
+
+
+        public virtual ICollection<TourOffer> TourOffers { get; set; } = new List<TourOffer>(); // ✅ Add this
+
     }
 }

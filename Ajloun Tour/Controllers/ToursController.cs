@@ -14,10 +14,12 @@ namespace Ajloun_Tour.Controllers
     public class ToursController : ControllerBase
     {
         private readonly IToursRepository _toursRepository;
+        private readonly MyDbContext _context;
 
-        public ToursController(IToursRepository toursRepository)
+        public ToursController(IToursRepository toursRepository, MyDbContext context)
         {
             _toursRepository = toursRepository;
+            _context = context;
         }
 
         [HttpGet]
@@ -66,6 +68,23 @@ namespace Ajloun_Tour.Controllers
             await _toursRepository.DeleteToursAsync(id);
             return;
 
+        }
+        [HttpGet("Last4")]
+        public async Task<IActionResult> GetLastFourToursWithRatings()
+        {
+            var tours = await _context.Tours
+                .OrderByDescending(t => t.TourId)
+                .Take(4)
+                .Select(tour => new
+                {
+                    Tour = tour,
+                    Rating = _context.Reviews
+                        .Where(r => r.TourId == tour.TourId)
+                        .Average(r => r.Rating)
+                })
+                .ToListAsync();
+
+            return Ok(tours);
         }
     }
 }

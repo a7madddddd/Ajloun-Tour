@@ -377,59 +377,56 @@ namespace Ajloun_Tour.Models
             modelBuilder.Entity<Tour>(entity =>
             {
                 entity.Property(e => e.TourId).HasColumnName("TourID");
+
                 entity.Property(e => e.Duration).HasMaxLength(50);
+
                 entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.Location).HasColumnName("location");
+
                 entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+
                 entity.Property(e => e.TourName).HasMaxLength(100);
 
-                entity.HasMany(d => d.Offers)
-                    .WithMany(p => p.Tours)
-                    .UsingEntity<TourOffer>(
-                        j =>
-                        {
-                            j.HasOne(to => to.Offer)
-                                .WithMany()
-                                .HasForeignKey(to => to.OfferId)
-                                .HasConstraintName("FK__TourOffer__offer__0F624AF8");
-
-                            j.HasOne(to => to.Tour)
-                                .WithMany()
-                                .HasForeignKey(to => to.TourId)
-                                .HasConstraintName("FK__TourOffer__tour___0E6E26BF");
-
-                            j.HasKey(to => new { to.TourId, to.OfferId })
-                                .HasName("PK__TourOffe__7B2B8E4A3F82AF83");
-
-                            j.ToTable("TourOffers");
-
-                            j.Property(to => to.TourId).HasColumnName("tour_id");
-                            j.Property(to => to.OfferId).HasColumnName("offer_id");
-                        });
-
-                entity.HasMany(d => d.Packages)
-                    .WithMany(p => p.Tours)
-                    .UsingEntity<TourPackage>(
-                        j =>
-                        {
-                            j.HasOne(tp => tp.Package)
-                                .WithMany()
-                                .HasForeignKey(tp => tp.PackageId)
-                                .HasConstraintName("FK__TourPacka__packa__0B91BA14");
-
-                            j.HasOne(tp => tp.Tour)
-                                .WithMany()
-                                .HasForeignKey(tp => tp.TourId)
-                                .HasConstraintName("FK__TourPacka__tour___0A9D95DB");
-
-                            j.HasKey(tp => new { tp.TourId, tp.PackageId })
-                                .HasName("PK__TourPack__DD2EFF48ADCDAF59");
-
-                            j.ToTable("TourPackages");
-
-                            j.Property(tp => tp.TourId).HasColumnName("tour_id");
-                            j.Property(tp => tp.PackageId).HasColumnName("package_id");
-                        });
             });
+            modelBuilder.Entity<TourOffer>(entity =>
+            {
+                entity.HasKey(e => new { e.TourId, e.OfferId });
+                entity.ToTable("TourOffers");
+
+                entity.HasOne(d => d.Tour)
+                    .WithMany()
+                    .HasForeignKey(d => d.TourId);
+
+                entity.HasOne(d => d.Offer)
+                    .WithMany()
+                    .HasForeignKey(d => d.OfferId);
+            });
+            modelBuilder.Entity<TourPackage>(entity =>
+            {
+                // Set the composite primary key
+                entity.HasKey(e => new { e.TourId, e.PackageId });
+
+                // Explicitly specify the table name
+                entity.ToTable("TourPackages");
+
+                // Configure the relationship with Tour
+                entity.HasOne(d => d.Tour)
+                    .WithMany(t => t.TourPackages) // ✅ Navigation property in Tour
+                    .HasForeignKey(d => d.TourId)
+                    .OnDelete(DeleteBehavior.Cascade); // Optional: specify delete behavior
+
+                // Configure the relationship with Package
+                entity.HasOne(d => d.Package)
+                    .WithMany(p => p.TourPackages) // ✅ Navigation property in Package
+                    .HasForeignKey(d => d.PackageId)
+                    .OnDelete(DeleteBehavior.Cascade); // Optional: specify delete behavior
+
+                // Explicitly specify column names
+                entity.Property(e => e.TourId).HasColumnName("tour_id");
+                entity.Property(e => e.PackageId).HasColumnName("package_id");
+            });
+
 
             modelBuilder.Entity<TourProgram>(entity =>
             {
@@ -464,45 +461,6 @@ namespace Ajloun_Tour.Models
                 entity.Property(e => e.FullName).HasMaxLength(100);
 
                 entity.Property(e => e.Phone).HasMaxLength(20);
-            });
-
-            modelBuilder.Entity<TourOffer>(entity =>
-            {
-                entity.HasKey(e => new { e.TourId, e.OfferId });
-                entity.ToTable("TourOffers");
-
-                entity.HasOne(d => d.Tour)
-                    .WithMany()
-                    .HasForeignKey(d => d.TourId);
-
-                entity.HasOne(d => d.Offer)
-                    .WithMany()
-                    .HasForeignKey(d => d.OfferId);
-            });
-
-            modelBuilder.Entity<TourPackage>(entity =>
-            {
-                // Set the composite primary key
-                entity.HasKey(e => new { e.TourId, e.PackageId });
-
-                // Explicitly specify the table name
-                entity.ToTable("TourPackages");
-
-                // Configure the relationship with Tour
-                entity.HasOne(d => d.Tour)
-                    .WithMany()
-                    .HasForeignKey(d => d.TourId)
-                    .OnDelete(DeleteBehavior.Cascade); // Optional: specify delete behavior
-
-                // Configure the relationship with Package
-                entity.HasOne(d => d.Package)
-                    .WithMany()
-                    .HasForeignKey(d => d.PackageId)
-                    .OnDelete(DeleteBehavior.Cascade); // Optional: specify delete behavior
-
-                // If you want to specify column names explicitly
-                entity.Property(e => e.TourId).HasColumnName("tour_id");
-                entity.Property(e => e.PackageId).HasColumnName("package_id");
             });
 
             OnModelCreatingPartial(modelBuilder);

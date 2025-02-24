@@ -66,6 +66,7 @@ namespace Ajloun_Tour.Implementations
                 IsActive = t.IsActive,
                 Price = t.Price,
                 TourImage = t.TourImage,
+                Location = t.Location,
 
             });
         }
@@ -90,6 +91,7 @@ namespace Ajloun_Tour.Implementations
                 IsActive = tour.IsActive,
                 Price = tour.Price,
                 TourImage = tour.TourImage,
+                Location= tour.Location,
 
             };
         }
@@ -113,6 +115,7 @@ namespace Ajloun_Tour.Implementations
                 Details = createTours.Details,
                 IsActive = createTours.IsActive,
                 Price = (decimal)createTours.Price,
+                Location = createTours.Location,
                 TourImage = fileName
             };
 
@@ -130,6 +133,7 @@ namespace Ajloun_Tour.Implementations
                 Details = tour.Details,
                 IsActive = tour.IsActive,
                 Price = tour.Price,
+                Location = tour.Location,
                 TourImage = fileName
 
             };
@@ -156,7 +160,8 @@ namespace Ajloun_Tour.Implementations
             tour.Description = createTours.Description ?? tour.Description;
             tour.Price = createTours.Price ?? tour.Price;
             tour.Duration = createTours.Duration ?? tour.Duration;
-            tour.Details = createTours.Details ?? createTours.Details;
+            tour.Details = createTours.Details ?? tour.Details;
+            tour.Location = createTours.Location ?? tour.Location;
 
             if (createTours.TourImage != null)
             {
@@ -180,6 +185,7 @@ namespace Ajloun_Tour.Implementations
                 Details = tour.Details,
                 Price = tour.Price,
                 IsActive = tour.IsActive,
+                Location = tour.Location,
                 TourImage = tour.TourImage,
 
             };
