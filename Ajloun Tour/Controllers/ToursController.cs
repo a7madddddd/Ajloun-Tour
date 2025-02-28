@@ -69,18 +69,26 @@ namespace Ajloun_Tour.Controllers
             return;
 
         }
-        [HttpGet("Last4")]
-        public async Task<IActionResult> GetLastFourToursWithRatings()
+
+
+        [HttpGet("LastFourToursWithRatings")]
+        public async Task<ActionResult<IEnumerable<TourWithRatingDTO>>> GetLastFourToursWithRatings()
         {
             var tours = await _context.Tours
                 .OrderByDescending(t => t.TourId)
                 .Take(4)
-                .Select(tour => new
+                .Select(t => new TourWithRatingDTO
                 {
-                    Tour = tour,
-                    Rating = _context.Reviews
-                        .Where(r => r.TourId == tour.TourId)
-                        .Average(r => r.Rating)
+                    TourId = t.TourId,
+                    TourName = t.TourName,
+                    Description = t.Description,
+                    Price = t.Price,
+                    Duration = t.Duration,
+                    IsActive = (bool)t.IsActive,
+                    TourImage = t.TourImage,
+                    AverageRating = t.Reviews.Any()
+                        ? t.Reviews.Average(r => r.Rating)
+                        : null
                 })
                 .ToListAsync();
 

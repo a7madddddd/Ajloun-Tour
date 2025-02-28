@@ -134,7 +134,5 @@ namespace Ajloun_Tour.Implementations
             await _context.SaveChangesAsync();
         }
 
-
-
     }
 }

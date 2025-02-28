@@ -14,9 +14,9 @@ namespace Ajloun_Tour.Models
         public string Name { get; set; } = null!;
         public string? Details { get; set; }
         public decimal? Price { get; set; }
+        public int? TourDays { get; set; }
+        public int? TourNights { get; set; }
 
         public virtual ICollection<Tour> Tours { get; set; }
-        public virtual ICollection<TourPackage> TourPackages { get; set; } = new List<TourPackage>(); // ✅ Add this
-
     }
 }

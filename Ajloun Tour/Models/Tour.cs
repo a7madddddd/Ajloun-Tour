@@ -32,10 +32,5 @@ namespace Ajloun_Tour.Models
 
         public virtual ICollection<Offer> Offers { get; set; }
         public virtual ICollection<Package> Packages { get; set; }
-
-        public virtual ICollection<TourOffer> TourOffers { get; set; } = new List<TourOffer>(); // ✅ Add this
-        public virtual ICollection<TourPackage> TourPackages { get; set; } = new List<TourPackage>(); // ✅ Add this
-
-
     }
 }

@@ -46,11 +46,11 @@ namespace Ajloun_Tour.Controllers
         //}
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateTourPackage(TourPackage tourPackage)
+        public async Task<ActionResult<bool>> CreateTourPackage(CreateToursPackages createToursPackages)
         {
             try
             {
-                var result = await _toursPackagesRepository.AddTourPackage(tourPackage);
+                var result = await _toursPackagesRepository.AddTourPackage(createToursPackages);
                 return Ok(result);
             }
             catch (InvalidOperationException ex)
