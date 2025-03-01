@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-
+// packages
 document.addEventListener("DOMContentLoaded", async function () {
     const toursApi = "https://localhost:44357/api/Tours";
     const toursPackagesApi = "https://localhost:44357/api/ToursPackages";
@@ -301,7 +301,7 @@ function generateStars(rating) {
         if (i <= rating) {
             starsHtml += '<i class="fas fa-star" style="color: #F56960;"></i>'; 
         } else {
-            starsHtml += '<i class="far fa-star"></i>'; // Empty star
+            starsHtml += '<i class="far fa-star" style="color: #F56960;"></i>'; // Empty star
         }
     }
 
@@ -310,7 +310,7 @@ function generateStars(rating) {
 
 
 
-
+// offers
 document.addEventListener('DOMContentLoaded', async function () {
     try {
         // Fetch offers data

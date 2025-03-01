@@ -289,6 +289,8 @@ namespace Ajloun_Tour.Models
                     .HasColumnType("text")
                     .HasColumnName("details");
 
+                entity.Property(e => e.IsActive).HasColumnName("isActive");
+
                 entity.Property(e => e.Name)
                     .HasMaxLength(255)
                     .IsUnicode(false)
@@ -449,6 +451,7 @@ namespace Ajloun_Tour.Models
                 });
 
             });
+
 
             modelBuilder.Entity<TourProgram>(entity =>
             {
