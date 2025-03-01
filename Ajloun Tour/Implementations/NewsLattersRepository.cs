@@ -23,6 +23,7 @@ namespace Ajloun_Tour.Implementations
                 SubscriberId = n.SubscriberId,
                 Email = n.Email,
                 SubscribedAt = n.SubscribedAt,
+                IsActive = n.IsActive,
             });
         }
 
@@ -42,6 +43,7 @@ namespace Ajloun_Tour.Implementations
                 SubscriberId = news.SubscriberId,
                 Email = news.Email,
                 SubscribedAt = news.SubscribedAt,
+                IsActive=news.IsActive,
             };
         }
 
@@ -52,7 +54,7 @@ namespace Ajloun_Tour.Implementations
             var news = new NewsletterSubscriber
             {
                 Email = createNews.Email,
-                SubscribedAt = createNews.SubscribedAt,
+                SubscribedAt = createNews.SubscribedAt = DateTime.Now,
             };
 
             _context.NewsletterSubscribers.Add(news);
@@ -62,6 +64,7 @@ namespace Ajloun_Tour.Implementations
             {
                 Email = news.Email,
                 SubscribedAt = news.SubscribedAt,
+                IsActive = news.IsActive,
 
             };
         }
@@ -76,7 +79,9 @@ namespace Ajloun_Tour.Implementations
             }
 
             updatedNews.Email = createNews.Email ?? updatedNews.Email;
-            updatedNews.SubscribedAt = createNews?.SubscribedAt ?? updatedNews.SubscribedAt;
+            updatedNews.SubscribedAt = createNews?.SubscribedAt ?? DateTime.Now;
+            updatedNews.IsActive = createNews?.IsActive ?? updatedNews.IsActive;
+
 
 
             _context.NewsletterSubscribers.Update(updatedNews);
@@ -86,7 +91,8 @@ namespace Ajloun_Tour.Implementations
             
                 Email = updatedNews.Email,
                 SubscribedAt = updatedNews.SubscribedAt,
-                SubscriberId = updatedNews.SubscriberId
+                SubscriberId = updatedNews.SubscriberId,
+                IsActive = updatedNews.IsActive,
             };
         }
 

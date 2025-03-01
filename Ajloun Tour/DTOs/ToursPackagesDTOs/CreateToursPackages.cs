@@ -6,7 +6,7 @@ namespace Ajloun_Tour.DTOs.ToursPackagesDTOs
     {
         public int TourId { get; set; }
         public int PackageId { get; set; }
-        public CreatePackages createPackages { get; set; }
-       
+        public bool? IsActive { get; set; }
+
     }
 }

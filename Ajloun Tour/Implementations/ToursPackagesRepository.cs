@@ -20,26 +20,23 @@ namespace Ajloun_Tour.Implementations
         public async Task<IEnumerable<ToursPackagesDTO>> GetAllToursPackages()
         {
             return await _context.TourPackages
-                 .Include(to => to.Tour)
-                 .Include(to => to.Package)
-                 .Select(to => new ToursPackagesDTO
-                 {
-                     TourId = to.TourId,
-                     PackageId = to.PackageId,
-                     // تعبئة البيانات الخاصة بـ PackagesDTO من البيانات الموجودة في Package
-                     packagesDTO = new PackagesDTO
-                     {
-                         // ضع هنا الحقول التي تحتاجها من Package
-                         Id = to.Package.Id,
-                         Name = to.Package.Name,
-                         Details = to.Package.Details,
-                         Price = to.Package.Price
-                     }
-                 })
-                 .AsNoTracking() // لمنع تتبع البيانات وتحميل العلاقات غير الضرورية
-                 .ToListAsync();
-
+                .Include(tp => tp.Package)
+                .Select(tp => new ToursPackagesDTO
+                {
+                    TourId = tp.TourId,
+                    PackageId = tp.PackageId,
+                    IsActive = tp.IsActive,
+                    PackageName = tp.Package.Name,
+                    Details = tp.Package.Details,
+                    Price = tp.Package.Price,
+                    TourDays = tp.Package.TourDays,
+                    TourNights = tp.Package.TourNights,
+                    NumberOfPeople = tp.Package.NumberOfPeople
+                })
+                .AsNoTracking()
+                .ToListAsync();
         }
+
 
         public async Task<ToursPackagesDTO> GetTourPackageById(int TourId, int PackageId)
         {
@@ -49,14 +46,8 @@ namespace Ajloun_Tour.Implementations
                 {
                     TourId = to.TourId,
                     PackageId = to.PackageId,
-                    packagesDTO = new PackagesDTO
-                    {
-                        // ضع هنا الحقول التي تحتاجها من Package
-                        Id = to.Package.Id,
-                        Name = to.Package.Name,
-                        Details = to.Package.Details,
-                        Price = to.Package.Price
-                    }
+                    IsActive = to.IsActive,
+
 
                 })
                 .AsNoTracking()
@@ -85,42 +76,57 @@ namespace Ajloun_Tour.Implementations
         //        .ToListAsync();
         //}
 
-        public async Task<bool> AddTourPackage(CreateToursPackages createToursPackages)
+        public async Task<ToursPackagesDTO> AddTourPackage(CreateToursPackages createToursPackages)
         {
             try
             {
-                Console.WriteLine($" Received: TourId={createToursPackages.TourId}, PackageId={createToursPackages.PackageId}");
+                Console.WriteLine($"Received: TourId={createToursPackages.TourId}, PackageId={createToursPackages.PackageId}");
 
                 var tourExists = await _context.Tours.AnyAsync(t => t.TourId == createToursPackages.TourId);
-                var packageExists = await _context.Packages.AnyAsync(p => p.Id == createToursPackages.PackageId);
 
-                if (!tourExists || !packageExists)
+                var package = await _context.Packages.FirstOrDefaultAsync(p => p.Id == createToursPackages.PackageId);
+
+                if (!tourExists)
                 {
-                    Console.WriteLine(" Error: Tour or Package does not exist.");
-                    return false;
+                    Console.WriteLine("❌ Error: Tour does not exist.");
+                    return null;
                 }
 
+               
                 var tourPackage = new TourPackage
                 {
                     TourId = createToursPackages.TourId,
-                    PackageId = createToursPackages.PackageId,
-
+                    PackageId = package.Id,
+                    IsActive = createToursPackages.IsActive = false,
                 };
 
                 await _context.TourPackages.AddAsync(tourPackage);
-                Console.WriteLine($" Added TourPackage: TourId={tourPackage.TourId}, PackageId={tourPackage.PackageId}");
+                Console.WriteLine($"✅ Added TourPackage: TourId={tourPackage.TourId}, PackageId={tourPackage.PackageId}");
 
                 var changes = await _context.SaveChangesAsync();
-                Console.WriteLine($" Database changes: {changes}");
+                Console.WriteLine($"🔄 Database changes: {changes}");
 
-                return changes > 0;
+                if (changes > 0)
+                {
+                    return new ToursPackagesDTO
+                    {
+                        TourId = tourPackage.TourId,
+                        PackageId = tourPackage.PackageId,
+                        IsActive= tourPackage.IsActive,
+
+                    };
+                }
+
+                return null; 
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"❗ Error in AddTourPackage: {ex.Message}");
-                return false;
+                return null; 
             }
         }
+
+
 
         public async Task<ToursPackagesDTO> UpdateTourPackages(int TourId, CreateToursPackages createToursPackages)
         {
@@ -129,13 +135,13 @@ namespace Ajloun_Tour.Implementations
 
             if (existingTourPackages == null)
             {
-                throw new KeyNotFoundException($"No tour Packages found with tour ID: {TourId}");
+                throw new KeyNotFoundException($"No tour package found with Tour ID: {TourId}");
             }
 
-            var packagesExists = await _context.Packages
+            var packageExists = await _context.Packages
                 .AnyAsync(o => o.Id == createToursPackages.PackageId);
 
-            if (!packagesExists)
+            if (!packageExists)
             {
                 throw new InvalidOperationException($"Package with ID {createToursPackages.PackageId} does not exist");
             }
@@ -151,19 +157,26 @@ namespace Ajloun_Tour.Implementations
                 throw new InvalidOperationException("This Tour-Package relationship already exists");
             }
 
+            // Update package and tour IDs
             existingTourPackages.PackageId = createToursPackages.PackageId;
 
             if (createToursPackages.TourId != TourId)
             {
-                var newPackageExists = await _context.Tours
+                var newTourExists = await _context.Tours
                     .AnyAsync(t => t.TourId == createToursPackages.TourId);
 
-                if (!newPackageExists)
+                if (!newTourExists)
                 {
-                    throw new InvalidOperationException($"Package with ID {createToursPackages.TourId} does not exist");
+                    throw new InvalidOperationException($"Tour with ID {createToursPackages.TourId} does not exist");
                 }
 
                 existingTourPackages.TourId = createToursPackages.TourId;
+            }
+
+            // Update IsActive status
+            if (createToursPackages.IsActive.HasValue) // Ensure IsActive is provided in the request
+            {
+                existingTourPackages.IsActive = createToursPackages.IsActive.Value;
             }
 
             await _context.SaveChangesAsync();
@@ -172,6 +185,7 @@ namespace Ajloun_Tour.Implementations
             {
                 TourId = existingTourPackages.TourId,
                 PackageId = existingTourPackages.PackageId,
+                IsActive = existingTourPackages.IsActive
             };
         }
 

@@ -10,9 +10,9 @@ namespace Ajloun_Tour.Models
             Bookings = new HashSet<Booking>();
             CartItems = new HashSet<CartItem>();
             Reviews = new HashSet<Review>();
+            TourPackages = new HashSet<TourPackage>();
             TourPrograms = new HashSet<TourProgram>();
             Offers = new HashSet<Offer>();
-            Packages = new HashSet<Package>();
         }
 
         public int TourId { get; set; }
@@ -28,9 +28,9 @@ namespace Ajloun_Tour.Models
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<CartItem> CartItems { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
+        public virtual ICollection<TourPackage> TourPackages { get; set; }
         public virtual ICollection<TourProgram> TourPrograms { get; set; }
 
         public virtual ICollection<Offer> Offers { get; set; }
-        public virtual ICollection<Package> Packages { get; set; }
     }
 }

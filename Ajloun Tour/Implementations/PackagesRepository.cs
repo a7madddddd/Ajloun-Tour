@@ -26,6 +26,9 @@ namespace Ajloun_Tour.Implementations
                 Name = c.Name,
                 Details = c.Details,
                 Price = c.Price,
+                NumberOfPeople = c.NumberOfPeople,
+                TourDays = c.TourDays,
+                TourNights = c.TourNights,
 
             });
         }
@@ -46,32 +49,41 @@ namespace Ajloun_Tour.Implementations
                 Name = Package.Name,
                 Details = Package.Details,
                 Price = Package.Price,
+                NumberOfPeople = Package.NumberOfPeople,
+                TourDays = Package.TourDays,
+                TourNights = Package.TourNights,
 
             };
         }
         public async Task<PackagesDTO> AddPackagesAsync(CreatePackages createPackages)
         {
+            Console.WriteLine($"Name: {createPackages.Name}, TourDays: {createPackages.TourDays}, TourNights: {createPackages.TourNights}");
+
             var Package = new Package
             {
-
                 Name = createPackages.Name,
                 Details = createPackages.Details,
                 Price = createPackages.Price,
-
+                NumberOfPeople = createPackages.NumberOfPeople,
+                TourNights = createPackages.TourNights,
+                TourDays = createPackages.TourDays,
             };
 
             await _context.Packages.AddAsync(Package);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync(); // Ensure async save
 
             return new PackagesDTO
             {
                 Id = Package.Id,
-                Name = createPackages.Name,
-                Details = createPackages.Details,
-                Price = createPackages.Price,
-
+                Name = Package.Name,
+                Details = Package.Details,
+                Price = Package.Price,
+                TourDays = Package.TourDays,
+                NumberOfPeople = Package.NumberOfPeople,
+                TourNights = Package.TourNights,
             };
         }
+
 
         public async Task<PackagesDTO> UpdatePackagesAsync(int id, CreatePackages createPackages)
         {
@@ -86,7 +98,10 @@ namespace Ajloun_Tour.Implementations
             updatePackage.Name = createPackages.Name ?? updatePackage.Name;
             updatePackage.Details = createPackages.Details ?? updatePackage.Details;
             updatePackage.Price = createPackages.Price ?? updatePackage.Price;
-           
+            updatePackage.NumberOfPeople = createPackages.NumberOfPeople ?? updatePackage.NumberOfPeople;
+            updatePackage.TourDays = createPackages.TourDays ?? updatePackage.TourDays;
+            updatePackage.TourNights = createPackages?.TourNights ?? updatePackage.TourNights;
+
 
 
             _context.Packages.Update(updatePackage);
@@ -100,7 +115,10 @@ namespace Ajloun_Tour.Implementations
                 Name = updatePackage.Name,
                 Price = updatePackage.Price,
                 Details = updatePackage.Details,
-              
+                TourNights = updatePackage.TourNights,
+                TourDays = updatePackage.TourDays,
+                NumberOfPeople = updatePackage.NumberOfPeople,
+
             };
         }
         public async Task DeletePackagesById(int id)

@@ -24,6 +24,8 @@ namespace Ajloun_Tour.Implementations
                 Id = r.Id,
                 TourId = r.TourId,
                 UserId = r.UserId,
+                OfferId = r.OfferId,
+                PackageId = r.PackageId,
                 Rating = r.Rating,
                 Comment = r.Comment,
                 Subject = r.Subject,
@@ -46,6 +48,8 @@ namespace Ajloun_Tour.Implementations
                 Id = review.Id,
                 TourId = review.TourId,
                 UserId = review.UserId,
+                PackageId = review.PackageId,
+                OfferId = review.OfferId,
                 Rating = review.Rating,
                 Comment = review.Comment,
                 Subject = review.Subject,
@@ -61,6 +65,8 @@ namespace Ajloun_Tour.Implementations
 
                 TourId = createReview.TourId,
                 UserId = createReview.UserId,
+                PackageId = createReview.PackageId,
+                OfferId = createReview.OfferId,
                 Rating = createReview.Rating,
                 Comment = createReview.Comment,
                 Subject = createReview.Subject,
@@ -77,6 +83,8 @@ namespace Ajloun_Tour.Implementations
                 Id = review.Id,
                 TourId = review.TourId,
                 UserId = review.UserId,
+                OfferId = review.OfferId,
+                PackageId = review.PackageId,
                 Rating = review.Rating,
                 Comment = review.Comment,
                 Subject = review.Subject,
@@ -89,7 +97,8 @@ namespace Ajloun_Tour.Implementations
         {
             var deletedreview = await _context.Reviews.FindAsync(id);
 
-            if (deletedreview == null) {
+            if (deletedreview == null)
+            {
 
                 throw new Exception("This Review Is Not Defined");
             };

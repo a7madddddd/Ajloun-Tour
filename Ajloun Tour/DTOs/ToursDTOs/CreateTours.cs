@@ -5,7 +5,7 @@ namespace Ajloun_Tour.DTOs.ToursDTOs
     public class CreateTours
     {
         [FromForm]
-        public string TourName { get; set; } = null!;
+        public string? TourName { get; set; } = null!;
         [FromForm]
         public string? Description { get; set; }
         [FromForm]

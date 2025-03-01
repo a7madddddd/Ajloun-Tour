@@ -1,4 +1,5 @@
 ﻿using Ajloun_Tour.DTOs.ToursOffersDTOs;
+using Ajloun_Tour.DTOs2.TourCartDTOs;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
 using Microsoft.EntityFrameworkCore;
@@ -69,19 +70,47 @@ namespace Ajloun_Tour.Implementations
                 .ToListAsync();
         }
 
-        public async Task<bool> AddTourOffer(TourOffer tourOffer)
+        public async Task<ToursOffersDTO> AddTourOffer(CreateToursOffer createToursOffer)
         {
-            try
+            // Check if the Tour and Offer exist
+            var tour = await _context.Tours.FirstOrDefaultAsync(t => t.TourId == createToursOffer.TourId);
+            if (tour == null)
             {
-                await _context.TourOffers.AddAsync(tourOffer);
-                await _context.SaveChangesAsync();
-                return true;
+                throw new InvalidOperationException($"Tour with ID {createToursOffer.TourId} does not exist.");
             }
-            catch
+
+            var offer = await _context.Offers.FirstOrDefaultAsync(o => o.Id == createToursOffer.OfferId);
+            if (offer == null)
             {
-                return false;
+                throw new InvalidOperationException($"Offer with ID {createToursOffer.OfferId} does not exist.");
             }
+
+            // Create the new TourOffer object
+            var tourOffer = new TourOffer
+            {
+                TourId = createToursOffer.TourId,
+                OfferId = createToursOffer.OfferId,
+                Tour = tour,        // Link the Tour object
+                Offer = offer,      // Link the Offer object
+            };
+
+            // Add the TourOffer to the context
+            _context.TourOffers.Add(tourOffer);
+            await _context.SaveChangesAsync();
+
+            // Returning the created TourOffer as ToursOffersDTO
+            return new ToursOffersDTO
+            {
+                TourId = tourOffer.TourId,
+                OfferId = tourOffer.OfferId,
+                TourName = tourOffer.Tour?.TourName, // Assuming TourName is a property of Tour
+                OfferTitle = offer?.Title,           // Assuming Title is a property of Offer
+                DiscountPercentage = createToursOffer.DiscountPercentage,
+                StartDate = createToursOffer.StartDate,
+                EndDate = createToursOffer.EndDate
+            };
         }
+
 
         public async Task<ToursOffersDTO> UpdateTourOffer(int tourId, CreateToursOffer createToursOffer)
         {

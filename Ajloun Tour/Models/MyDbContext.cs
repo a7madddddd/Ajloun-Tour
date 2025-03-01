@@ -246,6 +246,8 @@ namespace Ajloun_Tour.Models
 
                 entity.Property(e => e.Email).HasMaxLength(100);
 
+                entity.Property(e => e.IsActive).HasColumnName("isActive");
+
                 entity.Property(e => e.SubscribedAt)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -264,6 +266,8 @@ namespace Ajloun_Tour.Models
                 entity.Property(e => e.EndDate)
                     .HasColumnType("date")
                     .HasColumnName("end_date");
+
+                entity.Property(e => e.IsActive).HasColumnName("isActive");
 
                 entity.Property(e => e.StartDate)
                     .HasColumnType("date")
@@ -289,6 +293,8 @@ namespace Ajloun_Tour.Models
                     .HasMaxLength(255)
                     .IsUnicode(false)
                     .HasColumnName("name");
+
+                entity.Property(e => e.NumberOfPeople).HasColumnName("numberOfPeople");
 
                 entity.Property(e => e.Price)
                     .HasColumnType("decimal(10, 2)")
@@ -332,6 +338,10 @@ namespace Ajloun_Tour.Models
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.OfferId).HasColumnName("OfferID");
+
+                entity.Property(e => e.PackageId).HasColumnName("PackageID");
+
                 entity.Property(e => e.Rating).HasColumnName("rating");
 
                 entity.Property(e => e.Subject)
@@ -341,6 +351,16 @@ namespace Ajloun_Tour.Models
                 entity.Property(e => e.TourId).HasColumnName("TourID");
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
+
+                entity.HasOne(d => d.Offer)
+                    .WithMany(p => p.Reviews)
+                    .HasForeignKey(d => d.OfferId)
+                    .HasConstraintName("FK_Reviews_Offers");
+
+                entity.HasOne(d => d.Package)
+                    .WithMany(p => p.Reviews)
+                    .HasForeignKey(d => d.PackageId)
+                    .HasConstraintName("FK_Reviews_Packages");
 
                 entity.HasOne(d => d.Tour)
                     .WithMany(p => p.Reviews)
@@ -406,29 +426,28 @@ namespace Ajloun_Tour.Models
                             j.Property(to => to.OfferId).HasColumnName("offer_id");
                         });
 
-                entity.HasMany(d => d.Packages)
-                    .WithMany(p => p.Tours)
-                    .UsingEntity<TourPackage>(
-                        j =>
-                        {
-                            j.HasOne(tp => tp.Package)
-                                .WithMany()
-                                .HasForeignKey(tp => tp.PackageId)
-                                .HasConstraintName("FK__TourPacka__packa__0B91BA14");
+                modelBuilder.Entity<TourPackage>(entity =>
+                {
+                    entity.HasKey(e => new { e.TourId, e.PackageId })
+                        .HasName("PK__TourPack__DD2EFF48ADCDAF59");
 
-                            j.HasOne(tp => tp.Tour)
-                                .WithMany()
-                                .HasForeignKey(tp => tp.TourId)
-                                .HasConstraintName("FK__TourPacka__tour___0A9D95DB");
+                    entity.Property(e => e.TourId).HasColumnName("tour_id");
 
-                            j.HasKey(tp => new { tp.TourId, tp.PackageId })
-                                .HasName("PK__TourPack__DD2EFF48ADCDAF59");
+                    entity.Property(e => e.PackageId).HasColumnName("package_id");
 
-                            j.ToTable("TourPackages");
+                    entity.Property(e => e.IsActive).HasColumnName("isActive");
 
-                            j.Property(tp => tp.TourId).HasColumnName("tour_id");
-                            j.Property(tp => tp.PackageId).HasColumnName("package_id");
-                        });
+                    entity.HasOne(d => d.Package)
+                        .WithMany(p => p.TourPackages)
+                        .HasForeignKey(d => d.PackageId)
+                        .HasConstraintName("FK__TourPacka__packa__0B91BA14");
+
+                    entity.HasOne(d => d.Tour)
+                        .WithMany(p => p.TourPackages)
+                        .HasForeignKey(d => d.TourId)
+                        .HasConstraintName("FK__TourPacka__tour___0A9D95DB");
+                });
+
             });
 
             modelBuilder.Entity<TourProgram>(entity =>

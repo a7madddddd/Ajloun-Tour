@@ -3,6 +3,7 @@ using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Core.Types;
 
 namespace Ajloun_Tour.Controllers
@@ -45,22 +46,28 @@ namespace Ajloun_Tour.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateTourOffers(TourOffer tourOffer)
+        public async Task<ActionResult<ToursOffersDTO>> CreateTourOffers(CreateToursOffer createToursOffer)
         {
             try
             {
-                var result = await _toursOffersRepository.AddTourOffer(tourOffer);
+                var result = await _toursOffersRepository.AddTourOffer(createToursOffer);
                 return Ok(result);
+            }
+            catch (DbUpdateException dbEx)
+            {
+                return StatusCode(500, "An error occurred while saving the entity changes.");
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(false);
+                return BadRequest(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode(500, false);
             }
         }
+
+
 
 
         [HttpPut("{tourId}")]

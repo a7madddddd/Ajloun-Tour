@@ -7,6 +7,7 @@ namespace Ajloun_Tour.Models
     {
         public Offer()
         {
+            Reviews = new HashSet<Review>();
             Tours = new HashSet<Tour>();
         }
 
@@ -15,6 +16,9 @@ namespace Ajloun_Tour.Models
         public decimal? DiscountPercentage { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public bool? IsActive { get; set; }
+
+        public virtual ICollection<Review> Reviews { get; set; }
 
         public virtual ICollection<Tour> Tours { get; set; }
     }

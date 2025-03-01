@@ -51,16 +51,16 @@ namespace Ajloun_Tour.Controllers
             return Ok(newTour);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPut("Id")]
-        public async Task<ActionResult<ToursDTO>> UpdateToursAsync(int id, [FromBody] CreateTours createTours)
+        public async Task<ActionResult<ToursDTO>> UpdateToursAsync(int id, [FromForm] CreateTours createTours)
         {
-
             var updatedTour = await _toursRepository.UpdateToursAsync(id, createTours);
             return Ok(updatedTour);
         }
 
-        [Authorize]
+
+        //[Authorize]
         [HttpDelete("Id")]
         public async void DeleteTourById(int id)
         {

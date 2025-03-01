@@ -12,7 +12,7 @@ namespace Ajloun_Tour.Reposetories
 
         Task<ToursPackagesDTO> GetTourPackageById(int TourId, int PackageId);
 
-        Task<bool> AddTourPackage(CreateToursPackages createToursPackages);
+        Task<ToursPackagesDTO> AddTourPackage(CreateToursPackages createToursPackages);
 
         Task<ToursPackagesDTO> UpdateTourPackages(int TourId, CreateToursPackages createToursPackages);
 

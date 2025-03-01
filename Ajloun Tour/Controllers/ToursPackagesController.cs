@@ -46,7 +46,7 @@ namespace Ajloun_Tour.Controllers
         //}
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateTourPackage(CreateToursPackages createToursPackages)
+        public async Task<ActionResult<ToursPackagesDTO>> CreateTourPackage([FromForm]CreateToursPackages createToursPackages)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace Ajloun_Tour.Controllers
 
 
         [HttpPut("{TourId}")]
-        public async Task<ActionResult<ToursPackagesDTO>> UpdatePackage(int TourId, CreateToursPackages createToursPackages)
+        public async Task<ActionResult<ToursPackagesDTO>> UpdatePackage(int TourId,[FromBody] CreateToursPackages createToursPackages)
         {
             try
             {

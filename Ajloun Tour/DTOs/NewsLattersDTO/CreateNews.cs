@@ -5,5 +5,7 @@ namespace Ajloun_Tour.DTOs.NewsLattersDTO
     {
         public string Email { get; set; } = null!;
         public DateTime? SubscribedAt { get; set; }
+        public bool? IsActive { get; set; } = false;
+
     }
 }

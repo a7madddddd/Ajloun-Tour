@@ -180,3 +180,280 @@ document.addEventListener('DOMContentLoaded', function () {
     // Ensure we wait for everything to load
     setTimeout(fetchToursAndReviews, 500);
 });
+
+
+
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", async function () {
+    const toursApi = "https://localhost:44357/api/Tours";
+    const toursPackagesApi = "https://localhost:44357/api/ToursPackages";
+    const reviewsApi = "https://localhost:44357/api/Reviews";
+
+    try {
+        // Fetch all APIs in parallel
+        const [toursResponse, toursPackagesResponse, reviewsResponse] = await Promise.all([
+            fetch(toursApi),
+            fetch(toursPackagesApi),
+            fetch(reviewsApi)
+        ]);
+
+        // Convert responses to JSON
+        const toursData = await toursResponse.json();
+        const toursPackagesData = await toursPackagesResponse.json();
+        const reviewsData = await reviewsResponse.json();
+
+        // Extract relevant values
+        const tours = toursData.$values;
+        const toursPackages = toursPackagesData.$values.filter(pkg => pkg.isActive); // Filter active packages
+        const reviews = reviewsData.$values;
+
+        // Merge data based on tourId
+        const combinedData = toursPackages.map(package => {
+            const tour = tours.find(t => t.tourId === package.tourId);
+            const review = reviews.find(r => r.tourId === package.tourId);
+
+            return {
+                tourId: package.tourId,
+                packageId: package.packageId,
+                packageName: package.packageName,
+                details: package.details,
+                price: package.price,
+                tourDays: package.tourDays,
+                tourNights: package.tourNights,
+                numberOfPeople: package.numberOfPeople,
+                tourImage: tour ? tour.tourImage : "default.jpg",
+                location: tour ? tour.location || " Location" : " Location",
+                rating: review ? review.rating : 0 // Default rating 0 if no review exists
+            };
+        });
+
+        // Get the last 3 active packages
+        const lastThreePackages = combinedData.slice(-3);
+
+        // Render HTML
+        renderPackages(lastThreePackages);
+
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+});
+
+// Function to render data in HTML
+function renderPackages(data) {
+    const packageContainer = document.querySelector(".package-inner .row");
+    packageContainer.innerHTML = ""; // Clear existing content
+
+    data.forEach(item => {
+        // Create the stars for rating
+        const stars = generateStars(item.rating);
+
+        const packageHtml = `
+            <div class="col-lg-4 col-md-6">
+                <div class="package-wrap">
+                    <figure class="feature-image">
+                        <a href="#">
+                            <img src="https://localhost:44357/ToursImages/${item.tourImage}" alt="${item.packageName}">
+                        </a>
+                    </figure>
+                    <div class="package-price">
+                        <h6><span>$${item.price}</span> / per person</h6>
+                    </div>
+                    <div class="package-content-wrap">
+                        <div class="package-meta text-center">
+                            <ul>
+                                <li><i class="far fa-clock"></i> ${item.tourDays}D/${item.tourNights}N</li>
+                                <li><i class="fas fa-user-friends"></i> People: ${item.numberOfPeople}</li>
+                                <li><i class="fas fa-map-marker-alt"></i> ${item.location}</li>
+                            </ul>
+                        </div>
+                        <div class="package-content">
+                            <h3><a href="#">${item.packageName}</a></h3>
+                            <div class="review-area">
+                                <span class="review-text">(${item.rating} reviews)</span>
+                                <div class="rating-start" title="Rated ${item.rating} out of 5">
+                                    ${stars}  <!-- Render stars dynamically -->
+                                </div>
+                            </div>
+                            <p>${item.details}</p>
+                            <div class="btn-wrap">
+                                <a href="#" class="button-text width-6">Book Now<i class="fas fa-arrow-right"></i></a>
+                                <a href="#" class="button-text width-6">Wish List<i class="far fa-heart"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        packageContainer.innerHTML += packageHtml;
+    });
+}
+
+// Function to generate stars based on rating
+function generateStars(rating) {
+    let starsHtml = '';
+
+    for (let i = 1; i <= 5; i++) {
+        if (i <= rating) {
+            starsHtml += '<i class="fas fa-star" style="color: #F56960;"></i>'; 
+        } else {
+            starsHtml += '<i class="far fa-star"></i>'; // Empty star
+        }
+    }
+
+    return starsHtml;
+}
+
+
+
+
+document.addEventListener('DOMContentLoaded', async function () {
+    try {
+        // Fetch offers data
+        const offersResponse = await fetch('https://localhost:44357/api/Offers');
+        if (!offersResponse.ok) {
+            throw new Error('Failed to fetch offers data');
+        }
+        const offersData = await offersResponse.json();
+
+        // Fetch tours data
+        const toursResponse = await fetch('https://localhost:44357/api/Tours');
+        if (!toursResponse.ok) {
+            throw new Error('Failed to fetch tours data');
+        }
+        const toursData = await toursResponse.json();
+
+        // Process the data
+        const offers = offersData.$values || [];
+        const tours = toursData.$values || [];
+
+        // Filter active offers
+        const activeOffers = offers.filter(offer => offer.isActive === true);
+
+        // Get the last 3 active offers
+        const lastThreeActiveOffers = activeOffers.slice(-3);
+
+        // Create a map of tour id to tour data for easier lookup
+        const tourMap = {};
+        tours.forEach(tour => {
+            tourMap[tour.tourId] = tour;
+        });
+
+        // Generate HTML for each offer
+        const offerContainer = document.getElementById('offerContainer');
+
+        lastThreeActiveOffers.forEach(offer => {
+            // Find associated tour (for this example, assuming tour ID matches offer ID)
+            // In a real application, you might have a tourId in the offer object
+            const tour = tourMap[offer.id];
+
+            if (tour) {
+                // Calculate original and discounted prices
+                const originalPrice = tour.price;
+                const discountedPrice = originalPrice * (1 - (offer.discountPercentage / 100));
+
+                // Create offer HTML
+                const offerHTML = `
+                            <div class="col-md-6 col-lg-4">
+                                <div class="special-item">
+                                    <figure class="special-img">
+                                    <img src="https://localhost:44357/ToursImages/${tour.tourImage}" alt="${tour.packageName}" style="height: 60vh;">
+                                    </figure>
+                                    <div class="badge-dis">
+                                        <span>
+                                            <strong>${offer.discountPercentage}%</strong>
+                                            off
+                                        </span>
+                                    </div>
+                                    <div class="special-content">
+                                        <div class="meta-cat">
+                                            <a href="#">${tour.tourName || 'Ajloun'}</a>
+                                        </div>
+                                        <h3>
+                                            <a href="#">${offer.title}</a>
+                                        </h3>
+                                        <div class="package-price">
+                                            Price:
+                                            <del>$${originalPrice.toFixed(2)}</del>
+                                            <ins>$${discountedPrice.toFixed(2)}</ins>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                offerContainer.innerHTML += offerHTML;
+            }
+        });
+
+        // If no active offers were found
+        if (lastThreeActiveOffers.length === 0) {
+            offerContainer.innerHTML = '<div class="col-12 text-center"><p>No active offers available at the moment.</p></div>';
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('offerContainer').innerHTML = `
+                    <div class="col-12 text-center">
+                        <p>Failed to load offers. Please try again later.</p>
+                    </div>
+                `;
+    }
+});
+
+
+
+
+
+// Add an event listener to the form submission
+// Add an event listener to the form submission
+document.getElementById('subscribe-form').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    // Get the email value
+    const email = document.getElementById('email').value;
+
+    // Prepare the data to send
+    const formData = new FormData();
+    formData.append('Email', email);
+    formData.append('SubscribedAt', new Date().toISOString()); // Automatically set to the current date and time
+    formData.append('IsActive', 'true'); // Assuming you want to set IsActive to true
+
+    // Send the POST request using Fetch API
+    fetch('https://localhost:44357/api/NewsLatters', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+        },
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Handle success using SweetAlert
+            Swal.fire({
+                title: 'Success!',
+                text: 'You have successfully subscribed!',
+                icon: 'success',
+                confirmButtonText: 'Great!'
+            }).then(() => {
+                // Clear the form fields after success
+                document.getElementById('subscribe-form').reset();
+            });
+
+            console.log(data); // Log the response from the server
+        })
+        .catch(error => {
+            // Handle error using SweetAlert
+            Swal.fire({
+                title: 'Oops!',
+                text: 'Something went wrong. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'Try Again'
+            });
+            console.error(error);
+        });
+});

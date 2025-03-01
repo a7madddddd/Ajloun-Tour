@@ -7,8 +7,8 @@ namespace Ajloun_Tour.Models
     {
         public Tours()
         {
-            TourOffers = new HashSet<TourOffers>();
-            TourPackages = new HashSet<TourPackages>();
+            TourOffers = new HashSet<TourOffer>();
+            TourPackages = new HashSet<TourPackage>();
         }
 
         public int TourId { get; set; }
@@ -16,12 +16,12 @@ namespace Ajloun_Tour.Models
         public string? Description { get; set; }
         public decimal Price { get; set; }
         public string? Duration { get; set; }
-        public bool? IsActive { get; set; }
+        public bool? IsActive { get; set; } = false;
         public string? TourImage { get; set; }
         public string? Details { get; set; }
         public string? Location { get; set; }
 
-        public virtual ICollection<TourOffers> TourOffers { get; set; }
-        public virtual ICollection<TourPackages> TourPackages { get; set; }
+        public virtual ICollection<TourOffer> TourOffers { get; set; }
+        public virtual ICollection<TourPackage> TourPackages { get; set; }
     }
 }

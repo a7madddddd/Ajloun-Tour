@@ -148,31 +148,61 @@ namespace Ajloun_Tour.Implementations
             var tour = await _context.Tours.FindAsync(id);
             if (tour == null)
             {
-                throw new KeyNotFoundException($"User with ID {id} not found.");
+                throw new KeyNotFoundException($"Tour with ID {id} not found.");
             }
 
-            if (createTours.TourImage != null)
+            // Update fields if a value is provided, otherwise retain the existing value
+            if (!string.IsNullOrEmpty(createTours.TourName))
             {
-                tour.TourImage = await SaveImageFileAsync(createTours.TourImage);
+                tour.TourName = createTours.TourName;
             }
 
-            tour.TourName = createTours.TourName ?? tour.TourName;
-            tour.Description = createTours.Description ?? tour.Description;
-            tour.Price = createTours.Price ?? tour.Price;
-            tour.Duration = createTours.Duration ?? tour.Duration;
-            tour.Details = createTours.Details ?? tour.Details;
-            tour.Location = createTours.Location ?? tour.Location;
+            if (!string.IsNullOrEmpty(createTours.Description))
+            {
+                tour.Description = createTours.Description;
+            }
 
+            if (createTours.Price.HasValue)
+            {
+                tour.Price = createTours.Price.Value;
+            }
+
+            if (!string.IsNullOrEmpty(createTours.Duration))
+            {
+                tour.Duration = createTours.Duration;
+            }
+
+            if (!string.IsNullOrEmpty(createTours.Details))
+            {
+                tour.Details = createTours.Details;
+            }
+
+            if (!string.IsNullOrEmpty(createTours.Location))
+            {
+                tour.Location = createTours.Location;
+            }
+
+            // Handle TourImage file upload only if provided
             if (createTours.TourImage != null)
             {
+                // If there was an existing image, delete it before uploading the new one
                 if (!string.IsNullOrEmpty(tour.TourImage))
                 {
                     await DeleteImageFileAsync(tour.TourImage);
                 }
+
+                // Save new image and update the TourImage path
                 var fileName = await SaveImageFileAsync(createTours.TourImage);
                 tour.TourImage = fileName;
             }
 
+            // Update IsActive if a value is provided, otherwise retain the existing value
+            if (createTours.IsActive.HasValue)
+            {
+                tour.IsActive = createTours.IsActive.Value;
+            }
+
+            // Save changes to the database
             _context.Tours.Update(tour);
             await _context.SaveChangesAsync();
 
@@ -187,7 +217,6 @@ namespace Ajloun_Tour.Implementations
                 IsActive = tour.IsActive,
                 Location = tour.Location,
                 TourImage = tour.TourImage,
-
             };
         }
 
