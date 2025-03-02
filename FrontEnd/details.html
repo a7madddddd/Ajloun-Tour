@@ -27,7 +27,7 @@
    <link
       href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&amp;family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&amp;display=swap"
       rel="stylesheet">
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
    <!-- Custom CSS -->
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -524,8 +524,8 @@
                                  </div>
                                  <div class="col-sm-12">
                                     <div class="form-group">
-                                       <input class="input-date-picker" type="text" name="s" autocomplete="off"
-                                          readonly="readonly" placeholder="Date">
+                                       <input class="input-date-picker" type="date" name="s" autocomplete="on"
+                                           placeholder="Date">
                                     </div>
                                  </div>
                                  <div class="col-sm-12">
@@ -771,13 +771,17 @@
    <script src="assets/js/jquery.slicknav.js"></script>
    <script src="assets/js/custom.min.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 
    <!-- my js  -->
    <script src="Fetch/Details.js"></script>
    <script src="Fetch/Booking.js"></script>
-
+<script>
+   flatpickr(".input-date-picker", {
+      dateFormat: "Y-m-d", // Customize the format if needed
+   });
+</script>
 </body>
 
 <!-- Mirrored from demo.bosathemes.com/html/travele/package-detail.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 22 Feb 2025 18:24:58 GMT -->

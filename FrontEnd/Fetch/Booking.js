@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             Swal.fire({ title: 'Success!', text: 'Your booking has been created!', icon: 'success', confirmButtonText: 'View My Bookings' })
-                .then((result) => { if (result.isConfirmed) window.location.href = `/booking-confirmation.html?id=${bookingId}`; });
+                .then((result) => { if (result.isConfirmed) window.location.href = `/confirmation.html?id=${bookingId}`; });
 
         } catch (error) {
             console.error('Error during booking:', error);
