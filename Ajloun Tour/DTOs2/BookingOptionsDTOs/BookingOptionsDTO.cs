@@ -4,5 +4,7 @@
     {
         public int OptionID { get; set; }
         public string? OptionName { get; set; }
+        public decimal? OptionPrice { get; set; }
+
     }
 }

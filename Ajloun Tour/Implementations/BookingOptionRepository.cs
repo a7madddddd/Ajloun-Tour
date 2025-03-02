@@ -20,7 +20,8 @@ namespace Ajloun_Tour.Implementations
                 .Select(option => new BookingOptionsDTO
                 {
                     OptionID = option.OptionId,
-                    OptionName = option.OptionName
+                    OptionName = option.OptionName,
+                    OptionPrice = option.OptionPrice,
                 })
                 .ToListAsync();
         }
@@ -35,7 +36,8 @@ namespace Ajloun_Tour.Implementations
             return new BookingOptionsDTO
             {
                 OptionID = option.OptionId,
-                OptionName = option.OptionName
+                OptionName = option.OptionName,
+                OptionPrice = option.OptionPrice,
             };
         }
 
@@ -44,7 +46,8 @@ namespace Ajloun_Tour.Implementations
         {
             var newOption = new BookingOption
             {
-                OptionName = createBookingOption.OptionName
+                OptionName = createBookingOption.OptionName,
+                OptionPrice = createBookingOption.OptionPrice,
             };
 
             _context.BookingOptions.Add(newOption);
@@ -53,7 +56,8 @@ namespace Ajloun_Tour.Implementations
             return new BookingOptionsDTO
             {
                 OptionID = newOption.OptionId,
-                OptionName = newOption.OptionName
+                OptionName = newOption.OptionName,
+                OptionPrice = newOption.OptionPrice,
             };
         }
 
@@ -64,13 +68,15 @@ namespace Ajloun_Tour.Implementations
                 return null; 
 
             option.OptionName = createBookingOption.OptionName;
+            option.OptionPrice = createBookingOption.OptionPrice;
 
             await _context.SaveChangesAsync();
 
             return new BookingOptionsDTO
             {
                 OptionID = option.OptionId,
-                OptionName = option.OptionName
+                OptionName = option.OptionName,
+                OptionPrice = option.OptionPrice,
             };
         }
 

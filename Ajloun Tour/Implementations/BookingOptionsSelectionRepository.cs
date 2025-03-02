@@ -42,6 +42,18 @@ namespace Ajloun_Tour.Implementations
 
         public async Task<BookingOptionSelectionDTO> CreateAsync(CreateBookingOptionsSelection createBookingOptionsSelection)
         {
+            var bookingExists = await _context.Bookings.AnyAsync(b => b.BookingId == createBookingOptionsSelection.BookingId);
+            if (!bookingExists)
+            {
+                throw new Exception("Booking ID not found.");
+            }
+
+            var optionExists = await _context.BookingOptions.AnyAsync(o => o.OptionId == createBookingOptionsSelection.OptionId);
+            if (!optionExists)
+            {
+                throw new Exception("Option ID not found.");
+            }
+
             var newSelection = new BookingOptionSelection
             {
                 BookingId = createBookingOptionsSelection.BookingId,

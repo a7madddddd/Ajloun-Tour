@@ -12,6 +12,7 @@ namespace Ajloun_Tour.Models
 
         public int OptionId { get; set; }
         public string OptionName { get; set; } = null!;
+        public decimal? OptionPrice { get; set; }
 
         public virtual ICollection<BookingOptionSelection> BookingOptionSelections { get; set; }
     }

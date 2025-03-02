@@ -99,6 +99,8 @@ namespace Ajloun_Tour.Models
                 entity.Property(e => e.OptionId).HasColumnName("OptionID");
 
                 entity.Property(e => e.OptionName).HasMaxLength(100);
+
+                entity.Property(e => e.OptionPrice).HasColumnType("decimal(18, 0)");
             });
 
             modelBuilder.Entity<BookingOptionSelection>(entity =>
