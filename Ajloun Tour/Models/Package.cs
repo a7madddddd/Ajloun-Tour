@@ -18,7 +18,7 @@ namespace Ajloun_Tour.Models
         public int? TourDays { get; set; }
         public int? TourNights { get; set; }
         public int? NumberOfPeople { get; set; }
-        public bool? IsActive { get; set; } = false;
+        public bool? IsActive { get; set; }
 
         public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<TourPackage> TourPackages { get; set; }

@@ -8,6 +8,8 @@ namespace Ajloun_Tour.Reposetories
 
         Task<ToursProgramDTO> GetTourProgram(int id);
 
+        Task<ToursProgramDTO> GetProgramByTourId(int tourId);
+
         Task<ToursProgramDTO> AddToursProgram(CreateToursProgram createToursProgram);
 
         Task<ToursProgramDTO> UpdateToursProgram(int id, CreateToursProgram createToursProgram);

@@ -1,4 +1,5 @@
-﻿using Ajloun_Tour.DTOs.ReviewsDTOs;
+﻿using Ajloun_Tour.DTOs.ProjectsDTOs;
+using Ajloun_Tour.DTOs.ReviewsDTOs;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,7 @@ namespace Ajloun_Tour.Implementations
                 Rating = r.Rating,
                 Comment = r.Comment,
                 Subject = r.Subject,
+                IsActive = r.IsActive,
                 CreatedAt = DateTime.UtcNow,
             });
         }
@@ -53,25 +55,53 @@ namespace Ajloun_Tour.Implementations
                 Rating = review.Rating,
                 Comment = review.Comment,
                 Subject = review.Subject,
+                IsActive = review.IsActive,
                 CreatedAt = DateTime.UtcNow,
 
             };
         }
+        public async Task<List<ReviewsDTO>> getReviewByTourId(int tourId)
+        {
+            if (tourId <= 0)
+            {
+                throw new ArgumentException("Invalid tour ID.");
+            }
+
+            var reviews = await _context.Reviews
+                .Where(r => r.TourId == tourId)
+                .Select(r => new ReviewsDTO
+                {
+                    Id = r.Id,
+                    TourId = r.TourId,
+                    UserId = r.UserId,
+                    PackageId = r.PackageId,
+                    OfferId = r.OfferId,
+                    Rating = r.Rating,
+                    Subject = r.Subject,
+                    Comment = r.Comment,
+                    IsActive=r.IsActive,
+                    CreatedAt = r.CreatedAt
+                })
+                .ToListAsync();
+
+            return reviews;
+        }
+
+
 
         public async Task<ReviewsDTO> AddReviewAsync(CreateReview createReview)
         {
             var review = new Review
             {
-
                 TourId = createReview.TourId,
                 UserId = createReview.UserId,
-                PackageId = createReview.PackageId,
-                OfferId = createReview.OfferId,
+                PackageId = createReview.PackageId ?? null,
+                OfferId = createReview.OfferId ?? null, 
                 Rating = createReview.Rating,
                 Comment = createReview.Comment,
+                IsActive = createReview.IsActive ?? false, 
                 Subject = createReview.Subject,
-                CreatedAt = DateTime.UtcNow,
-
+                CreatedAt = DateTime.UtcNow
             };
 
             _context.Reviews.Add(review);
@@ -79,7 +109,6 @@ namespace Ajloun_Tour.Implementations
 
             return new ReviewsDTO
             {
-
                 Id = review.Id,
                 TourId = review.TourId,
                 UserId = review.UserId,
@@ -88,7 +117,46 @@ namespace Ajloun_Tour.Implementations
                 Rating = review.Rating,
                 Comment = review.Comment,
                 Subject = review.Subject,
+                IsActive = review.IsActive,
                 CreatedAt = review.CreatedAt,
+            };
+        }
+
+
+        public async Task<ReviewsDTO> UpdateReviews(int id, CreateReview createReview)
+        {
+            var updatedReview = await _context.Reviews.FindAsync(id);
+
+            if (updatedReview == null)
+            {
+
+                throw new ArgumentNullException(nameof(updatedReview));
+            }
+
+            updatedReview.TourId = createReview.TourId ?? updatedReview.TourId;
+            updatedReview.UserId = createReview.UserId ?? updatedReview.UserId;
+            updatedReview.OfferId = createReview.OfferId ?? updatedReview.OfferId;
+            updatedReview.PackageId = createReview.PackageId ?? updatedReview.PackageId;
+            updatedReview.Comment = createReview.Comment ?? updatedReview.Comment;
+            updatedReview.Subject = createReview.Subject ?? updatedReview.Subject;
+            updatedReview.Rating = createReview.Rating ?? updatedReview.Rating;
+            updatedReview.IsActive = createReview.IsActive ?? updatedReview.IsActive;
+
+
+
+            _context.Reviews.Update(updatedReview);
+            await _context.SaveChangesAsync();
+
+            return new ReviewsDTO
+            {
+                Id = updatedReview.Id,
+                UserId = updatedReview.UserId,
+                OfferId = updatedReview.OfferId,
+                PackageId = updatedReview.PackageId,
+                Comment = updatedReview.Comment,
+                Subject = updatedReview.Subject,
+                Rating = updatedReview.Rating,
+                IsActive = updatedReview.IsActive,
 
             };
         }
@@ -106,7 +174,5 @@ namespace Ajloun_Tour.Implementations
             _context.Reviews.Remove(deletedreview);
             await _context.SaveChangesAsync();
         }
-
-
     }
 }

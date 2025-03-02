@@ -11,6 +11,7 @@
         public bool? IsActive { get; set; }
         public string? TourImage { get; set; }
         public string? Location { get; set; }
+        public string? Map { get; set; }
 
     }
 }

@@ -272,7 +272,7 @@ function renderPackages(data) {
                             </ul>
                         </div>
                         <div class="package-content">
-                            <h3><a href="#">${item.packageName}</a></h3>
+                            <h3><a href="package-detail.html">${item.packageName}</a></h3>
                             <div class="review-area">
                                 <span class="review-text">(${item.rating} reviews)</span>
                                 <div class="rating-start" title="Rated ${item.rating} out of 5">

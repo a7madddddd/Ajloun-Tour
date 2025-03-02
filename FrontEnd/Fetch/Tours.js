@@ -120,15 +120,17 @@ function generateTourItemHTML(tour, reviewsMap, columnClass, imageHeight) {
     return `
          <div class="${columnClass}">
             <div class="desti-item overlay-desti-item">
-               <figure class="desti-image">
-                  <img src="https://localhost:44357/ToursImages/${tour.tourImage}" alt="${tour.tourName}" style="height: ${imageHeight}; width: 100%; object-fit: cover;">
-               </figure>
+                <figure class="desti-image">
+                        <img src="https://localhost:44357/ToursImages/${tour.tourImage}" 
+                            alt="${tour.tourName}" 
+                            style="height: ${imageHeight}; width: 100%; object-fit: cover;">
+                    </figure>
                <div class="meta-cat bg-meta-cat">
-                  <a href="#">${tour.location ? tour.location.toUpperCase() : 'JORDAN'}</a>
+                  <a href="details.html?tourId=${tour.tourId}">${tour.location ? tour.location.toUpperCase() : 'JORDAN'}</a>
                </div>
                <div class="desti-content">
                   <h3>
-                     <a href="#">${tour.tourName}</a>
+                     <a href="details.html?tourId=${tour.tourId}">${tour.tourName}</a>
                   </h3>
                   <div class="review-stars">
                      ${generateStarsHTML(filledStars)}

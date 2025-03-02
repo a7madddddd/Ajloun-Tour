@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
 
 namespace Ajloun_Tour.DTOs.UsersDTOs
 {
@@ -14,6 +15,9 @@ namespace Ajloun_Tour.DTOs.UsersDTOs
         public string? Phone { get; set; }
         [FromForm]
         public DateTime? CreatedAt { get; set; }
+        [FromForm]
+        public IFormFile? UserImage { get; set; }
+
 
     }
 }

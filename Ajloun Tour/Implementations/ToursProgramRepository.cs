@@ -21,7 +21,6 @@ namespace Ajloun_Tour.Implementations
              {
                  ProgramId = tp.ProgramId,
                  TourId = tp.TourId,
-                 TourName = tp.Tour.TourName,
                  DayNumber = tp.DayNumber,
                  Title = tp.Title,
                  Description = tp.Description,
@@ -43,7 +42,6 @@ namespace Ajloun_Tour.Implementations
             {
                 ProgramId = tourProgram.ProgramId,
                 TourId = tourProgram.TourId,
-                TourName = tourProgram.Tour.TourName,
                 DayNumber = tourProgram.DayNumber,
                 Title = tourProgram.Title,
                 Description = tourProgram.Description,
@@ -51,7 +49,41 @@ namespace Ajloun_Tour.Implementations
             };
 
         }
+        public async Task<ToursProgramDTO> GetProgramByTourId(int tourId)
+        {
+            var program = await _context.TourPrograms
+         .Where(p => p.TourId == tourId)
+         .Select(p => new ToursProgramDTO
+         {
+             ProgramId = p.ProgramId,
+             TourId = p.TourId,
+             TourName = p.Tour.TourName,
+             DayNumber = p.DayNumber,
+             Description = p.Description,
+             Title = p.Title,
+             ProgramDate = p.ProgramDate
+         })
+         .FirstOrDefaultAsync();
 
+            if (program == null)
+            {
+                throw new Exception("No program found for this tour.");
+            }
+
+
+            return new ToursProgramDTO
+            {
+
+                ProgramId = program.ProgramId,
+                TourId = program.TourId,
+                TourName = program.TourName,
+                DayNumber = program.DayNumber,
+                Description = program.Description,
+                Title = program.Title,
+                ProgramDate = program.ProgramDate
+
+            };
+        }
 
         public async Task<ToursProgramDTO> AddToursProgram(CreateToursProgram createToursProgram)
         {
@@ -61,7 +93,8 @@ namespace Ajloun_Tour.Implementations
                 DayNumber = createToursProgram.DayNumber,
                 Title = createToursProgram.Title,
                 Description = createToursProgram.Description,
-                ProgramDate = createToursProgram.ProgramDate
+                ProgramDate = createToursProgram.ProgramDate,
+
             };
 
             _context.TourPrograms.Add(tourProgram);
@@ -111,5 +144,7 @@ namespace Ajloun_Tour.Implementations
                 await _context.SaveChangesAsync();
             }
         }
+
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Ajloun_Tour.DTOs.LoginDTOs;
+using Ajloun_Tour.DTOs.ToursDTOs;
 using Ajloun_Tour.DTOs.UsersDTOs;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
@@ -38,8 +39,16 @@ namespace Ajloun_Tour.Implementations
 
         private async Task<string> SaveImageFileAsync(IFormFile imageFile)
         {
+            if (imageFile == null)
+            {
+                throw new ArgumentNullException(nameof(imageFile), "Image file is required.");
+            }
+
             string fileName = $"{Guid.NewGuid()}_{Path.GetFileName(imageFile.FileName)}";
             string filePath = Path.Combine(_imageDirectory, fileName);
+
+            // Ensure the directory exists
+            Directory.CreateDirectory(_imageDirectory);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
@@ -48,6 +57,7 @@ namespace Ajloun_Tour.Implementations
 
             return fileName;
         }
+
 
 
         private async Task DeleteImageFileAsync(string fileName)
@@ -91,7 +101,7 @@ namespace Ajloun_Tour.Implementations
                 {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.FullName)
+                new Claim(ClaimTypes.Name, user.FullName),
             }),
                 Expires = DateTime.UtcNow.AddHours(Convert.ToInt32(_configuration["JwtSettings:ExpiryInHours"])),
                 SigningCredentials = new SigningCredentials(
@@ -115,6 +125,7 @@ namespace Ajloun_Tour.Implementations
                 FullName = u.FullName,
                 Password = u.Password,
                 Phone = u.Phone,
+                UserImage = u.UserImage,
                 CreatedAt = DateTime.UtcNow,
             });
         }
@@ -136,6 +147,7 @@ namespace Ajloun_Tour.Implementations
                 FullName = user.FullName,
                 CreatedAt = user.CreatedAt,
                 Password = user.Password,
+                UserImage = user.UserImage,
                 Phone = user.Phone,
 
             };
@@ -145,6 +157,8 @@ namespace Ajloun_Tour.Implementations
         {
 
             var passwordHasher = new PasswordHasher<User>();
+            var fileName = await SaveImageFileAsync(createUsers.UserImage);
+
 
             var user = new User
             {
@@ -153,6 +167,8 @@ namespace Ajloun_Tour.Implementations
                 Email = createUsers.Email,
                 Phone = createUsers.Phone,
                 CreatedAt = createUsers.CreatedAt,
+                UserImage = fileName
+
 
             };
 
@@ -169,6 +185,7 @@ namespace Ajloun_Tour.Implementations
                 CreatedAt = user.CreatedAt,
                 Phone = user.Phone,
                 Email = user.Email,
+                UserImage = fileName,
                 Password = user.Password
 
             };
@@ -181,6 +198,19 @@ namespace Ajloun_Tour.Implementations
             if (user == null)
             {
                 throw new KeyNotFoundException($"User with ID {id} not found.");
+            }
+
+            if (createUsers.UserImage != null)
+            {
+                // If there was an existing image, delete it before uploading the new one
+                if (!string.IsNullOrEmpty(user.UserImage))
+                {
+                    await DeleteImageFileAsync(user.UserImage);
+                }
+
+                // Save new image and update the TourImage path
+                var fileName = await SaveImageFileAsync(createUsers.UserImage);
+                user.UserImage = fileName;
             }
 
             user.FullName = createUsers.FullName ?? user.FullName;
@@ -202,6 +232,7 @@ namespace Ajloun_Tour.Implementations
                 Phone = user.Phone,
                 Password = user.Password,
                 CreatedAt = user.CreatedAt,
+                UserImage = user.UserImage,
 
             };
         }

@@ -10,6 +10,8 @@
         public DateTime? CreatedAt { get; set; }
         public int? PackageId { get; set; }
         public int? OfferId { get; set; }
+        public bool? IsActive { get; set; }
+
 
     }
 }

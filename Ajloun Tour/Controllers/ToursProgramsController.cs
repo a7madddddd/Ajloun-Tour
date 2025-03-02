@@ -2,6 +2,7 @@
 using Ajloun_Tour.Reposetories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ajloun_Tour.Controllers
 {
@@ -32,6 +33,18 @@ namespace Ajloun_Tour.Controllers
 
             return Ok(program);
         }
+
+        [HttpGet("GetProgramByTourId")]
+        public async Task<ActionResult<ToursProgramDTO>> GetProgramByTourId(int tourId)
+        {
+            var program = await _toursProgramRepository.GetProgramByTourId(tourId);
+
+            if (program == null)
+                return NotFound("No program found for this tour.");
+
+            return Ok(program);
+        }
+
 
         [HttpPost]
         public async Task<ActionResult<ToursProgramDTO>> CreateTourProgram(CreateToursProgram createToursProgram)

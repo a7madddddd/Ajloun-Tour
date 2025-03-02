@@ -41,8 +41,8 @@ namespace Ajloun_Tour.Controllers
         {
 
 
-            var admin = await _usersRepository.AddUserAsync(createUsers);
-            return Ok(admin);
+            var newUser = await _usersRepository.AddUserAsync(createUsers);
+            return Ok(newUser);
         }
 
         [HttpPost("login")]

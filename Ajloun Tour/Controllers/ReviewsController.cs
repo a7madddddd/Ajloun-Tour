@@ -34,12 +34,33 @@ namespace Ajloun_Tour.Controllers
             return Ok(review);
         }
 
+        [HttpGet("getReviewByTourId")]
+        public async Task<ActionResult<IEnumerable<ReviewsDTO>>> GetReviewByTourId(int tourId)
+        {
+            var reviews = await _reviewsRepository.getReviewByTourId(tourId);
+
+            if (reviews == null )
+            {
+                return NotFound("No reviews found for this tour.");
+            }
+
+            return Ok(reviews);
+        }
+
         [HttpPost]
-        public async Task<ActionResult> AddReviewAsync(CreateReview createReview)
+        public async Task<ActionResult> AddReviewAsync([FromForm]CreateReview createReview)
         {
 
             var addReview = await _reviewsRepository.AddReviewAsync(createReview);
             return Ok(addReview);
+        }
+
+        [HttpPut("id")]
+        public async Task<ActionResult<ReviewsDTO>> UpdateReviewsById(int id ,[FromBody] CreateReview createReview) {
+        
+            var updatedRviews = await _reviewsRepository.UpdateReviews(id, createReview);
+
+            return Ok(updatedRviews);
         }
 
         [HttpDelete("id")]

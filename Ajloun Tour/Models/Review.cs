@@ -14,6 +14,7 @@ namespace Ajloun_Tour.Models
         public DateTime? CreatedAt { get; set; }
         public int? PackageId { get; set; }
         public int? OfferId { get; set; }
+        public bool? IsActive { get; set; } = false;
 
         public virtual Offer? Offer { get; set; }
         public virtual Package? Package { get; set; }

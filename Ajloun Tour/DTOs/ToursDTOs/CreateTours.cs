@@ -20,5 +20,8 @@ namespace Ajloun_Tour.DTOs.ToursDTOs
         public IFormFile? TourImage { get; set; }
         [FromForm]
         public string? Location { get; set; }
+        [FromForm]
+        public string? Map { get; set; }
+
     }
 }
