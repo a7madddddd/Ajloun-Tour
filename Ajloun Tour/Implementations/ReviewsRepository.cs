@@ -133,13 +133,6 @@ namespace Ajloun_Tour.Implementations
                 throw new ArgumentNullException(nameof(updatedReview));
             }
 
-            updatedReview.TourId = createReview.TourId ?? updatedReview.TourId;
-            updatedReview.UserId = createReview.UserId ?? updatedReview.UserId;
-            updatedReview.OfferId = createReview.OfferId ?? updatedReview.OfferId;
-            updatedReview.PackageId = createReview.PackageId ?? updatedReview.PackageId;
-            updatedReview.Comment = createReview.Comment ?? updatedReview.Comment;
-            updatedReview.Subject = createReview.Subject ?? updatedReview.Subject;
-            updatedReview.Rating = createReview.Rating ?? updatedReview.Rating;
             updatedReview.IsActive = createReview.IsActive ?? updatedReview.IsActive;
 
 
@@ -149,13 +142,6 @@ namespace Ajloun_Tour.Implementations
 
             return new ReviewsDTO
             {
-                Id = updatedReview.Id,
-                UserId = updatedReview.UserId,
-                OfferId = updatedReview.OfferId,
-                PackageId = updatedReview.PackageId,
-                Comment = updatedReview.Comment,
-                Subject = updatedReview.Subject,
-                Rating = updatedReview.Rating,
                 IsActive = updatedReview.IsActive,
 
             };

@@ -296,7 +296,7 @@ function addStyles() {
         
         .rating-stars i.fas.fa-star, 
         .rating-stars i.fas.fa-star-half-alt {
-            color: #ffc107;
+            color: #F56960;
         }
         
         .rating-stars i.far.fa-star {
@@ -310,7 +310,7 @@ function addStyles() {
         
         .summary-stars i.fas.fa-star,
         .summary-stars i.fas.fa-star-half-alt {
-            color: #ffc107;
+            color: #F56960;
         }
         
         .summary-stars i.far.fa-star {
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // add review
 // Star Rating Functionality with Multiple API Approaches
 document.addEventListener('DOMContentLoaded', function () {
-    const stars = document.querySelectorAll('.star');
+    const stars = document.querySelectorAll('.fas');
     let selectedRating = 0;
 
     // API URLs
@@ -386,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function () {
     stars.forEach(star => {
         star.style.color = '#ccc';
         star.style.cursor = 'pointer';
-        star.style.fontSize = '40px'; // Making the stars bigger
+        star.style.fontSize = '20px'; // Making the stars bigger
 
         star.addEventListener('mouseover', function () {
             const rating = parseInt(this.getAttribute('data-rating'));
@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function () {
         stars.forEach(star => {
             const starRating = parseInt(star.getAttribute('data-rating'));
             if (starRating <= rating) {
-                star.style.color = '#FFD700';
+                star.style.color = '#F56960';
             } else {
                 star.style.color = '#ccc';
             }

@@ -27,6 +27,8 @@
    <link
       href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&amp;family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&amp;display=swap"
       rel="stylesheet">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
    <!-- Custom CSS -->
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
@@ -331,30 +333,26 @@
                                     <p id="tour-description"> </p>
                                     <p> </p>
                                     <ul>
-                                       <li>- Travel cancellation insurance</li>
-                                       <li>- Breakfast and dinner included</li>
-                                       <li>- Health care included</li>
-                                       <li>- Transfer to the airport and return to the agency</li>
-                                       <li>- Lorem ipsum dolor sit amet, consectetur adipiscing</li>
+                                       <li></li>
+                                       <li></li>
+                                       <li></li>
+                                       <li></li>
+                                       <li></li>
                                     </ul>
                                  </div>
                               </div>
                               <div class="tab-pane" id="program" role="tabpanel" aria-labelledby="program-tab">
                                  <div class="itinerary-content">
                                     <h3>Program <span>( 4 days )</span></h3>
-                                    <p>Dolores maiores dicta dolore. Natoque placeat libero sunt sagittis debitis?
-                                       Egestas non non qui quos, semper aperiam lacinia eum nam! Pede beatae. Soluta,
-                                       convallis irure accusamus voluptatum ornare saepe cupidatat.</p>
+                                    <p></p>
                                  </div>
                                  <div class="itinerary-timeline-wrap">
                                     <ul>
                                        <li>
                                           <div class="timeline-content">
-                                             <div class="day-count">Day <span>1</span></div>
-                                             <h4>Ancient Rome Visit</h4>
-                                             <p>Nostra semper ultricies eu leo eros orci porta provident, fugit?
-                                                Pariatur interdum assumenda, qui aliquip ipsa! Dictum natus potenti
-                                                pretium.</p>
+                                             <div class="day-count"> <span></span></div>
+                                             <h4></h4>
+                                             <p>.</p>
                                           </div>
                                        </li>
                                     </ul>
@@ -431,18 +429,20 @@
                                           <div class="full-width rate-wrap">
                                              <label>Your rating</label>
                                              <div class="procduct-rates">
-                                                <span class="star" data-rating="1">&#9733;</span>
-                                                <span class="star" data-rating="2">&#9733;</span>
-                                                <span class="star" data-rating="3">&#9733;</span>
-                                                <span class="star" data-rating="4">&#9733;</span>
-                                                <span class="star" data-rating="5">&#9733;</span>
+                                                <span class="fas fa-star" data-rating="1"></span>
+                                                <span class="fas fa-star" data-rating="2"></span>
+                                                <span class="fas fa-star" data-rating="3"></span>
+                                                <span class="fas fa-star" data-rating="4"></span>
+                                                <span class="fas fa-star" data-rating="5"></span>
                                              </div>
                                           </div>
                                           <p>
-                                             <input type="text" name="FullName" placeholder="Full Name" readonly>
+                                             <input type="text" name="FullName" placeholder="Full Name" disabled
+                                                style="font-weight: bold;">
                                           </p>
                                           <p>
-                                             <input type="email" name="email" placeholder="Email" readonly>
+                                             <input type="email" name="email" placeholder="Email" disabled
+                                                style="font-weight: bold;">
                                           </p>
                                           <p>
                                              <input type="text" name="subject" placeholder="Subject">
@@ -499,81 +499,64 @@
                            </h5>
                            <div class="start-wrap">
                               <div class="rating-start" title="Rated 5 out of 5">
-                                 <span style="width: 60%"></span>
+
                               </div>
                            </div>
                         </div>
-                        <!-- <div class="widget-bg booking-form-wrap">
-                              <h4 class="bg-title">Booking</h4>
-                              <form class="booking-form">
-                                 <div class="row">
-                                    <div class="col-sm-12">
-                                       <div class="form-group">
-                                          <input name="name_booking" type="text" placeholder="Full Name">
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                       <div class="form-group">
-                                          <input name="email_booking" type="text" placeholder="Email">
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                       <div class="form-group">
-                                          <input name="phone_booking" type="text" placeholder="Number">
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                       <div class="form-group">
-                                          <input class="input-date-picker" type="text" name="s" autocomplete="off" readonly="readonly" placeholder="Date">
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                       <h4 class="">Add Options</h4>
-                                    </div>
-                                    <div class="col-sm-6">
-                                       <div class="form-group">
-                                          <label class="checkbox-list">
-                                             <input type="checkbox" name="s">
-                                             <span class="custom-checkbox"></span>
-                                             Tour guide
-                                          </label>
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                       <div class="form-group">
-                                          <label class="checkbox-list">
-                                             <input type="checkbox" name="s">
-                                             <span class="custom-checkbox"></span>
-                                             Insurance 
-                                          </label>
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                       <div class="form-group">
-                                          <label class="checkbox-list">
-                                             <input type="checkbox" name="s">
-                                             <span class="custom-checkbox"></span>
-                                             Dinner
-                                          </label>
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                       <div class="form-group">
-                                          <label class="checkbox-list">
-                                             <input type="checkbox" name="s">
-                                             <span class="custom-checkbox"></span>
-                                             Bike rent
-                                          </label>
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                       <div class="form-group submit-btn">
-                                          <input type="submit" name="submit" value="Boook Now">
-                                       </div>
+                        <div class="widget-bg booking-form-wrap">
+                           <h4 class="bg-title">Booking</h4>
+                           <form class="booking-form">
+                              <div class="row">
+                                 <div class="col-sm-12">
+                                    <div class="form-group">
+                                       <input name="name_booking" type="text" placeholder="Full Name">
                                     </div>
                                  </div>
-                              </form>
-                           </div> -->
+                                 <div class="col-sm-12">
+                                    <div class="form-group">
+                                       <input name="email_booking" type="text" placeholder="Email">
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12">
+                                    <div class="form-group">
+                                       <input name="phone_booking" type="number" placeholder="Number Of Peapole" >
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12">
+                                    <div class="form-group">
+                                       <input class="input-date-picker" type="text" name="s" autocomplete="off"
+                                          readonly="readonly" placeholder="Date">
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12">
+                                    <h4 class="">Add Options</h4>
+                                 </div>
+                                 <div class="col-sm-6">
+                                    <div class="form-group">
+                                       <label class="checkbox-list">
+                                          <input type="checkbox" name="option" value="1">
+                                          <span class="custom-checkbox"></span>
+                                          Tour guide
+                                       </label>
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-6">
+                                    <div class="form-group">
+                                       <label class="checkbox-list">
+                                          <input type="checkbox" name="option" value="2">
+                                          <span class="custom-checkbox"></span>
+                                          meal
+                                       </label>
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12">
+                                    <div class="form-group submit-btn">
+                                       <input type="submit" name="submit" value="Boook Now">
+                                    </div>
+                                 </div>
+                              </div>
+                           </form>
+                        </div>
                         <!-- <div class="widget-bg information-content text-center">
                               <h5>TRAVEL TIPS</h5>
                               <h3>NEED TRAVEL RELATED TIPS & INFORMATION</h3>
@@ -788,9 +771,12 @@
    <script src="assets/js/jquery.slicknav.js"></script>
    <script src="assets/js/custom.min.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 
    <!-- my js  -->
    <script src="Fetch/Details.js"></script>
+   <script src="Fetch/Booking.js"></script>
 
 </body>
 

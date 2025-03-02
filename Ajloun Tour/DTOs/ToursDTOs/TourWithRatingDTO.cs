@@ -10,5 +10,7 @@
         public bool IsActive { get; set; }
         public string TourImage { get; set; }
         public double? AverageRating { get; set; }
+        public int? Limit { get; set; }
+
     }
 }

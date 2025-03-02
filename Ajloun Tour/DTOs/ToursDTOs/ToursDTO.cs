@@ -12,6 +12,7 @@
         public string? TourImage { get; set; }
         public string? Location { get; set; }
         public string? Map { get; set; }
+        public int? Limit { get; set; }
 
     }
 }

@@ -68,6 +68,7 @@ namespace Ajloun_Tour.Implementations
                 TourImage = t.TourImage,
                 Location = t.Location,
                 Map = t.Map,
+                Limit = t.Limit,
 
             });
         }
@@ -92,8 +93,9 @@ namespace Ajloun_Tour.Implementations
                 IsActive = tour.IsActive,
                 Price = tour.Price,
                 TourImage = tour.TourImage,
-                Location= tour.Location,
+                Location = tour.Location,
                 Map = tour.Map,
+                Limit = tour.Limit,
 
             };
         }
@@ -119,6 +121,7 @@ namespace Ajloun_Tour.Implementations
                 Price = (decimal)createTours.Price,
                 Location = createTours.Location,
                 Map = createTours.Map,
+                Limit = createTours.Limit,
                 TourImage = fileName
             };
 
@@ -138,6 +141,7 @@ namespace Ajloun_Tour.Implementations
                 Price = tour.Price,
                 Location = tour.Location,
                 Map = tour.Map,
+                Limit = tour.Limit,
                 TourImage = fileName
 
             };
@@ -155,7 +159,6 @@ namespace Ajloun_Tour.Implementations
                 throw new KeyNotFoundException($"Tour with ID {id} not found.");
             }
 
-            // Update fields if a value is provided, otherwise retain the existing value
             if (!string.IsNullOrEmpty(createTours.TourName))
             {
                 tour.TourName = createTours.TourName;
@@ -189,28 +192,26 @@ namespace Ajloun_Tour.Implementations
             {
                 tour.Map = createTours.Map;
             }
-
-            // Handle TourImage file upload only if provided
+            if (createTours.Limit.HasValue)
+            {
+                tour.Limit = createTours.Limit.Value;
+            }
             if (createTours.TourImage != null)
             {
-                // If there was an existing image, delete it before uploading the new one
                 if (!string.IsNullOrEmpty(tour.TourImage))
                 {
                     await DeleteImageFileAsync(tour.TourImage);
                 }
 
-                // Save new image and update the TourImage path
                 var fileName = await SaveImageFileAsync(createTours.TourImage);
                 tour.TourImage = fileName;
             }
 
-            // Update IsActive if a value is provided, otherwise retain the existing value
             if (createTours.IsActive.HasValue)
             {
                 tour.IsActive = createTours.IsActive.Value;
             }
 
-            // Save changes to the database
             _context.Tours.Update(tour);
             await _context.SaveChangesAsync();
 
@@ -225,6 +226,7 @@ namespace Ajloun_Tour.Implementations
                 IsActive = tour.IsActive,
                 Location = tour.Location,
                 Map = tour.Map,
+                Limit = tour.Limit,
                 TourImage = tour.TourImage,
             };
         }
@@ -233,7 +235,8 @@ namespace Ajloun_Tour.Implementations
         {
             var DeleteTour = await _context.Tours.FindAsync(id);
 
-            if (DeleteTour == null) {
+            if (DeleteTour == null)
+            {
 
                 throw new Exception("This Tour Is Not Defined");
             }

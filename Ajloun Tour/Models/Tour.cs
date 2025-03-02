@@ -25,6 +25,7 @@ namespace Ajloun_Tour.Models
         public string? Details { get; set; }
         public string? Location { get; set; }
         public string? Map { get; set; }
+        public int? Limit { get; set; }
 
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<CartItem> CartItems { get; set; }

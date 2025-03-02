@@ -22,6 +22,9 @@ namespace Ajloun_Tour.DTOs.ToursDTOs
         public string? Location { get; set; }
         [FromForm]
         public string? Map { get; set; }
+        [FromForm]
+        public int? Limit { get; set; }
+
 
     }
 }
