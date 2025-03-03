@@ -11,77 +11,92 @@ namespace Ajloun_Tour.Controllers
     [ApiController]
     public class ToursProgramsController : ControllerBase
     {
-        private readonly IToursProgramRepository _toursProgramRepository;
+        private readonly ITourProgramServiceRepository _tourProgramService;
 
-        public ToursProgramsController(IToursProgramRepository toursProgramRepository)
+        public ToursProgramsController(ITourProgramServiceRepository tourProgramService)
         {
-            _toursProgramRepository = toursProgramRepository;
+            _tourProgramService = tourProgramService;
         }
+
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ToursProgramDTO>>> GetToursPrograms()
+        public async Task<ActionResult<IEnumerable<ToursProgramDTO>>> GetTourPrograms()
         {
-            var programs = await _toursProgramRepository.GetToursPrograms();
-            return Ok(programs);
+            var tourPrograms = await _tourProgramService.GetAllTourProgramsAsync();
+            return Ok(tourPrograms);
         }
 
+        // GET: api/TourPrograms/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ToursProgramDTO>> GetTourProgram(int id)
         {
-            var program = await _toursProgramRepository.GetTourProgram(id);
-            if (program == null)
-                return NotFound();
+            var tourProgram = await _tourProgramService.GetTourProgramByIdAsync(id);
 
-            return Ok(program);
-        }
-
-        [HttpGet("GetProgramByTourId")]
-        public async Task<ActionResult<ToursProgramDTO>> GetProgramByTourId(int tourId)
-        {
-            var program = await _toursProgramRepository.GetProgramByTourId(tourId);
-
-            if (program == null)
-                return NotFound("No program found for this tour.");
-
-            return Ok(program);
-        }
-
-        [HttpGet("{packageId}/programs")]
-        public async Task<IActionResult> GetTourProgramsByPackageId(int packageId)
-        {
-            var result = await _toursProgramRepository.GetPackageWithProgramsAsync(packageId);
-
-            if (result == null)
+            if (tourProgram == null)
             {
-                return NotFound(new { Message = "Package not found or is inactive." });
+                return NotFound();
             }
 
-            return Ok(result);
+            return Ok(tourProgram);
         }
 
+        // GET: api/TourPrograms/tour/5
+        [HttpGet("tour/{tourId}")]
+        public async Task<ActionResult<IEnumerable<ToursProgramDTO>>> GetTourProgramsByTourId(int tourId)
+        {
+            var tourPrograms = await _tourProgramService.GetTourProgramsByTourIdAsync(tourId);
+            return Ok(tourPrograms);
+        }
 
+        // GET: api/TourPrograms/tour/5/programs
+        [HttpGet("tour/{tourId}/Withprograms")]
+        public async Task<ActionResult<TourWithProgramsDTO>> GetTourWithPrograms(int tourId)
+        {
+            var tourWithPrograms = await _tourProgramService.GetTourWithProgramsAsync(tourId);
+
+            if (tourWithPrograms == null)
+            {
+                return NotFound($"Tour with ID {tourId} not found");
+            }
+
+            return Ok(tourWithPrograms);
+        }
+
+        // POST: api/TourPrograms
         [HttpPost]
-        public async Task<ActionResult<ToursProgramDTO>> CreateTourProgram(CreateToursProgram createToursProgram)
+        public async Task<ActionResult<ToursProgramDTO>> CreateTourProgram([FromForm] CreateToursProgram createTourProgramDTO)
         {
-            var program = await _toursProgramRepository.AddToursProgram(createToursProgram);
-            return CreatedAtAction(nameof(GetTourProgram), new { id = program.ProgramId }, program);
+            var tourProgram = await _tourProgramService.CreateTourProgramAsync(createTourProgramDTO);
+            return CreatedAtAction(nameof(GetTourProgram), new { id = tourProgram.TourProgramId }, tourProgram);
         }
 
+        // PUT: api/TourPrograms/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<ToursProgramDTO>> UpdateTourProgram(int id, CreateToursProgram createToursProgram)
+        public async Task<IActionResult> UpdateTourProgram(int id, [FromForm] UpdateTourProgramDTO updateTourProgramDTO)
         {
-            var program = await _toursProgramRepository.UpdateToursProgram(id, createToursProgram);
-            if (program == null)
-                return NotFound();
+            var tourProgram = await _tourProgramService.UpdateTourProgramAsync(id, updateTourProgramDTO);
 
-            return Ok(program);
+            if (tourProgram == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(tourProgram);
         }
 
+        // DELETE: api/TourPrograms/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTourProgram(int id)
         {
-            await _toursProgramRepository.DeleteToursProgram(id);
+            var result = await _tourProgramService.DeleteTourProgramAsync(id);
+
+            if (!result)
+            {
+                return NotFound();
+            }
+
             return NoContent();
         }
     }
 }
+

@@ -1,20 +1,19 @@
-﻿using Ajloun_Tour.DTOs2.PackagesProgramDTOs;
+﻿using Ajloun_Tour.DTOs2;
+using Ajloun_Tour.DTOs2.PackagesProgramDTOs;
 using Ajloun_Tour.DTOs2.ToursProgramDTOs;
+using Ajloun_Tour.Models;
 
 namespace Ajloun_Tour.Reposetories
 {
     public interface IToursProgramRepository
     {
-        Task<IEnumerable<ToursProgramDTO>> GetToursPrograms();
-
-        Task<ToursProgramDTO> GetTourProgram(int id);
-
-        Task<ToursProgramDTO> GetProgramByTourId(int tourId);
-        Task<PackageWithProgramsDTO?> GetPackageWithProgramsAsync(int packageId);
-        Task<ToursProgramDTO> AddToursProgram(CreateToursProgram createToursProgram);
-
-        Task<ToursProgramDTO> UpdateToursProgram(int id, CreateToursProgram createToursProgram);
-
-        Task DeleteToursProgram(int id);
+        Task<IEnumerable<TourProgram>> GetAllTourProgramsAsync();
+        Task<TourProgram?> GetTourProgramByIdAsync(int tourProgramId);
+        Task<IEnumerable<TourProgram>> GetTourProgramsByTourIdAsync(int tourId);
+        Task<IEnumerable<TourProgram>> GetTourProgramsByProgramIdAsync(int programId);
+        Task<TourProgram> CreateTourProgramAsync(TourProgram tourProgram);
+        Task<TourProgram?> UpdateTourProgramAsync(int tourProgramId, TourProgram tourProgram);
+        Task<bool> DeleteTourProgramAsync(int tourProgramId);
+        Task<bool> TourProgramExistsAsync(int tourProgramId);
     }
 }

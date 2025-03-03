@@ -28,27 +28,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Get user info but don't check it yet
     const userInfo = getUserInfoFromToken();
-    if (!userInfo) {
-        Swal.fire({
-            title: 'Authentication Required',
-            text: 'You must be logged in to book a tour. Please login first.',
-            icon: 'warning',
-            confirmButtonText: 'Go to Login',
-            showCancelButton: true,
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = '/login.html?returnUrl=' + encodeURIComponent(window.location.href);
-            }
-        });
-        return;
-    }
 
-    const nameInput = document.querySelector('input[name="name_booking"]');
-    const emailInput = document.querySelector('input[name="email_booking"]');
-    if (nameInput) nameInput.value = userInfo.fullName;
-    if (emailInput) emailInput.value = userInfo.email;
+    // Still populate fields if user is logged in
+    if (userInfo) {
+        const nameInput = document.querySelector('input[name="name_booking"]');
+        const emailInput = document.querySelector('input[name="email_booking"]');
+        if (nameInput) nameInput.value = userInfo.fullName;
+        if (emailInput) emailInput.value = userInfo.email;
+    }
 
     const datePicker = document.querySelector('.input-date-picker');
     if (datePicker) {
@@ -123,11 +112,12 @@ document.addEventListener('DOMContentLoaded', function () {
     bookingForm.addEventListener('submit', async function (event) {
         event.preventDefault();
 
+        // Check login status when form is submitted
         const currentUserInfo = getUserInfoFromToken();
         if (!currentUserInfo) {
             Swal.fire({
-                title: 'Session Expired',
-                text: 'Your session has expired or you are not logged in. Please login to continue.',
+                title: 'Authentication Required',
+                text: 'You must be logged in to book a tour. Please login first.',
                 icon: 'warning',
                 confirmButtonText: 'Go to Login',
                 showCancelButton: true,
@@ -140,6 +130,8 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        const nameInput = document.querySelector('input[name="name_booking"]');
+        const emailInput = document.querySelector('input[name="email_booking"]');
         const userName = nameInput.value;
         const userEmail = emailInput.value;
         const numberOfPeople = parseInt(document.querySelector('input[name="phone_booking"]').value, 10);
@@ -196,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
-            Swal.fire({ title: 'Success!', text: `Your booking has been created! with Total Price: ${totalPrice}`, icon: 'success', confirmButtonText: 'View My Bookings'})
+            Swal.fire({ title: 'Success!', text: `Your booking has been created! with Total Price: ${totalPrice}`, icon: 'success', confirmButtonText: 'View My Bookings' })
                 .then((result) => { if (result.isConfirmed) window.location.href = `/confirmation.html?id=${bookingId}`; });
 
         } catch (error) {
@@ -204,5 +196,4 @@ document.addEventListener('DOMContentLoaded', function () {
             Swal.fire({ title: 'Error', text: `There was an error processing your booking: ${error.message}`, icon: 'error', confirmButtonText: 'OK' });
         }
     });
-
 });

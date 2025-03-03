@@ -71,6 +71,8 @@ namespace Ajloun_Tour.Implementations
                     TourDays = tp.Package.TourDays,
                     TourNights = tp.Package.TourNights,
                     NumberOfPeople = tp.Package.NumberOfPeople,
+                    Map = tp.Package.Map,
+                    Location = tp.Package.Location,
                     Image = tp.Image,
                 })
                 .AsNoTracking()
@@ -88,12 +90,14 @@ namespace Ajloun_Tour.Implementations
                     TourId = to.TourId,
                     PackageId = to.PackageId,
                     IsActive = to.IsActive,
-                    PackageName = to.Package.Name,  // Access the related Package's Name
-                    Details = to.Package.Details,   // Access the related Package's Details
-                    Price = to.Package.Price,       // Access the related Package's Price
-                    TourDays = to.Package.TourDays, // Access the related Package's TourDays
-                    TourNights = to.Package.TourNights,  // Access the related Package's TourNights
-                    NumberOfPeople = to.Package.NumberOfPeople,  // Access the related Package's NumberOfPeople
+                    PackageName = to.Package.Name, 
+                    Details = to.Package.Details,   
+                    Price = to.Package.Price,      
+                    TourDays = to.Package.TourDays, 
+                    TourNights = to.Package.TourNights,  
+                    NumberOfPeople = to.Package.NumberOfPeople, 
+                    Map = to.Package.Map,
+                    Location = to.Package.Location,
                     Image = to.Image
                 })
                 .AsNoTracking()
@@ -151,7 +155,7 @@ namespace Ajloun_Tour.Implementations
                     TourId = createToursPackages.TourId,
                     PackageId = package.Id,
                     IsActive = createToursPackages.IsActive,
-                    Image = fileName, // Save the file name to the database
+                    Image = fileName, 
                 };
 
                 await _context.TourPackages.AddAsync(tourPackage);
@@ -167,7 +171,7 @@ namespace Ajloun_Tour.Implementations
                         TourId = tourPackage.TourId,
                         PackageId = tourPackage.PackageId,
                         IsActive = tourPackage.IsActive,
-                        Image = fileName,  // Return the file name
+                        Image = fileName,  
                     };
                 }
 

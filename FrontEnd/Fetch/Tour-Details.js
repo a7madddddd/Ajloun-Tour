@@ -29,33 +29,46 @@ if (tourId) {
 
 
 // programs
+// programs
 const tourIdProgram = new URLSearchParams(window.location.search).get('tourId');
 
 if (tourIdProgram) {
-    fetch(`https://localhost:44357/api/ToursPrograms/GetProgramByTourId?tourId=${tourIdProgram}`)
+    fetch(`https://localhost:44357/api/ToursPrograms/tour/${tourIdProgram}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'text/plain'
+        }
+    })
         .then(response => response.json())
         .then(data => {
             const itineraryWrap = document.querySelector(".itinerary-timeline-wrap ul");
-            itineraryWrap.innerHTML = ""; // مسح المحتوى القديم قبل إضافة الجديد
+            itineraryWrap.innerHTML = ""; // Clear old content before adding new
 
-            // التأكد مما إذا كانت الاستجابة كائنًا مفردًا أو مصفوفة
-            let programs = Array.isArray(data) ? data : [data];
+            // Handle the new response structure where programs are in $values array
+            let programs = [];
+            if (data && data.$values && Array.isArray(data.$values)) {
+                programs = data.$values;
+            } else if (Array.isArray(data)) {
+                programs = data;
+            } else if (data) {
+                programs = [data];
+            }
 
-            if (programs.length > 0 && programs[0].programId) {
+            if (programs.length > 0) {
                 programs.forEach(program => {
                     const programHTML = `
                         <li>
                             <div class="timeline-content">
                                 <div class="day-count">Day <span>${program.dayNumber}</span></div>
-                                <h4>${program.title}</h4>
-                                <p>${program.description || "No description available."}</p>
+                                <h4>${program.programTitle || program.customTitle}</h4>
+                                <p>${program.customDescription || "No description available."}</p>
                             </div>
                         </li>
                     `;
                     itineraryWrap.innerHTML += programHTML;
                 });
 
-                // تحديث العنوان بعدد الأيام
+                // Update title with number of days
                 document.querySelector(".itinerary-content h3").innerHTML = `Program <span>(${programs.length} days)</span>`;
             } else {
                 itineraryWrap.innerHTML = "<li><p>No program available for this tour.</p></li>";

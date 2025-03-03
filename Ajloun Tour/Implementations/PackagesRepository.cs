@@ -29,6 +29,8 @@ namespace Ajloun_Tour.Implementations
                 NumberOfPeople = c.NumberOfPeople,
                 TourDays = c.TourDays,
                 TourNights = c.TourNights,
+                Location = c.Location,
+                Map = c.Map,
                 IsActive = c.IsActive,
 
             });
@@ -53,6 +55,8 @@ namespace Ajloun_Tour.Implementations
                 NumberOfPeople = Package.NumberOfPeople,
                 TourDays = Package.TourDays,
                 TourNights = Package.TourNights,
+                Location = Package.Location,
+                Map = Package.Map,
                 IsActive = Package.IsActive,
 
             };
@@ -69,6 +73,8 @@ namespace Ajloun_Tour.Implementations
                 NumberOfPeople = createPackages.NumberOfPeople,
                 TourNights = createPackages.TourNights,
                 TourDays = createPackages.TourDays,
+                Location = createPackages.Location,
+                Map = createPackages.Map,
                 IsActive=createPackages.IsActive,
             };
 
@@ -84,6 +90,8 @@ namespace Ajloun_Tour.Implementations
                 TourDays = Package.TourDays,
                 NumberOfPeople = Package.NumberOfPeople,
                 TourNights = Package.TourNights,
+                Location= Package.Location,
+                Map = Package.Map,
                 IsActive = Package.IsActive,
             };
         }
@@ -105,6 +113,8 @@ namespace Ajloun_Tour.Implementations
             updatePackage.NumberOfPeople = createPackages.NumberOfPeople ?? updatePackage.NumberOfPeople;
             updatePackage.TourDays = createPackages.TourDays ?? updatePackage.TourDays;
             updatePackage.TourNights = createPackages?.TourNights ?? updatePackage.TourNights;
+            updatePackage.Location = createPackages?.Location ?? updatePackage.Location;
+            updatePackage.Map = createPackages?.Map ?? updatePackage.Map;
             updatePackage.IsActive = createPackages?.IsActive ?? updatePackage.IsActive;
 
 
@@ -123,6 +133,8 @@ namespace Ajloun_Tour.Implementations
                 TourNights = updatePackage.TourNights,
                 TourDays = updatePackage.TourDays,
                 NumberOfPeople = updatePackage.NumberOfPeople,
+                Location = updatePackage.Location,
+                Map = updatePackage.Map,
                 IsActive = updatePackage.IsActive,
 
             };

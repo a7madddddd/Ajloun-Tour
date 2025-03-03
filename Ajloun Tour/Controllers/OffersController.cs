@@ -41,7 +41,7 @@ namespace Ajloun_Tour.Controllers
             var AddOffer = await _offersRepository.AddOffersAsync(createOffers);
             return Ok(AddOffer);
         }
-        [HttpPut]
+        [HttpPut("id")]
         public async Task<ActionResult<OffersDTO>> updateOffersAsync(int id, [FromBody] CreateOffers createOffers)
         {
 

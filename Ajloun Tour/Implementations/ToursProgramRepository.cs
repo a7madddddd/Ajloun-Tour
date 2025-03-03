@@ -14,173 +14,93 @@ namespace Ajloun_Tour.Implementations
             _context = context;
         }
 
-        public async Task<IEnumerable<ToursProgramDTO>> GetToursPrograms()
+
+        public async Task<IEnumerable<TourProgram>> GetAllTourProgramsAsync()
         {
             return await _context.TourPrograms
-             .Include(tp => tp.Tour)
-             .Select(tp => new ToursProgramDTO
-             {
-                 ProgramId = tp.ProgramId,
-                 TourId = tp.TourId,
-                 DayNumber = tp.DayNumber,
-                 Title = tp.Title,
-                 Description = tp.Description,
-                 ProgramDate = tp.ProgramDate
-             })
-             .ToListAsync();
+                .Include(tp => tp.Tour)
+                .Include(tp => tp.Program)
+                .ToListAsync();
         }
 
-        public async Task<ToursProgramDTO> GetTourProgram(int id)
+        public async Task<TourProgram?> GetTourProgramByIdAsync(int tourProgramId)
         {
-            var tourProgram = await _context.TourPrograms
-            .Include(tp => tp.Tour)
-            .FirstOrDefaultAsync(tp => tp.ProgramId == id);
-
-            if (tourProgram == null)
-                return null!;
-
-            return new ToursProgramDTO
-            {
-                ProgramId = tourProgram.ProgramId,
-                TourId = tourProgram.TourId,
-                DayNumber = tourProgram.DayNumber,
-                Title = tourProgram.Title,
-                Description = tourProgram.Description,
-                ProgramDate = tourProgram.ProgramDate
-            };
-
-        }
-        public async Task<ToursProgramDTO> GetProgramByTourId(int tourId)
-        {
-            var program = await _context.TourPrograms
-         .Where(p => p.TourId == tourId)
-         .Select(p => new ToursProgramDTO
-         {
-             ProgramId = p.ProgramId,
-             TourId = p.TourId,
-             TourName = p.Tour.TourName,
-             DayNumber = p.DayNumber,
-             Description = p.Description,
-             Title = p.Title,
-             ProgramDate = p.ProgramDate
-         })
-         .FirstOrDefaultAsync();
-
-            if (program == null)
-            {
-                throw new Exception("No program found for this tour.");
-            }
-
-
-            return new ToursProgramDTO
-            {
-
-                ProgramId = program.ProgramId,
-                TourId = program.TourId,
-                TourName = program.TourName,
-                DayNumber = program.DayNumber,
-                Description = program.Description,
-                Title = program.Title,
-                ProgramDate = program.ProgramDate
-
-            };
+            return await _context.TourPrograms
+                .Include(tp => tp.Tour)
+                .Include(tp => tp.Program)
+                .FirstOrDefaultAsync(tp => tp.TourProgramId == tourProgramId);
         }
 
-        public async Task<PackageWithProgramsDTO?> GetPackageWithProgramsAsync(int packageId)
+        public async Task<IEnumerable<TourProgram>> GetTourProgramsByTourIdAsync(int tourId)
         {
-
-            var program = await _context.TourPrograms
-         .Where(p => p.PackageId == packageId)
-         .Select(p => new PackageWithProgramsDTO
-         {
-             ProgramId = p.ProgramId,
-
-             DayNumber = p.DayNumber,
-             Description = p.Description,
-             Title = p.Title,
-             ProgramDate = p.ProgramDate
-         })
-         .FirstOrDefaultAsync();
-
-            if (program == null)
-            {
-                throw new Exception("No program found for this tour.");
-            }
-
-
-            return new PackageWithProgramsDTO
-            {
-
-                ProgramId = program.ProgramId,
-                PackageId = packageId,
-                DayNumber = program.DayNumber,
-                Description = program.Description,
-                Title = program.Title,
-                ProgramDate = program.ProgramDate
-
-            };
+            return await _context.TourPrograms
+                .Include(tp => tp.Tour)
+                .Include(tp => tp.Program)
+                .Where(tp => tp.TourId == tourId)
+                .OrderBy(tp => tp.DayNumber)
+                .ToListAsync();
         }
 
-
-        public async Task<ToursProgramDTO> AddToursProgram(CreateToursProgram createToursProgram)
+        public async Task<IEnumerable<TourProgram>> GetTourProgramsByProgramIdAsync(int programId)
         {
-            var tourProgram = new TourProgram
-            {
-                TourId = createToursProgram.TourId,
-                DayNumber = createToursProgram.DayNumber,
-                Title = createToursProgram.Title,
-                Description = createToursProgram.Description,
-                ProgramDate = createToursProgram.ProgramDate,
+            return await _context.TourPrograms
+                .Include(tp => tp.Tour)
+                .Include(tp => tp.Program)
+                .Where(tp => tp.ProgramId == programId)
+                .ToListAsync();
+        }
 
-            };
+        public async Task<TourProgram> CreateTourProgramAsync(TourProgram tourProgram)
+        {
+            tourProgram.CreatedAt = DateTime.Now;
+            tourProgram.UpdatedAt = DateTime.Now;
 
             _context.TourPrograms.Add(tourProgram);
             await _context.SaveChangesAsync();
 
-            return new ToursProgramDTO
-            {
-                ProgramId = tourProgram.ProgramId,
-                TourId = tourProgram.TourId,
-                DayNumber = tourProgram.DayNumber,
-                Title = tourProgram.Title,
-                Description = tourProgram.Description,
-                ProgramDate = tourProgram.ProgramDate
-            };
+            return tourProgram;
         }
 
-        public async Task<ToursProgramDTO> UpdateToursProgram(int id, CreateToursProgram createToursProgram)
+        public async Task<TourProgram?> UpdateTourProgramAsync(int tourProgramId, TourProgram tourProgram)
         {
-            var tourProgram = await _context.TourPrograms.FindAsync(id);
-            if (tourProgram == null)
-                return null!;
+            var existingTourProgram = await _context.TourPrograms.FindAsync(tourProgramId);
 
-            tourProgram.TourId = createToursProgram.TourId;
-            tourProgram.DayNumber = createToursProgram.DayNumber;
-            tourProgram.Title = createToursProgram.Title;
-            tourProgram.Description = createToursProgram.Description;
-            tourProgram.ProgramDate = createToursProgram.ProgramDate;
+            if (existingTourProgram == null)
+            {
+                return null;
+            }
+
+            existingTourProgram.DayNumber = tourProgram.DayNumber;
+            existingTourProgram.ProgramDate = tourProgram.ProgramDate;
+            existingTourProgram.CustomTitle = tourProgram.CustomTitle;
+            existingTourProgram.CustomDescription = tourProgram.CustomDescription;
+            existingTourProgram.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
 
-            return new ToursProgramDTO
-            {
-                ProgramId = tourProgram.ProgramId,
-                TourId = tourProgram.TourId,
-                DayNumber = tourProgram.DayNumber,
-                Title = tourProgram.Title,
-                Description = tourProgram.Description,
-                ProgramDate = tourProgram.ProgramDate
-            };
+            return existingTourProgram;
         }
-        public async Task DeleteToursProgram(int id)
+
+        public async Task<bool> DeleteTourProgramAsync(int tourProgramId)
         {
-            var tourProgram = await _context.TourPrograms.FindAsync(id);
-            if (tourProgram != null)
+            var tourProgram = await _context.TourPrograms.FindAsync(tourProgramId);
+
+            if (tourProgram == null)
             {
-                _context.TourPrograms.Remove(tourProgram);
-                await _context.SaveChangesAsync();
+                return false;
             }
+
+            _context.TourPrograms.Remove(tourProgram);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> TourProgramExistsAsync(int tourProgramId)
+        {
+            return await _context.TourPrograms.AnyAsync(tp => tp.TourProgramId == tourProgramId);
         }
     }
 }
+
 

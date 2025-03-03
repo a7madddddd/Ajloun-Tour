@@ -8,6 +8,8 @@
         public int? TourDays { get; set; }
         public int? TourNights { get; set; }
         public int? NumberOfPeople { get; set; }
+        public string? Location { get; set; }
+        public string? Map { get; set; }
         public bool? IsActive { get; set; }
 
     }

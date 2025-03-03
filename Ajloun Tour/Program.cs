@@ -119,6 +119,12 @@ builder.Services.AddScoped<ITourCartRepository, TourCartRepository>();
 builder.Services.AddScoped<ITourCartItemsRepository, TourCartItemsRepository>();
 builder.Services.AddScoped<IPackagesRepository, PackagesRepository>();
 builder.Services.AddScoped<IOffersRepository, OffersRepository>();
+builder.Services.AddScoped<ITourProgramServiceRepository, TourProgramServiceRepository>();
+builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
+builder.Services.AddScoped<IPackProgramServiceRepository, PackProgramServiceRepository>();
+builder.Services.AddScoped<IPackageProgramRepository, PackageProgramRepository>();
+
+
 
 
 

@@ -96,11 +96,11 @@ function renderPackages(data) {
                                 </li>
                                 <li>
                                     <i class="fas fa-user-friends"></i> 
-                                    People: ${item.numberOfPeople}
+                                    ${item.numberOfPeople}
                                 </li>
                                 <li>
                                     <i class="fas fa-map-marker-alt"></i> 
-                                    Tour ID: ${item.location}
+                                    ${item.location}
                                 </li>
                             </ul>
                         </div>

@@ -25,12 +25,16 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<ContactMessage> ContactMessages { get; set; } = null!;
         public virtual DbSet<NewsletterSubscriber> NewsletterSubscribers { get; set; } = null!;
         public virtual DbSet<Offer> Offers { get; set; } = null!;
+        public virtual DbSet<OfferProgram> OfferPrograms { get; set; } = null!;
         public virtual DbSet<Package> Packages { get; set; } = null!;
+        public virtual DbSet<PackageProgram> PackagePrograms { get; set; } = null!;
+        public virtual DbSet<Program> Programs { get; set; } = null!;
         public virtual DbSet<Project> Projects { get; set; } = null!;
         public virtual DbSet<Review> Reviews { get; set; } = null!;
         public virtual DbSet<Testomonial> Testomonials { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
         public virtual DbSet<TourOffer> TourOffers { get; set; } = null!;
+
         public virtual DbSet<TourPackage> TourPackages { get; set; } = null!;
         public virtual DbSet<TourProgram> TourPrograms { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
@@ -281,6 +285,37 @@ namespace Ajloun_Tour.Models
                     .HasColumnName("title");
             });
 
+            modelBuilder.Entity<OfferProgram>(entity =>
+            {
+                entity.HasIndex(e => e.OfferId, "IX_OfferPrograms_OfferId");
+
+                entity.HasIndex(e => e.ProgramId, "IX_OfferPrograms_ProgramId");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.CustomTitle).HasMaxLength(100);
+
+                entity.Property(e => e.ProgramDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Offer)
+                    .WithMany(p => p.OfferPrograms)
+                    .HasForeignKey(d => d.OfferId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OfferPrograms_Offers");
+
+                entity.HasOne(d => d.Program)
+                    .WithMany(p => p.OfferPrograms)
+                    .HasForeignKey(d => d.ProgramId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OfferPrograms_Programs");
+            });
+
             modelBuilder.Entity<Package>(entity =>
             {
                 entity.ToTable("packages");
@@ -293,6 +328,12 @@ namespace Ajloun_Tour.Models
 
                 entity.Property(e => e.IsActive).HasColumnName("isActive");
 
+                entity.Property(e => e.Location)
+                    .HasMaxLength(100)
+                    .HasColumnName("location");
+
+                entity.Property(e => e.Map).HasColumnName("map");
+
                 entity.Property(e => e.Name)
                     .HasMaxLength(255)
                     .IsUnicode(false)
@@ -303,6 +344,50 @@ namespace Ajloun_Tour.Models
                 entity.Property(e => e.Price)
                     .HasColumnType("decimal(10, 2)")
                     .HasColumnName("price");
+            });
+
+            modelBuilder.Entity<PackageProgram>(entity =>
+            {
+                entity.HasIndex(e => e.PackageId, "IX_PackagePrograms_PackageId");
+
+                entity.HasIndex(e => e.ProgramId, "IX_PackagePrograms_ProgramId");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.CustomTitle).HasMaxLength(100);
+
+                entity.Property(e => e.ProgramDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Package)
+                    .WithMany(p => p.PackagePrograms)
+                    .HasForeignKey(d => d.PackageId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PackagePrograms_Packages");
+
+                entity.HasOne(d => d.Program)
+                    .WithMany(p => p.PackagePrograms)
+                    .HasForeignKey(d => d.ProgramId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PackagePrograms_Programs");
+            });
+
+            modelBuilder.Entity<Program>(entity =>
+            {
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Title).HasMaxLength(100);
+
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
             });
 
             modelBuilder.Entity<Project>(entity =>
@@ -400,6 +485,7 @@ namespace Ajloun_Tour.Models
                     .HasConstraintName("FK__testomoni__UserI__619B8048");
             });
 
+
             modelBuilder.Entity<Tour>(entity =>
             {
                 entity.Property(e => e.TourId).HasColumnName("TourID");
@@ -480,36 +566,33 @@ namespace Ajloun_Tour.Models
 
             modelBuilder.Entity<TourProgram>(entity =>
             {
-                entity.HasKey(e => e.ProgramId)
-                    .HasName("PK__TourProg__75256058F9824B24");
+                entity.HasIndex(e => e.ProgramId, "IX_TourPrograms_ProgramId");
 
-                entity.Property(e => e.OfferId).HasColumnName("offer_id");
+                entity.HasIndex(e => e.TourId, "IX_TourPrograms_TourId");
 
-                entity.Property(e => e.PackageId).HasColumnName("package_id");
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.ProgramDate)
-                    .HasColumnType("date")
-                    .HasColumnName("programDate");
+                entity.Property(e => e.CustomTitle).HasMaxLength(100);
 
-                entity.Property(e => e.Title).HasMaxLength(255);
+                entity.Property(e => e.ProgramDate).HasColumnType("datetime");
 
-                entity.HasOne(d => d.Offer)
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.Program)
                     .WithMany(p => p.TourPrograms)
-                    .HasForeignKey(d => d.OfferId)
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_TourProgram_offer");
-
-                entity.HasOne(d => d.Package)
-                    .WithMany(p => p.TourPrograms)
-                    .HasForeignKey(d => d.PackageId)
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_TourProgram_Package");
+                    .HasForeignKey(d => d.ProgramId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_TourPrograms_Programs");
 
                 entity.HasOne(d => d.Tour)
                     .WithMany(p => p.TourPrograms)
                     .HasForeignKey(d => d.TourId)
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK__TourProgr__TourI__17F790F9");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_TourPrograms_Tours");
             });
 
             modelBuilder.Entity<User>(entity =>

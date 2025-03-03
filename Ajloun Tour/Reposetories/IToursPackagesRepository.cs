@@ -19,5 +19,8 @@ namespace Ajloun_Tour.Reposetories
         Task<bool> DeleteTourPackages(int TourId, int PackageId);
 
         //Task<IEnumerable<ToursPackagesDTO>> GetActivePackages();
+
+
+
     }
 }
