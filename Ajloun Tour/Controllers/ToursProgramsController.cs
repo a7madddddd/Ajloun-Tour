@@ -1,4 +1,5 @@
 ﻿using Ajloun_Tour.DTOs2.ToursProgramDTOs;
+using Ajloun_Tour.Implementations;
 using Ajloun_Tour.Reposetories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,6 +44,19 @@ namespace Ajloun_Tour.Controllers
                 return NotFound("No program found for this tour.");
 
             return Ok(program);
+        }
+
+        [HttpGet("{packageId}/programs")]
+        public async Task<IActionResult> GetTourProgramsByPackageId(int packageId)
+        {
+            var result = await _toursProgramRepository.GetPackageWithProgramsAsync(packageId);
+
+            if (result == null)
+            {
+                return NotFound(new { Message = "Package not found or is inactive." });
+            }
+
+            return Ok(result);
         }
 
 

@@ -1,27 +1,22 @@
 document.addEventListener("DOMContentLoaded", async function () {
-    const toursApi = "https://localhost:44357/api/Tours";
-    const packagesApi = "https://localhost:44357/api/Packages";
+    const toursPackagesApi = "https://localhost:44357/api/ToursPackages";
     const reviewsApi = "https://localhost:44357/api/Reviews";
 
     try {
-        // جلب البيانات بالتوازي
-        const [toursResponse, packagesResponse, reviewsResponse] = await Promise.all([
-            fetch(toursApi),
-            fetch(packagesApi),
+        // Fetch data in parallel
+        const [toursPackagesResponse, reviewsResponse] = await Promise.all([
+            fetch(toursPackagesApi),
             fetch(reviewsApi)
         ]);
 
-        // تحويل الاستجابات إلى JSON
-        const toursData = await toursResponse.json();
-        const packagesData = await packagesResponse.json();
+        const toursPackagesData = await toursPackagesResponse.json();
         const reviewsData = await reviewsResponse.json();
 
-        // استخراج البيانات ذات الصلة
-        const tours = toursData.$values || [];
-        const packages = packagesData.$values.filter(pkg => pkg.isActive); // تصفية الحزم الفعالة
+        // Extract data arrays
+        const toursPackages = toursPackagesData.$values || [];
         const reviews = reviewsData.$values || [];
 
-        // إنشاء خريطة التقييمات لكل جولة
+        // Create reviews map
         const reviewsMap = {};
         reviews.forEach(review => {
             if (!reviewsMap[review.tourId]) {
@@ -31,31 +26,30 @@ document.addEventListener("DOMContentLoaded", async function () {
             reviewsMap[review.tourId].count += 1;
         });
 
-        // دمج البيانات وربط كل حزمة بجولتها وتقييماتها
-        const combinedData = packages.map(pkg => {
-            const tour = tours.find(t => t.tourId === pkg.id); // افتراض أن package.id هو tourId
+        // Process and combine data
+        const combinedData = toursPackages
+            .filter(pkg => pkg.isActive)  // Only active packages
+            .map(item => {
+                const tourReviews = reviewsMap[item.tourId] || { sum: 0, count: 0 };
+                const avgRating = tourReviews.count > 0 ?
+                    tourReviews.sum / tourReviews.count : 0;
 
-            // حساب متوسط التقييم
-            const tourReviews = reviewsMap[pkg.id] || { sum: 0, count: 0 };
-            const avgRating = tourReviews.count > 0 ? tourReviews.sum / tourReviews.count : 0;
-            const reviewCount = tourReviews.count || 0;
+                return {
+                    tourId: item.tourId,
+                    packageId: item.packageId,
+                    packageName: item.packageName,
+                    details: item.details,
+                    price: item.price,
+                    tourDays: item.tourDays,
+                    tourNights: item.tourNights,
+                    numberOfPeople: item.numberOfPeople,
+                    image: item.image,
+                    avgRating: avgRating,
+                    reviewCount: tourReviews.count,
+                    location: item.location
+                };
+            });
 
-            return {
-                packageId: pkg.id,
-                packageName: pkg.name,
-                details: pkg.details,
-                price: pkg.price,
-                tourDays: pkg.tourDays,
-                tourNights: pkg.tourNights,
-                numberOfPeople: pkg.numberOfPeople,
-                tourImage: tour ? tour.tourImage : "default.jpg",
-                location: tour ? tour.location || " Location" : " Location",
-                avgRating: avgRating,
-                reviewCount: reviewCount
-            };
-        });
-
-        // عرض جميع الحزم الفعالة
         renderPackages(combinedData);
 
     } catch (error) {
@@ -68,49 +62,71 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 });
 
-// وظيفة لعرض الحزم في HTML
 function renderPackages(data) {
     const packageContainer = document.querySelector(".package-inner .row");
-    packageContainer.innerHTML = ""; // تنظيف المحتوى السابق
+    packageContainer.innerHTML = "";
 
     data.forEach(item => {
-        // توليد نجوم التقييم
         const starsHtml = generateStars(Math.round(item.avgRating));
-
-        // تقصير النصوص الطويلة
-        const shortDetails = item.details.length > 100 ? item.details.substring(0, 100) + '...' : item.details;
+        const shortDetails = item.details.length > 100 ?
+            item.details.substring(0, 100) + '...' :
+            item.details;
 
         const packageHtml = `
             <div class="col-lg-4 col-md-6">
                 <div class="package-wrap">
                     <figure class="feature-image">
-                        <a href="#">
-                            <img src="https://localhost:44357/ToursImages/${item.tourImage}" alt="${item.packageName}" style="height: 40vh; object-fit: cover;">
+                        <a href="package-detail.html?tourId=${item.tourId}&packageId=${item.packageId}">
+                            <img src="https://localhost:44357/PakagesImages/${item.image}" 
+                                 alt="${item.packageName}" 
+                                 style="height: 40vh; object-fit: cover;">
                         </a>
                     </figure>
                     <div class="package-price">
-                        <h6><span>$${item.price}</span> / per person</h6>
+                        <h6>
+                            <span>$${item.price}</span> / per person
+                        </h6>
                     </div>
                     <div class="package-content-wrap">
                         <div class="package-meta text-center">
                             <ul>
-                                <li><i class="far fa-clock"></i> ${item.tourDays}D/${item.tourNights}N</li>
-                                <li><i class="fas fa-user-friends"></i> People: ${item.numberOfPeople}</li>
-                                <li><i class="fas fa-map-marker-alt"></i> ${item.location}</li>
+                                <li>
+                                    <i class="far fa-clock"></i> 
+                                    ${item.tourDays}D/${item.tourNights}N
+                                </li>
+                                <li>
+                                    <i class="fas fa-user-friends"></i> 
+                                    People: ${item.numberOfPeople}
+                                </li>
+                                <li>
+                                    <i class="fas fa-map-marker-alt"></i> 
+                                    Tour ID: ${item.location}
+                                </li>
                             </ul>
                         </div>
                         <div class="package-content">
-                            <h3><a href="#">${item.packageName}</a></h3>
+                            <h3>
+                                <a href="package-detail.html?tourId=${item.tourId}&packageId=${item.packageId}">
+                                    ${item.packageName}
+                                </a>
+                            </h3>
                             <div class="review-area">
-                                <span class="review-text">(${item.reviewCount} reviews)</span>
+                                <span class="review-text">
+                                    (${item.reviewCount} reviews)
+                                </span>
                                 <div class="rating-stars">
                                     ${starsHtml}
                                 </div>
                             </div>
                             <p>${shortDetails}</p>
                             <div class="btn-wrap">
-                                <a href="#" class="button-text width-6">Book Now<i class="fas fa-arrow-right"></i></a>
-                                <a href="#" class="button-text width-6">Wish List<i class="far fa-heart"></i></a>
+                                <a href="package-detail.html?tourId=${item.tourId}&packageId=${item.packageId}" 
+                                   class="button-text width-6">
+                                    Book Now<i class="fas fa-arrow-right"></i>
+                                </a>
+                                <a href="#" class="button-text width-6">
+                                    Wish List<i class="far fa-heart"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -121,17 +137,14 @@ function renderPackages(data) {
     });
 }
 
-// وظيفة لإنشاء نجوم التقييم
 function generateStars(rating) {
     let starsHtml = '';
-
     for (let i = 1; i <= 5; i++) {
         if (i <= rating) {
-            starsHtml += '<i class="fas fa-star" style="color: #F56960;"></i>'; // نجمة ممتلئة
+            starsHtml += '<i class="fas fa-star" style="color: #F56960;"></i>';
         } else {
-            starsHtml += '<i class="far fa-star" style="color: #F56960;"></i>'; // نجمة فارغة
+            starsHtml += '<i class="far fa-star" style="color: #F56960;"></i>';
         }
     }
-
     return starsHtml;
 }

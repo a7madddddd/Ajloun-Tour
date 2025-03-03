@@ -8,6 +8,7 @@ namespace Ajloun_Tour.Models
         public int TourId { get; set; }
         public int PackageId { get; set; }
         public bool? IsActive { get; set; }
+        public string? Image { get; set; }
 
         public virtual Package Package { get; set; } = null!;
         public virtual Tour Tour { get; set; } = null!;

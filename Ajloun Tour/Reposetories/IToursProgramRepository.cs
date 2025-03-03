@@ -1,4 +1,5 @@
-﻿using Ajloun_Tour.DTOs2.ToursProgramDTOs;
+﻿using Ajloun_Tour.DTOs2.PackagesProgramDTOs;
+using Ajloun_Tour.DTOs2.ToursProgramDTOs;
 
 namespace Ajloun_Tour.Reposetories
 {
@@ -9,7 +10,7 @@ namespace Ajloun_Tour.Reposetories
         Task<ToursProgramDTO> GetTourProgram(int id);
 
         Task<ToursProgramDTO> GetProgramByTourId(int tourId);
-
+        Task<PackageWithProgramsDTO?> GetPackageWithProgramsAsync(int packageId);
         Task<ToursProgramDTO> AddToursProgram(CreateToursProgram createToursProgram);
 
         Task<ToursProgramDTO> UpdateToursProgram(int id, CreateToursProgram createToursProgram);

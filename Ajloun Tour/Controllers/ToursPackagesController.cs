@@ -37,13 +37,7 @@ namespace Ajloun_Tour.Controllers
             return Ok(tourPackage);
         }
 
-        //[HttpGet("Activate")]
-        //public async Task<ActionResult<ToursPackagesDTO>> GetActivateToursPackage()
-        //{
 
-        //    var activatePackage = await _toursPackagesRepository.GetActivePackage();
-        //    return Ok(activatePackage);
-        //}
 
         [HttpPost]
         public async Task<ActionResult<ToursPackagesDTO>> CreateTourPackage([FromForm]CreateToursPackages createToursPackages)
@@ -65,7 +59,7 @@ namespace Ajloun_Tour.Controllers
 
 
         [HttpPut("{TourId}")]
-        public async Task<ActionResult<ToursPackagesDTO>> UpdatePackage(int TourId,[FromBody] CreateToursPackages createToursPackages)
+        public async Task<ActionResult<ToursPackagesDTO>> UpdatePackage(int TourId, [FromForm] CreateToursPackages createToursPackages)
         {
             try
             {
@@ -74,17 +68,24 @@ namespace Ajloun_Tour.Controllers
             }
             catch (KeyNotFoundException ex)
             {
+                // Log error and return response
+                Console.WriteLine($"KeyNotFoundException: {ex.Message}");
                 return NotFound(ex.Message);
             }
             catch (InvalidOperationException ex)
             {
+                // Log error and return response
+                Console.WriteLine($"InvalidOperationException: {ex.Message}");
                 return BadRequest(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Log generic error and return response
+                Console.WriteLine($"Exception: {ex.Message}");
                 return StatusCode(500, "An error occurred while processing your request");
             }
         }
+
 
         [HttpDelete("{TourId}/{PackageId}")]
         public async Task<ActionResult<bool>> DeleteToursPackage(int TourId, int PackageId)

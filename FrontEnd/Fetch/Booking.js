@@ -73,6 +73,53 @@ document.addEventListener('DOMContentLoaded', function () {
         return selectedOptionIds;
     }
 
+    async function getTourPrice(tourId) {
+        try {
+            const response = await fetch(`https://localhost:44357/api/Tours/id?id=${tourId}`, {
+                method: 'GET',
+                headers: { 'accept': 'text/plain' }
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch tour details.');
+
+            const tourData = await response.json();
+            return tourData.price || 0; // Return the real price from the tour data or 0 if not available
+        } catch (error) {
+            console.error('Error fetching tour price:', error);
+            return 0; // Return 0 if there's an error
+        }
+    }
+
+    async function getOptionPrice(optionId) {
+        try {
+            const response = await fetch(`https://localhost:44357/api/BookingOptions/${optionId}`, {
+                method: 'GET',
+                headers: { 'accept': 'text/plain' }
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch option price.');
+
+            const optionData = await response.json();
+            return optionData.optionPrice || 0; // Return the option price or 0 if not available
+        } catch (error) {
+            console.error('Error fetching option price:', error);
+            return 0; // Return 0 if there's an error
+        }
+    }
+
+    async function calculateTotalPrice(tourId, peopleCount, selectedOptions) {
+        const tourPrice = await getTourPrice(tourId); // Fetch the real tour price
+        let totalPrice = tourPrice * peopleCount; // Start with the tour price multiplied by the number of people
+
+        // Fetch the price for each selected option
+        for (const optionId of selectedOptions) {
+            const optionPrice = await getOptionPrice(optionId);
+            totalPrice += optionPrice * peopleCount; // Add the option price, considering the number of people
+        }
+
+        return totalPrice;
+    }
+
     bookingForm.addEventListener('submit', async function (event) {
         event.preventDefault();
 
@@ -114,12 +161,15 @@ document.addEventListener('DOMContentLoaded', function () {
         Swal.fire({ title: 'Processing', text: 'Creating your booking...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         try {
+            // Calculate the total price dynamically before submitting the form
+            const totalPrice = await calculateTotalPrice(tourId, numberOfPeople, selectedOptionIds);
+
             const formData = new FormData();
             formData.append('TourId', tourId);
             formData.append('UserId', currentUserInfo.userId);
             formData.append('BookingDate', new Date(bookingDate).toISOString());
             formData.append('NumberOfPeople', numberOfPeople);
-            formData.append('TotalPrice', calculateTotalPrice(tourId, numberOfPeople, selectedOptionIds));
+            formData.append('TotalPrice', totalPrice); // Use the dynamically calculated price
             formData.append('Status', 'Pending');
             formData.append('CreatedAt', new Date().toISOString());
 
@@ -146,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
-            Swal.fire({ title: 'Success!', text: 'Your booking has been created!', icon: 'success', confirmButtonText: 'View My Bookings' })
+            Swal.fire({ title: 'Success!', text: `Your booking has been created! with Total Price: ${totalPrice}`, icon: 'success', confirmButtonText: 'View My Bookings'})
                 .then((result) => { if (result.isConfirmed) window.location.href = `/confirmation.html?id=${bookingId}`; });
 
         } catch (error) {
@@ -155,7 +205,4 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    function calculateTotalPrice(tourId, peopleCount, selectedOptions) {
-        return (100 * peopleCount) + (selectedOptions.includes(1) ? 50 : 0) + (selectedOptions.includes(2) ? 25 * peopleCount : 0);
-    }
 });

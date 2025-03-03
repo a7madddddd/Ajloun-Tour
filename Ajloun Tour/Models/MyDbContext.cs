@@ -483,15 +483,32 @@ namespace Ajloun_Tour.Models
                 entity.HasKey(e => e.ProgramId)
                     .HasName("PK__TourProg__75256058F9824B24");
 
+                entity.Property(e => e.OfferId).HasColumnName("offer_id");
+
+                entity.Property(e => e.PackageId).HasColumnName("package_id");
+
                 entity.Property(e => e.ProgramDate)
                     .HasColumnType("date")
                     .HasColumnName("programDate");
 
                 entity.Property(e => e.Title).HasMaxLength(255);
 
+                entity.HasOne(d => d.Offer)
+                    .WithMany(p => p.TourPrograms)
+                    .HasForeignKey(d => d.OfferId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_TourProgram_offer");
+
+                entity.HasOne(d => d.Package)
+                    .WithMany(p => p.TourPrograms)
+                    .HasForeignKey(d => d.PackageId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_TourProgram_Package");
+
                 entity.HasOne(d => d.Tour)
                     .WithMany(p => p.TourPrograms)
                     .HasForeignKey(d => d.TourId)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__TourProgr__TourI__17F790F9");
             });
 

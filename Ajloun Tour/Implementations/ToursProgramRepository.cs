@@ -1,4 +1,5 @@
-﻿using Ajloun_Tour.DTOs2.ToursProgramDTOs;
+﻿using Ajloun_Tour.DTOs2.PackagesProgramDTOs;
+using Ajloun_Tour.DTOs2.ToursProgramDTOs;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
 using Microsoft.EntityFrameworkCore;
@@ -85,6 +86,42 @@ namespace Ajloun_Tour.Implementations
             };
         }
 
+        public async Task<PackageWithProgramsDTO?> GetPackageWithProgramsAsync(int packageId)
+        {
+
+            var program = await _context.TourPrograms
+         .Where(p => p.PackageId == packageId)
+         .Select(p => new PackageWithProgramsDTO
+         {
+             ProgramId = p.ProgramId,
+
+             DayNumber = p.DayNumber,
+             Description = p.Description,
+             Title = p.Title,
+             ProgramDate = p.ProgramDate
+         })
+         .FirstOrDefaultAsync();
+
+            if (program == null)
+            {
+                throw new Exception("No program found for this tour.");
+            }
+
+
+            return new PackageWithProgramsDTO
+            {
+
+                ProgramId = program.ProgramId,
+                PackageId = packageId,
+                DayNumber = program.DayNumber,
+                Description = program.Description,
+                Title = program.Title,
+                ProgramDate = program.ProgramDate
+
+            };
+        }
+
+
         public async Task<ToursProgramDTO> AddToursProgram(CreateToursProgram createToursProgram)
         {
             var tourProgram = new TourProgram
@@ -144,7 +181,6 @@ namespace Ajloun_Tour.Implementations
                 await _context.SaveChangesAsync();
             }
         }
-
-
     }
 }
+

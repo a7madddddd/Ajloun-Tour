@@ -7,5 +7,7 @@
         public string Title { get; set; } = null!;
         public string? Description { get; set; }
         public DateTime? ProgramDate { get; set; }
+        public int? PackageId { get; set; }
+
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace Ajloun_Tour.DTOs2.PackagesDTOS
+﻿namespace Ajloun_Tour.DTOs2.PackagesProgramDTOs
 {
-    public class PackagesDTO
+    public class CreatePackageProgram
     {
-        public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Details { get; set; }
         public decimal? Price { get; set; }
@@ -10,7 +9,5 @@
         public int? TourNights { get; set; }
         public int? NumberOfPeople { get; set; }
         public bool? IsActive { get; set; }
-
-
     }
 }

@@ -146,9 +146,6 @@ namespace Ajloun_Tour.Implementations
 
             };
 
-
-
-
         }
 
         public async Task<ToursDTO> UpdateToursAsync(int id, CreateTours createTours)
