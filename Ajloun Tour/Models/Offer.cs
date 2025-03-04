@@ -7,6 +7,7 @@ namespace Ajloun_Tour.Models
     {
         public Offer()
         {
+            Bookings = new HashSet<Booking>();
             OfferPrograms = new HashSet<OfferProgram>();
             Reviews = new HashSet<Review>();
             Tours = new HashSet<Tour>();
@@ -19,6 +20,7 @@ namespace Ajloun_Tour.Models
         public DateTime? EndDate { get; set; }
         public bool? IsActive { get; set; }
 
+        public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<OfferProgram> OfferPrograms { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
 

@@ -9,6 +9,8 @@ namespace Ajloun_Tour.Reposetories
         Task<ReviewsDTO> getReviewById(int id);
 
         Task<List<ReviewsDTO>> getReviewByTourId(int tourId);
+        Task<List<ReviewsDTO>> getReviewByPackId(int PackId);
+        Task<List<ReviewsDTO>> getReviewByOfferId(int offerId);
 
         Task<ReviewsDTO> AddReviewAsync(CreateReview createReview);
 

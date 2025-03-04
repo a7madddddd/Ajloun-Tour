@@ -34,7 +34,6 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Testomonial> Testomonials { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
         public virtual DbSet<TourOffer> TourOffers { get; set; } = null!;
-
         public virtual DbSet<TourPackage> TourPackages { get; set; } = null!;
         public virtual DbSet<TourProgram> TourPrograms { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
@@ -74,6 +73,10 @@ namespace Ajloun_Tour.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.OfferId).HasColumnName("OfferID");
+
+                entity.Property(e => e.PackageId).HasColumnName("PackageID");
+
                 entity.Property(e => e.Status)
                     .HasMaxLength(20)
                     .HasDefaultValueSql("('Pending')");
@@ -83,6 +86,16 @@ namespace Ajloun_Tour.Models
                 entity.Property(e => e.TourId).HasColumnName("TourID");
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
+
+                entity.HasOne(d => d.Offer)
+                    .WithMany(p => p.Bookings)
+                    .HasForeignKey(d => d.OfferId)
+                    .HasConstraintName("FK_Bookings_Offer");
+
+                entity.HasOne(d => d.Package)
+                    .WithMany(p => p.Bookings)
+                    .HasForeignKey(d => d.PackageId)
+                    .HasConstraintName("FK_Bookings_Package");
 
                 entity.HasOne(d => d.Tour)
                     .WithMany(p => p.Bookings)
@@ -484,7 +497,6 @@ namespace Ajloun_Tour.Models
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK__testomoni__UserI__619B8048");
             });
-
 
             modelBuilder.Entity<Tour>(entity =>
             {

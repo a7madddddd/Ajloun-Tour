@@ -42,6 +42,24 @@ namespace Ajloun_Tour.Controllers
             var newBooking = await _bookingRepository.AddBookingAsync(createBooking);
             return Ok(newBooking);
         }
+
+        [HttpPost("By PackId")]
+        public async Task<ActionResult<BookingDTO>> AddPackBookingAsync([FromForm] CreateBooking createBooking)
+        {
+
+            var newBooking = await _bookingRepository.AddPackBookingAsync(createBooking);
+            return Ok(newBooking);
+        }
+
+        [HttpPost("By Offerid")]
+        public async Task<ActionResult<BookingDTO>> AddOfferBookingAsync([FromForm] CreateBooking createBooking)
+        {
+
+            var newBooking = await _bookingRepository.AddOfferBookingAsync(createBooking);
+            return Ok(newBooking);
+        }
+
+
         [HttpPut("id")]
         public async Task<ActionResult<BookingDTO>> UpdeteBookingAsync(int id,[FromBody] CreateBooking createBooking)
         {

@@ -27,9 +27,173 @@
    <link
       href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&amp;family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&amp;display=swap"
       rel="stylesheet">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
    <!-- Custom CSS -->
    <link rel="stylesheet" type="text/css" href="style/style.css">
    <title>Travele | Travel & Tour HTML5 template </title>
+   <style>
+      /* Basic styling for readability */
+      .itinerary-timeline-wrap ul {
+         list-style-type: none;
+         padding: 0;
+      }
+
+      .timeline-content {
+         margin-bottom: 15px;
+         border: 1px solid #e0e0e0;
+         padding: 10px;
+         border-radius: 5px;
+      }
+
+      .day-count {
+         font-weight: bold;
+         color: #333;
+      }
+
+      .review-section {
+         max-width: 800px;
+         margin: 0 auto;
+         font-family: Arial, sans-serif;
+      }
+
+      .summary-review {
+         display: flex;
+         align-items: center;
+         background-color: #f9f9f9;
+         padding: 20px;
+         border-radius: 10px;
+         margin-bottom: 20px;
+      }
+
+      .review-score {
+         font-size: 48px;
+         font-weight: bold;
+         color: black;
+         margin-right: 20px;
+         display: flex;
+         align-items: center;
+      }
+
+      .review-score span {
+         display: flex;
+         align-items: center;
+      }
+
+      .review-score-content h3 {
+         margin: 0 0 10px 0;
+         color: #333;
+      }
+
+      .review-score-content h3 span {
+         font-size: 16px;
+         color: #888;
+         margin-left: 10px;
+      }
+
+      .review-summary-stars {
+         color: #F56960;
+         font-size: 24px;
+         margin-bottom: 10px;
+      }
+
+      .comment-area {
+         margin-top: 20px;
+      }
+
+      .comment-area-inner ol {
+         list-style: none;
+         padding: 0;
+      }
+
+      .comment-list-item {
+         display: flex;
+         margin-bottom: 20px;
+         border-bottom: 1px solid #e0e0e0;
+         padding-bottom: 15px;
+      }
+
+      .comment-thumb {
+         margin-right: 15px;
+      }
+
+      .comment-thumb img {
+         width: 80px;
+         height: 80px;
+         border-radius: 50%;
+         object-fit: cover;
+      }
+
+      .comment-content {
+         flex-grow: 1;
+      }
+
+      .comment-header {
+         display: flex;
+         align-items: center;
+         margin-bottom: 10px;
+      }
+
+      .author-name {
+         margin-right: 10px;
+         font-weight: bold;
+      }
+
+      .post-on {
+         color: #888;
+         margin-right: 10px;
+      }
+
+      .star-rating {
+         color: #F56960;
+         font-size: 18px;
+      }
+
+      .star-rating .fas {
+         margin-right: 2px;
+      }
+
+      .no-reviews {
+         text-align: center;
+         color: #888;
+         padding: 20px;
+      }
+
+      .loading {
+         text-align: center;
+         color: #888;
+         padding: 20px;
+      }
+
+      .interactive-stars {
+         display: flex;
+         color: #F56960;
+         font-size: 25px;
+         cursor: pointer;
+      }
+
+
+      .interactive-stars .fas:hover,
+      .interactive-stars .fas.active {
+         color: #F56960;
+      }
+
+      .error-message {
+         color: red;
+         margin-bottom: 15px;
+         text-align: center;
+      }
+
+      .success-message {
+         color: green;
+         margin-bottom: 15px;
+         text-align: center;
+      }
+      .review-summary-stars2 .fas{
+
+         color: #ffffff !important;
+      }
+   </style>
 </head>
 
 <body>
@@ -297,7 +461,7 @@
                                  </li>
                                  <li>
                                     <i class="fas fa-money-bill"></i>
-                                    <span id="tour-price"></span>
+                                    <span id=".tour-price"></span>
                                  </li>
                                  <li>
                                     <i class="fas fa-map-marked-alt"></i>
@@ -329,12 +493,12 @@
                               <div class="tab-pane fade show active" id="overview" role="tabpanel"
                                  aria-labelledby="overview-tab">
                                  <div class="overview-content">
-                                    <p id="program-description"> 
+                                    <p id="program-description">
                                     </p>
                                     <p></p>
                                     <ul>
                                        <li>- </li>
-                                       <li>-</li>
+                                       <li>- </li>
                                        <li>- </li>
                                        <li>- </li>
                                        <li>- </li>
@@ -343,165 +507,75 @@
                               </div>
                               <div class="tab-pane" id="program" role="tabpanel" aria-labelledby="program-tab">
                                  <div class="itinerary-content">
-                                    <h3>Program <span id="program-duration">( 4 days )</span></h3>
-                                    <p>.</p>
+                                    <h3>Program <span id="program-duration">( - days )</span></h3>
+                                    <p id="program-duration-info">Loading program details...</p>
                                  </div>
                                  <div class="itinerary-timeline-wrap">
-                                    <ul id="program-list">
-                                       <li>
-                                          <div class="timeline-content">
-                                             <div class="day-count">Day <span>1</span></div>
-                                             <h4>Ancient Rome Visit</h4>
-                                             <p>
-                                                pretium.</p>
-                                          </div>
-                                       </li>
-                                       <li>
-                                          <div class="timeline-content">
-                                             <div class="day-count">Day <span>2</span></div>
-                                             <h4>Classic Rome Sightseeing</h4>
-                                             <p>.</p>
-                                          </div>
-                                       </li>
-                                       <li>
-                                          <div class="timeline-content">
-                                             <div class="day-count">Day <span>3</span></div>
-                                             <h4>Vatican City Visit</h4>
-                                             <p>
-                                                pretium.</p>
-                                          </div>
-                                       </li>
-                                       <li>
-                                          <div class="timeline-content">
-                                             <div class="day-count">Day <span>4</span></div>
-                                             <h4>Italian Food Tour</h4>
-                                             <p>
-                                                pretium.</p>
-                                          </div>
-                                       </li>
-                                    </ul>
+                                    <ul id="program-list"></ul>
                                  </div>
                               </div>
-                              <div class="tab-pane" id="review" role="tabpanel" aria-labelledby="review-tab">
+                              <div class="tab-pane review-section" id="review" role="tabpanel"
+                                 aria-labelledby="review-tab">
                                  <div class="summary-review">
                                     <div class="review-score">
-                                       <span>4.9</span>
+                                       <span id="overall-rating">-</span>
                                     </div>
                                     <div class="review-score-content">
-                                       <h3>
-                                          Excellent
-                                          <span>( Based on 24 reviews )</span>
+                                       <div id="review-summary-stars" class="review-summary-stars"></div>
+                                       <h3 id="review-quality">
+                                          Review Quality
+                                          <span id="review-count-text">( - reviews )</span>
                                        </h3>
-                                       <p>Tincidunt iaculis pede mus lobortis hendrerit eveniet impedit aenean mauris
-                                          qui, pharetra rem doloremque laboris euismod deserunt non, cupiditate,
-                                          vestibulum.</p>
+                                       <p id="review-summary-text">Loading review summary...</p>
                                     </div>
                                  </div>
-                                 <!-- review comment html -->
+
                                  <div class="comment-area">
-                                    <h3 class="comment-title">3 Reviews</h3>
+                                    <h3 class="comment-title" id="review-count">Reviews</h3>
                                     <div class="comment-area-inner">
-                                       <ol>
-                                          <li>
-                                             <figure class="comment-thumb">
-                                                <img src="assets/images/img20.jpg" alt="">
-                                             </figure>
-                                             <div class="comment-content">
-                                                <div class="comment-header">
-                                                   <h5 class="author-name">Tom Sawyer</h5>
-                                                   <span class="post-on">Jana 10 2020</span>
-                                                   <div class="rating-wrap">
-                                                      <div class="rating-start" title="Rated 5 out of 5">
-                                                         <span style="width: 90%;"></span>
-                                                      </div>
-                                                   </div>
-                                                </div>
-                                                <p>Officia amet posuere voluptates, mollit montes eaque accusamus
-                                                   laboriosam quisque cupidatat dolor pariatur, pariatur auctor.</p>
-                                                <a href="#" class="reply"><i class="fas fa-reply"></i>Reply</a>
-                                             </div>
-                                          </li>
-                                          <li>
-                                             <ol>
-                                                <li>
-                                                   <figure class="comment-thumb">
-                                                      <img src="assets/images/img21.jpg" alt="">
-                                                   </figure>
-                                                   <div class="comment-content">
-                                                      <div class="comment-header">
-                                                         <h5 class="author-name">John Doe</h5>
-                                                         <span class="post-on">Jana 10 2020</span>
-                                                         <div class="rating-wrap">
-                                                            <div class="rating-start" title="Rated 5 out of 5">
-                                                               <span style="width: 90%"></span>
-                                                            </div>
-                                                         </div>
-                                                      </div>
-                                                      <p>Officia amet posuere voluptates, mollit montes eaque accusamus
-                                                         laboriosam quisque cupidatat dolor pariatur, pariatur auctor.
-                                                      </p>
-                                                      <a href="#" class="reply"><i class="fas fa-reply"></i>Reply</a>
-                                                   </div>
-                                                </li>
-                                             </ol>
-                                          </li>
-                                       </ol>
-                                       <ol>
-                                          <li>
-                                             <figure class="comment-thumb">
-                                                <img src="assets/images/img22.jpg" alt="">
-                                             </figure>
-                                             <div class="comment-content">
-                                                <div class="comment-header">
-                                                   <h5 class="author-name">Jaan Smith</h5>
-                                                   <span class="post-on">Jana 10 2020</span>
-                                                   <div class="rating-wrap">
-                                                      <div class="rating-start" title="Rated 5 out of 5">
-                                                         <span></span>
-                                                      </div>
-                                                   </div>
-                                                </div>
-                                                <p>Officia amet posuere voluptates, mollit montes eaque accusamus
-                                                   laboriosam quisque cupidatat dolor pariatur, pariatur auctor.</p>
-                                                <a href="#" class="reply"><i class="fas fa-reply"></i>Reply</a>
-                                             </div>
-                                          </li>
+                                       <ol id="reviews-list">
+                                          <!-- Reviews will be dynamically populated here -->
                                        </ol>
                                     </div>
-                                    <div class="comment-form-wrap">
-                                       <h3 class="comment-title">Leave a Review</h3>
-                                       <form class="comment-form">
-                                          <div class="full-width rate-wrap">
-                                             <label>Your rating</label>
-                                             <div class="procduct-rate">
-                                                <span></span>
-                                             </div>
+                                 </div>
+                                 <div class="comment-form-wrap">
+                                    <h3 class="comment-title">Leave a Review</h3>
+                                    <form id="review-form" class="comment-form">
+                                       <div class="full-width rate-wrap">
+                                          <label>Your rating</label>
+                                          <div class="interactive-stars" id="star-rating">
+                                             <i class="far fa-star" data-rating="1"></i>
+                                             <i class="far fa-star" data-rating="2"></i>
+                                             <i class="far fa-star" data-rating="3"></i>
+                                             <i class="far fa-star" data-rating="4"></i>
+                                             <i class="far fa-star" data-rating="5"></i>
                                           </div>
-                                          <p>
-                                             <input type="text" name="name" placeholder="Name">
-                                          </p>
-                                          <p>
-                                             <input type="text" name="name" placeholder="Last name">
-                                          </p>
-                                          <p>
-                                             <input type="email" name="email" placeholder="Email">
-                                          </p>
-                                          <p>
-                                             <input type="text" name="subject" placeholder="Subject">
-                                          </p>
-                                          <p>
-                                             <textarea rows="6" placeholder="Your review"></textarea>
-                                          </p>
-                                          <p>
-                                             <input type="submit" name="submit" value="Submit">
-                                          </p>
-                                       </form>
-                                    </div>
+                                       </div>
+                                       <div id="error-container" class="error-message"></div>
+                                       <div id="success-container" class="success-message"></div>
+                                       <p>
+                                          <input type="text" id="full-name" name="name" placeholder="Full Name"
+                                             readonly>
+                                       </p>
+                                       <p>
+                                          <input type="email" id="email" name="email" placeholder="Email" readonly>
+                                       </p>
+                                       <p>
+                                          <input type="text" name="subject" placeholder="Review Subject" required>
+                                       </p>
+                                       <p>
+                                          <textarea rows="6" name="comment" placeholder="Your review"
+                                             required></textarea>
+                                       </p>
+                                       <p>
+                                          <input type="submit" class="submit-btn" value="Submit Review">
+                                       </p>
+                                    </form>
                                  </div>
                               </div>
                               <div class="tab-pane" id="map" role="tabpanel" aria-labelledby="map-tab">
                                  <div class="map-area">
-                                    <iframe
+                                    <iframe id="program-map"
                                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d60998820.06503915!2d95.3386452160086!3d-21.069765827214972!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2b2bfd076787c5df%3A0x538267a1955b1352!2sAustralia!5e0!3m2!1sen!2snp!4v1579777829477!5m2!1sen!2snp"
                                        height="450" allowfullscreen=""></iframe>
                                  </div>
@@ -539,110 +613,69 @@
                      <div class="sidebar">
                         <div class="package-price">
                            <h5 class="price">
-                              <span>$649</span> / per person
+                              <span id="tour-price">$649</span> / per package
                            </h5>
-                           <div class="start-wrap">
-                              <div class="rating-start" title="Rated 5 out of 5">
-                                 <span style="width: 60%"></span>
-                              </div>
-                           </div>
+                           <div id=".review-summary-stars" class="review-summary-stars2"></div>
                         </div>
-                        <!-- <div class="widget-bg booking-form-wrap">
-                              <h4 class="bg-title">Booking</h4>
-                              <form class="booking-form">
-                                 <div class="row">
-                                    <div class="col-sm-12">
-                                       <div class="form-group">
-                                          <input name="name_booking" type="text" placeholder="Full Name">
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                       <div class="form-group">
-                                          <input name="email_booking" type="text" placeholder="Email">
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                       <div class="form-group">
-                                          <input name="phone_booking" type="text" placeholder="Number">
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                       <div class="form-group">
-                                          <input class="input-date-picker" type="text" name="s" autocomplete="off" readonly="readonly" placeholder="Date">
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                       <h4 class="">Add Options</h4>
-                                    </div>
-                                    <div class="col-sm-6">
-                                       <div class="form-group">
-                                          <label class="checkbox-list">
-                                             <input type="checkbox" name="s">
-                                             <span class="custom-checkbox"></span>
-                                             Tour guide
-                                          </label>
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                       <div class="form-group">
-                                          <label class="checkbox-list">
-                                             <input type="checkbox" name="s">
-                                             <span class="custom-checkbox"></span>
-                                             Insurance 
-                                          </label>
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                       <div class="form-group">
-                                          <label class="checkbox-list">
-                                             <input type="checkbox" name="s">
-                                             <span class="custom-checkbox"></span>
-                                             Dinner
-                                          </label>
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                       <div class="form-group">
-                                          <label class="checkbox-list">
-                                             <input type="checkbox" name="s">
-                                             <span class="custom-checkbox"></span>
-                                             Bike rent
-                                          </label>
-                                       </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                       <div class="form-group submit-btn">
-                                          <input type="submit" name="submit" value="Boook Now">
-                                       </div>
+                        <div class="widget-bg booking-form-wrap">
+                           <h4 class="bg-title">Booking</h4>
+                           <form class="booking-form">
+                              <div class="row">
+                                 <div class="col-sm-12">
+                                    <div class="form-group">
+                                       <input name="name_booking" type="text" placeholder="Full Name">
                                     </div>
                                  </div>
-                              </form>
-                           </div>
-                           <div class="widget-bg information-content text-center">
-                              <h5>TRAVEL TIPS</h5>
-                              <h3>NEED TRAVEL RELATED TIPS & INFORMATION</h3>
-                              <p>Mollit voluptatem perspiciatis convallis elementum corporis quo veritatis aliquid blandit, blandit torquent, odit placeat. </p>
-                              <a href="#" class="button-primary">GET A QUOTE</a>
-                           </div>
-                           <div class="travel-package-content text-center" style="background-image: url(assets/images/img11.jpg);">
-                              <h5>MORE PACKAGES</h5>
-                              <h3>OTHER TRAVEL PACKAGES</h3>
-                              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus.</p>
-                              <ul>
-                                 <li>
-                                    <a href="#"><i class="far fa-arrow-alt-circle-right"></i>Vacation packages</a>
-                                 </li>
-                                 <li>
-                                    <a href="#"><i class="far fa-arrow-alt-circle-right"></i>Honeymoon packages</a>
-                                 </li>
-                                 <li>
-                                    <a href="#"><i class="far fa-arrow-alt-circle-right"></i>New year packages</a>
-                                 </li>
-                                 <li>
-                                    <a href="#"><i class="far fa-arrow-alt-circle-right"></i>Weekend packages</a>
-                                 </li>
-                              </ul>
-                           </div> -->
+                                 <div class="col-sm-12">
+                                    <div class="form-group">
+                                       <input name="email_booking" type="text" placeholder="Email">
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12">
+                                    <div class="form-group">
+                                       <input id="..tour-price" name="price" type="text" placeholder="Number" disabled>
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12">
+                                    <div class="form-group">
+                                       <input class="input-date-picker" type="text" name="s" autocomplete="off" placeholder="Date">
+                                    </div>
+                                 </div>
+                                 <div class="col-sm-12">
+                                    <div class="form-group submit-btn">
+                                       <input type="submit" name="submit" value="Boook Now">
+                                    </div>
+                                 </div>
+                              </div>
+                           </form>
+                        </div>
+                        <div class="widget-bg information-content text-center">
+                           <h5>TRAVEL TIPS</h5>
+                           <h3>NEED TRAVEL RELATED TIPS & INFORMATION</h3>
+                           <p>Mollit voluptatem perspiciatis convallis elementum corporis quo veritatis aliquid blandit,
+                              blandit torquent, odit placeat. </p>
+                           <a href="#" class="button-primary">GET A QUOTE</a>
+                        </div>
+                        <div class="travel-package-content text-center"
+                           style="background-image: url(assets/images/img11.jpg);">
+                           <h5>MORE PACKAGES</h5>
+                           <h3>OTHER TRAVEL PACKAGES</h3>
+                           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus.</p>
+                           <ul>
+                              <li>
+                                 <a href="#"><i class="far fa-arrow-alt-circle-right"></i>Vacation packages</a>
+                              </li>
+                              <li>
+                                 <a href="#"><i class="far fa-arrow-alt-circle-right"></i>Honeymoon packages</a>
+                              </li>
+                              <li>
+                                 <a href="#"><i class="far fa-arrow-alt-circle-right"></i>New year packages</a>
+                              </li>
+                              <li>
+                                 <a href="#"><i class="far fa-arrow-alt-circle-right"></i>Weekend packages</a>
+                              </li>
+                           </ul>
+                        </div>
                      </div>
                   </div>
                </div>
@@ -831,9 +864,11 @@
    <script src="assets/vendors/slick/slick.min.js"></script>
    <script src="assets/js/jquery.slicknav.js"></script>
    <script src="assets/js/custom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
    <!-- my js -->
    <script src="Fetch/Package-Details.js"></script>
+
 </body>
 
 <!-- Mirrored from demo.bosathemes.com/html/travele/package-detail.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 22 Feb 2025 18:24:58 GMT -->

@@ -112,7 +112,9 @@ namespace Ajloun_Tour.Implementations
                 DayNumber = packageProgram.DayNumber,
                 ProgramDate = packageProgram.ProgramDate,
                 CustomTitle = packageProgram.CustomTitle,
-                CustomDescription = packageProgram.CustomDescription
+                CustomDescription = packageProgram.CustomDescription,
+                CreatedAt = packageProgram.CreatedAt,
+                UpdatedAt = packageProgram.UpdatedAt,
             };
         }
 

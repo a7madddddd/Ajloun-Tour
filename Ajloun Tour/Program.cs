@@ -123,6 +123,8 @@ builder.Services.AddScoped<ITourProgramServiceRepository, TourProgramServiceRepo
 builder.Services.AddScoped<IProgramRepository, ProgramRepository>();
 builder.Services.AddScoped<IPackProgramServiceRepository, PackProgramServiceRepository>();
 builder.Services.AddScoped<IPackageProgramRepository, PackageProgramRepository>();
+builder.Services.AddScoped<IOffersProgramRepository, OffersProgramRepository>();
+builder.Services.AddScoped<IOfferProgramServiceRepository, OfferProgramServiceRepository>();
 
 
 

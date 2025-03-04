@@ -71,6 +71,7 @@ namespace Ajloun_Tour.Implementations
             existingPackProgram.ProgramDate = packageProgram.ProgramDate;
             existingPackProgram.CustomTitle = packageProgram.CustomTitle;
             existingPackProgram.CustomDescription = packageProgram.CustomDescription;
+            existingPackProgram.CreatedAt = DateTime.Now;
             existingPackProgram.UpdatedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();

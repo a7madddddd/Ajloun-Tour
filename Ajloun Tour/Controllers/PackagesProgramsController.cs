@@ -47,7 +47,7 @@ namespace Ajloun_Tour.Controllers
 
         // GET: api/TourPrograms/tour/5/programs
         [HttpGet("pack/{packId}/Withprograms")]
-        public async Task<ActionResult<PackageWithProgramsDTO>> GetTourWithPrograms(int packId)
+        public async Task<ActionResult<PackageWithProgramsDTO>> GetPackWithPrograms(int packId)
         {
             var packWithPrograms = await _packageServiceRepository.GetPackProgramsByPackIdAsync(packId);
 

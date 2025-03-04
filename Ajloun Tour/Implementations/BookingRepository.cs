@@ -15,13 +15,16 @@ namespace Ajloun_Tour.Implementations
         }
         public async Task<IEnumerable<BookingDTO>> GetAllBookings()
         {
-            var Bookings = await _context.Bookings.ToListAsync();
+            // Fetch all bookings along with their related PackageId
+            var bookings = await _context.Bookings
+                .ToListAsync();
 
-            return Bookings.Select(b => new BookingDTO
+            // Map the bookings to BookingDTOs
+            return bookings.Select(b => new BookingDTO
             {
-
                 BookingId = b.BookingId,
                 TourId = b.TourId,
+                PackageId = b.PackageId, // Only include the PackageId, not the entire Package data
                 UserId = b.UserId,
                 BookingDate = b.BookingDate,
                 CreatedAt = b.CreatedAt,
@@ -30,6 +33,8 @@ namespace Ajloun_Tour.Implementations
                 Status = b.Status
             });
         }
+
+
         public async Task<BookingDTO> GetBookingById(int id)
         {
             var booking = await _context.Bookings.FindAsync(id);
@@ -76,6 +81,72 @@ namespace Ajloun_Tour.Implementations
 
                 BookingId = newBooking.BookingId,
                 TourId = newBooking.TourId,
+                UserId = newBooking.UserId,
+                BookingDate = newBooking.BookingDate,
+                CreatedAt = newBooking.CreatedAt,
+                NumberOfPeople = newBooking.NumberOfPeople,
+                TotalPrice = newBooking.TotalPrice,
+                Status = newBooking.Status
+
+
+            };
+        }
+
+        public async Task<BookingDTO> AddPackBookingAsync(CreateBooking createBooking)
+        {
+            var newBooking = new Booking
+            {
+
+                PackageId = createBooking.PackageId,
+                UserId = createBooking.UserId,
+                BookingDate = createBooking.BookingDate,
+                CreatedAt = createBooking.CreatedAt,
+                NumberOfPeople = createBooking.NumberOfPeople,
+                TotalPrice = createBooking.TotalPrice,
+                Status = createBooking.Status
+            };
+
+            _context.Bookings.Add(newBooking);
+            await _context.SaveChangesAsync();
+
+            return new BookingDTO
+            {
+
+                BookingId = newBooking.BookingId,
+                PackageId = newBooking.PackageId,
+                UserId = newBooking.UserId,
+                BookingDate = newBooking.BookingDate,
+                CreatedAt = newBooking.CreatedAt,
+                NumberOfPeople = newBooking.NumberOfPeople,
+                TotalPrice = newBooking.TotalPrice,
+                Status = newBooking.Status
+
+
+            };
+        }
+
+        public async Task<BookingDTO> AddOfferBookingAsync(CreateBooking createBooking)
+        {
+            var newBooking = new Booking
+            {
+
+                OfferId = createBooking.OfferId,
+                UserId = createBooking.UserId,
+                BookingDate = createBooking.BookingDate,
+                CreatedAt = createBooking.CreatedAt,
+                NumberOfPeople = createBooking.NumberOfPeople,
+                TotalPrice = createBooking.TotalPrice,
+                Status = createBooking.Status
+            };
+
+            _context.Bookings.Add(newBooking);
+            await _context.SaveChangesAsync();
+
+            return new BookingDTO
+            {
+
+                BookingId = newBooking.BookingId,
+                OfferId = newBooking.OfferId,
                 UserId = newBooking.UserId,
                 BookingDate = newBooking.BookingDate,
                 CreatedAt = newBooking.CreatedAt,
@@ -141,6 +212,5 @@ namespace Ajloun_Tour.Implementations
             await _context.SaveChangesAsync();
 
         }
-
     }
 }
