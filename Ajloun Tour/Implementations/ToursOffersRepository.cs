@@ -26,11 +26,16 @@ namespace Ajloun_Tour.Implementations
                   OfferId = to.OfferId,
                   TourName = to.Tour.TourName,
                   OfferTitle = to.Offer.Title,
-                  DiscountPercentage = to.Offer.DiscountPercentage ?? 0,  
-                  StartDate = to.Offer.StartDate ?? DateTime.MinValue,   
-                  EndDate = to.Offer.EndDate ?? DateTime.MinValue       
+                  Image = to.Offer.Image,
+                  DiscountPercentage = to.Offer.DiscountPercentage ?? 0,
+                  IsActive = to.Offer.IsActive,
+                  Price = to.Offer.Price,
+                  Peapole = to.Offer.Peapole,
+                  Description = to.Offer.Description,
+                  StartDate = to.Offer.StartDate ?? DateTime.MinValue,
+                  EndDate = to.Offer.EndDate ?? DateTime.MinValue
               })
-              .ToListAsync();           
+              .ToListAsync();
         }
         public async Task<ToursOffersDTO> GetTourOfferById(int tourId, int offerId)
         {
@@ -43,10 +48,16 @@ namespace Ajloun_Tour.Implementations
                            TourId = to.TourId,
                            OfferId = to.OfferId,
                            TourName = to.Tour.TourName,
+                           Image = to.Offer.Image,
                            OfferTitle = to.Offer.Title,
+                           Price  = to.Offer.Price,
+                           Peapole = to.Offer.Peapole,
+                           Description = to.Offer.Description,
+                           IsActive = to.Offer.IsActive,
                            DiscountPercentage = (decimal)to.Offer.DiscountPercentage,
                            StartDate = (DateTime)to.Offer.StartDate,
-                           EndDate = (DateTime)to.Offer.EndDate
+                           EndDate = (DateTime)to.Offer.EndDate,
+                           Map = to.Tour.Map
                        })
                        .FirstOrDefaultAsync();
         }
@@ -63,6 +74,10 @@ namespace Ajloun_Tour.Implementations
                     OfferId = to.OfferId,
                     TourName = to.Tour.TourName,
                     OfferTitle = to.Offer.Title,
+                    Peapole = to.Offer.Peapole,
+                    Description= to.Offer.Description,
+                    Price = to.Offer.Price,
+                    Image = to.Offer.Image,
                     DiscountPercentage = (decimal)to.Offer.DiscountPercentage,
                     StartDate = (DateTime)to.Offer.StartDate,
                     EndDate = (DateTime)to.Offer.EndDate
@@ -105,6 +120,10 @@ namespace Ajloun_Tour.Implementations
                 OfferId = tourOffer.OfferId,
                 TourName = tourOffer.Tour?.TourName, // Assuming TourName is a property of Tour
                 OfferTitle = offer?.Title,           // Assuming Title is a property of Offer
+                Price = offer.Price,
+                Peapole = offer.Peapole,
+                Description = offer.Description, 
+                IsActive = offer.IsActive,
                 DiscountPercentage = createToursOffer.DiscountPercentage,
                 StartDate = createToursOffer.StartDate,
                 EndDate = createToursOffer.EndDate

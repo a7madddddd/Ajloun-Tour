@@ -25,6 +25,7 @@ namespace Ajloun_Tour.Implementations
                 BookingId = b.BookingId,
                 TourId = b.TourId,
                 PackageId = b.PackageId, // Only include the PackageId, not the entire Package data
+                OfferId = b.OfferId,
                 UserId = b.UserId,
                 BookingDate = b.BookingDate,
                 CreatedAt = b.CreatedAt,
@@ -154,9 +155,10 @@ namespace Ajloun_Tour.Implementations
                 TotalPrice = newBooking.TotalPrice,
                 Status = newBooking.Status
 
-
             };
         }
+
+        
 
         public async Task<BookingDTO> UpdateBookingAsync(int id, CreateBooking createBooking)
         {

@@ -12,47 +12,12 @@ namespace Ajloun_Tour.Implementations
     public class ToursPackagesRepository : IToursPackagesRepository
     {
         private readonly MyDbContext _context;
-        private readonly string _imageDirectory;
 
         public ToursPackagesRepository(MyDbContext context)
         {
             _context = context;
-            _imageDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "PakagesImages");
-            EnsureImageDirectoryExists();
+
         }
-
-
-        private void EnsureImageDirectoryExists()
-        {
-            if (!Directory.Exists(_imageDirectory))
-            {
-                Directory.CreateDirectory(_imageDirectory);
-            }
-        }
-
-        private async Task<string> SaveImageFileAsync(IFormFile imageFile)
-        {
-            string fileName = $"{Guid.NewGuid()}_{Path.GetFileName(imageFile.FileName)}";
-            string filePath = Path.Combine(_imageDirectory, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await imageFile.CopyToAsync(stream);
-            }
-
-            return fileName;
-        }
-
-
-        private async Task DeleteImageFileAsync(string fileName)
-        {
-            string filePath = Path.Combine(_imageDirectory, fileName);
-            if (File.Exists(filePath))
-            {
-                await Task.Run(() => File.Delete(filePath));
-            }
-        }
-
 
 
 
@@ -73,7 +38,7 @@ namespace Ajloun_Tour.Implementations
                     NumberOfPeople = tp.Package.NumberOfPeople,
                     Map = tp.Package.Map,
                     Location = tp.Package.Location,
-                    Image = tp.Image,
+                    Image = tp.Package.Image,
                 })
                 .AsNoTracking()
                 .ToListAsync();
@@ -98,7 +63,7 @@ namespace Ajloun_Tour.Implementations
                     NumberOfPeople = to.Package.NumberOfPeople, 
                     Map = to.Package.Map,
                     Location = to.Package.Location,
-                    Image = to.Image
+                    Image = to.Package.Image
                 })
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
@@ -131,22 +96,13 @@ namespace Ajloun_Tour.Implementations
         {
             try
             {
-                if (createToursPackages.Image == null)
-                {
-                    throw new ArgumentNullException(nameof(createToursPackages.Image), "Image file is required.");
-                }
 
-                // Save the image file and get the file name
-                var fileName = await SaveImageFileAsync(createToursPackages.Image);
-
-                Console.WriteLine($"Received: TourId={createToursPackages.TourId}, PackageId={createToursPackages.PackageId}");
 
                 var tourExists = await _context.Tours.AnyAsync(t => t.TourId == createToursPackages.TourId);
                 var package = await _context.Packages.FirstOrDefaultAsync(p => p.Id == createToursPackages.PackageId);
 
                 if (!tourExists)
                 {
-                    Console.WriteLine("❌ Error: Tour does not exist.");
                     return null;
                 }
 
@@ -155,14 +111,11 @@ namespace Ajloun_Tour.Implementations
                     TourId = createToursPackages.TourId,
                     PackageId = package.Id,
                     IsActive = createToursPackages.IsActive,
-                    Image = fileName, 
                 };
 
                 await _context.TourPackages.AddAsync(tourPackage);
-                Console.WriteLine($"✅ Added TourPackage: TourId={tourPackage.TourId}, PackageId={tourPackage.PackageId}");
 
                 var changes = await _context.SaveChangesAsync();
-                Console.WriteLine($"🔄 Database changes: {changes}");
 
                 if (changes > 0)
                 {
@@ -171,7 +124,6 @@ namespace Ajloun_Tour.Implementations
                         TourId = tourPackage.TourId,
                         PackageId = tourPackage.PackageId,
                         IsActive = tourPackage.IsActive,
-                        Image = fileName,  
                     };
                 }
 
@@ -179,7 +131,6 @@ namespace Ajloun_Tour.Implementations
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❗ Error in AddTourPackage: {ex.Message}");
                 return null;
             }
         }
@@ -231,13 +182,6 @@ namespace Ajloun_Tour.Implementations
                 existingTourPackage.IsActive = createToursPackages.IsActive.Value;
             }
 
-            // Handle Image update if a new image is provided
-            if (createToursPackages.Image != null)
-            {
-                // Save the new image and update the Image field
-                var newImageFileName = await SaveImageFileAsync(createToursPackages.Image);
-                existingTourPackage.Image = newImageFileName;
-            }
 
             // Save changes to the database
             _context.TourPackages.Update(existingTourPackage);
@@ -248,7 +192,7 @@ namespace Ajloun_Tour.Implementations
                 TourId = existingTourPackage.TourId,
                 PackageId = existingTourPackage.PackageId,
                 IsActive = existingTourPackage.IsActive,
-                Image = existingTourPackage.Image,
+                Image = existingTourPackage.Package.Image,
             };
         }
 

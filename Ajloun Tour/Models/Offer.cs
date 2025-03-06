@@ -19,6 +19,10 @@ namespace Ajloun_Tour.Models
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public bool? IsActive { get; set; }
+        public string? Image { get; set; }
+        public int? Peapole { get; set; }
+        public decimal? Price { get; set; }
+        public string? Description { get; set; }
 
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<OfferProgram> OfferPrograms { get; set; }

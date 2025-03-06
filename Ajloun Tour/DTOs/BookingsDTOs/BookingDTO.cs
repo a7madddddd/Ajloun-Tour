@@ -16,5 +16,6 @@ namespace Ajloun_Tour.DTOs.BookingsDTOs
         public string? Status { get; set; }
         public DateTime? CreatedAt { get; set; }
 
+
     }
 }

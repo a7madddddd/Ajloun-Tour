@@ -36,15 +36,16 @@ document.addEventListener('DOMContentLoaded', async function () {
         activeOffers.forEach(offer => {
             const tour = tourMap[offer.id]; // البحث عن الجولة المرتبطة بالعرض
             if (tour) {
-                const originalPrice = tour.price;
+                const originalPrice = offer.price;
                 const discountedPrice = originalPrice * (1 - (offer.discountPercentage / 100));
 
                 // إنشاء كود HTML للعرض
                 const offerHTML = `
                     <div class="col-md-6 col-lg-4">
+
                         <div class="special-item">
                             <figure class="special-img">
-                                <img src="https://localhost:44357/ToursImages/${tour.tourImage}" alt="${tour.packageName}" style="height: 60vh;">
+                                <img src="https://localhost:44357/OffersImages/${offer.image}" alt="${offer.title}" style="height: 60vh;">
                             </figure>
                             <div class="badge-dis">
                                 <span>
@@ -54,10 +55,16 @@ document.addEventListener('DOMContentLoaded', async function () {
                             </div>
                             <div class="special-content">
                                 <div class="meta-cat">
-                                    <a href="#">${tour.tourName || 'Ajloun'}</a>
+           
+                                    <a href="Offers-detail.html?offerId=${offer.id}&tourId=${tour.tourId}">${tour.tourName || 'Ajloun'}</a>
+                                    <div class="badge-dis">
+                                        <span>
+                                            <strong><i class="fas fa-user-friends">   ${offer.peapole}   </i></strong>
+                                        </span>
+                                    </div>
                                 </div>
                                 <h3>
-                                    <a href="#">${offer.title}</a>
+                                    <a href="Offers-detail.html?offerId=${offer.id}&tourId=${tour.tourId}">${offer.title}</a>
                                 </h3>
                                 <div class="package-price">
                                     Price:

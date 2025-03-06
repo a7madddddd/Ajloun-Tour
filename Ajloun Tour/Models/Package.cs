@@ -23,6 +23,7 @@ namespace Ajloun_Tour.Models
         public bool? IsActive { get; set; }
         public string? Location { get; set; }
         public string? Map { get; set; }
+        public string? Image { get; set; }
 
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<PackageProgram> PackagePrograms { get; set; }

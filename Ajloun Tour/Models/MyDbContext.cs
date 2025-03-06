@@ -278,6 +278,8 @@ namespace Ajloun_Tour.Models
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.Description).HasColumnName("description");
+
                 entity.Property(e => e.DiscountPercentage)
                     .HasColumnType("decimal(5, 2)")
                     .HasColumnName("discount_percentage");
@@ -286,7 +288,15 @@ namespace Ajloun_Tour.Models
                     .HasColumnType("date")
                     .HasColumnName("end_date");
 
+                entity.Property(e => e.Image).HasColumnName("image");
+
                 entity.Property(e => e.IsActive).HasColumnName("isActive");
+
+                entity.Property(e => e.Peapole).HasColumnName("peapole");
+
+                entity.Property(e => e.Price)
+                    .HasColumnType("decimal(18, 0)")
+                    .HasColumnName("price");
 
                 entity.Property(e => e.StartDate)
                     .HasColumnType("date")
@@ -338,6 +348,8 @@ namespace Ajloun_Tour.Models
                 entity.Property(e => e.Details)
                     .HasColumnType("text")
                     .HasColumnName("details");
+
+                entity.Property(e => e.Image).HasColumnName("image");
 
                 entity.Property(e => e.IsActive).HasColumnName("isActive");
 
