@@ -1,4 +1,4 @@
-﻿using Ajloun_Tour.DTOs2.TourCartItemsDTOs;
+﻿using Ajloun_Tour.DTOs2.CartItemsDTOs;
 using Ajloun_Tour.Reposetories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,46 +9,65 @@ namespace Ajloun_Tour.Controllers
     [ApiController]
     public class TourCartItemsController : ControllerBase
     {
-        private readonly ITourCartItemsRepository _tourCartItemsRepository;
+        private readonly ICartItemRepository _cartItemRepository;
 
-        public TourCartItemsController(ITourCartItemsRepository tourCartItemsRepository)
+        public TourCartItemsController(ICartItemRepository cartItemRepository)
         {
-            _tourCartItemsRepository = tourCartItemsRepository;
+            _cartItemRepository = cartItemRepository;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TourCartItemsDTO>>> GetCartItems()
+        public async Task<ActionResult<IEnumerable<CartItemDTO>>> GetAllCartItems()
         {
-            var cartItems = await _tourCartItemsRepository.GetCartItems();
-            return Ok(cartItems);
+            return Ok(await _cartItemRepository.GetAllCartItemsAsync());
         }
 
-        [HttpGet("{cartItemId}")]
-        public async Task<ActionResult<TourCartItemsDTO>> GetCartItemById(int cartItemId)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CartItemDTO>> GetCartItemById(int id)
         {
-            var cartItem = await _tourCartItemsRepository.GetCartItemsByCartId(cartItemId);
+            var cartItem = await _cartItemRepository.GetCartItemByIdAsync(id);
+            if (cartItem == null)
+                return NotFound();
+
             return Ok(cartItem);
         }
 
+        [HttpGet("cart/{cartId}")]
+        public async Task<ActionResult<IEnumerable<CartItemDTO>>> GetCartItemsByCartId(int cartId)
+        {
+            return Ok(await _cartItemRepository.GetCartItemsByCartIdAsync(cartId));
+        }
+
         [HttpPost]
-        public async Task<ActionResult<TourCartItemsDTO>> AddCartItem(CreateCartItemDTO createCartItemDTO)
+        public async Task<ActionResult<CartItemDTO>> CreateCartItem(CreateCartItemDTO createCartItemDTO)
         {
-            var createdCartItem = await _tourCartItemsRepository.AddCartItem(createCartItemDTO);
-            return CreatedAtAction(nameof(GetCartItemById), new { cartItemId = createdCartItem.CartItemId }, createdCartItem);
+            var cartItem = await _cartItemRepository.AddCartItemAsync(createCartItemDTO);
+            return CreatedAtAction(nameof(GetCartItemById), new { id = cartItem.CartItemId }, cartItem);
         }
 
-        [HttpPut("{cartItemId}")]
-        public async Task<IActionResult> UpdateCartItem(int cartItemId, CreateCartItemDTO updateCartItemDTO)
+        [HttpPut("{id}")]
+        public async Task<ActionResult<CartItemDTO>> UpdateCartItem(int id, UpdateCartItemDTO updateCartItemDTO)
         {
-            var updatedCartItem = await _tourCartItemsRepository.UpdateCartItem(cartItemId, updateCartItemDTO);
-            return Ok(updatedCartItem);
+            var cartItem = await _cartItemRepository.UpdateCartItemAsync(id, updateCartItemDTO);
+            if (cartItem == null)
+                return NotFound();
+
+            return Ok(cartItem);
         }
 
-        [HttpDelete("{cartItemId}")]
-        public async Task<IActionResult> DeleteCartItem(int cartItemId)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteCartItem(int id)
         {
-            await _tourCartItemsRepository.DeleteCartItem(cartItemId);
+            await _cartItemRepository.DeleteCartItemAsync(id);
             return NoContent();
         }
+
+        [HttpPut("booking/{bookingId}")]
+        public async Task<ActionResult<IEnumerable<CartItemDTO>>> UpdateCartItemsBookingId([FromBody] int[] cartItemIds, int bookingId)
+        {
+            var cartItems = await _cartItemRepository.UpdateCartItemsBookingIdAsync(cartItemIds, bookingId);
+            return Ok(cartItems);
+        }
     }
+
 }

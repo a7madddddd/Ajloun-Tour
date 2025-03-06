@@ -2,6 +2,7 @@ using Ajloun_Tour;
 using Ajloun_Tour.Implementations;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
+using Ajloun_Tour.Repositories.Implementations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
@@ -124,7 +125,7 @@ builder.Services.AddScoped<IPackProgramServiceRepository, PackProgramServiceRepo
 builder.Services.AddScoped<IPackageProgramRepository, PackageProgramRepository>();
 builder.Services.AddScoped<IOffersProgramRepository, OffersProgramRepository>();
 builder.Services.AddScoped<IOfferProgramServiceRepository, OfferProgramServiceRepository>();
-
+builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 
 
 

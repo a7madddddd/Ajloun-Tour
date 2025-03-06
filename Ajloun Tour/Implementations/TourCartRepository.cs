@@ -67,7 +67,9 @@ namespace Ajloun_Tour.Implementations
             var cart = new Cart
             {
                 UserId = createTourCart.UserID,
-                Status = createTourCart.Status
+                Status = createTourCart.Status ?? "Pending", 
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
 
             _context.Carts.Add(cart);
@@ -77,11 +79,12 @@ namespace Ajloun_Tour.Implementations
             {
                 CartID = cart.CartId,
                 UserID = cart.UserId,
-                CreatedAt = (DateTime)cart.CreatedAt,
-                UpdatedAt = (DateTime)cart.UpdatedAt,
+                CreatedAt = cart.CreatedAt ?? DateTime.UtcNow,
+                UpdatedAt = cart.UpdatedAt ?? DateTime.UtcNow,
                 Status = cart.Status
             };
         }
+
 
         public async Task<TourCartDTO> UpdateCart(int cartId, CreateTourCart updateCartDTO)
         {

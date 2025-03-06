@@ -22,6 +22,8 @@ namespace Ajloun_Tour.Repositories.Implementations
                     CartItemId = ci.CartItemId,
                     CartId = ci.CartId,
                     TourId = ci.TourId,
+                    PackageId = ci.PackageId,
+                    OfferId = ci.OfferId,
                     Quantity = ci.Quantity,
                     Price = ci.Price,
                     SelectedDate = ci.SelectedDate,
@@ -52,6 +54,8 @@ namespace Ajloun_Tour.Repositories.Implementations
                 CartItemId = cartItem.CartItemId,
                 CartId = cartItem.CartId,
                 TourId = cartItem.TourId,
+                PackageId = cartItem.PackageId,
+                OfferId = cartItem.OfferId,
                 Quantity = cartItem.Quantity,
                 Price = cartItem.Price,
                 SelectedDate = cartItem.SelectedDate,
@@ -79,6 +83,8 @@ namespace Ajloun_Tour.Repositories.Implementations
                     CartItemId = ci.CartItemId,
                     CartId = ci.CartId,
                     TourId = ci.TourId,
+                    PackageId = ci.PackageId,
+                    OfferId = ci.OfferId,
                     Quantity = ci.Quantity,
                     Price = ci.Price,
                     SelectedDate = ci.SelectedDate,
@@ -100,10 +106,23 @@ namespace Ajloun_Tour.Repositories.Implementations
 
         public async Task<CartItemDTO> AddCartItemAsync(CreateCartItemDTO createCartItemDTO)
         {
+            // Retrieve the booking using the provided BookingId
+            var booking = await _context.Bookings
+                .Where(b => b.BookingId == createCartItemDTO.BookingId)
+                .FirstOrDefaultAsync();
+
+            if (booking == null)
+            {
+                throw new Exception("Booking not found.");
+            }
+
+            // Create a new CartItem based on the Booking information
             var cartItem = new CartItem
             {
                 CartId = createCartItemDTO.CartId,
-                TourId = createCartItemDTO.TourId,
+                TourId = booking.TourId ?? 0,  
+                PackageId = booking.PackageId ?? 0,  
+                OfferId = booking.OfferId ?? 0, 
                 Quantity = createCartItemDTO.Quantity,
                 Price = createCartItemDTO.Price,
                 SelectedDate = createCartItemDTO.SelectedDate,
@@ -117,7 +136,8 @@ namespace Ajloun_Tour.Repositories.Implementations
                 Option3Price = createCartItemDTO.Option3Price,
                 Option4Price = createCartItemDTO.Option4Price,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
+                BookingId = createCartItemDTO.BookingId 
             };
 
             _context.CartItems.Add(cartItem);
@@ -128,6 +148,8 @@ namespace Ajloun_Tour.Repositories.Implementations
                 CartItemId = cartItem.CartItemId,
                 CartId = cartItem.CartId,
                 TourId = cartItem.TourId,
+                PackageId = cartItem.PackageId,
+                OfferId = cartItem.OfferId,
                 Quantity = cartItem.Quantity,
                 Price = cartItem.Price,
                 SelectedDate = cartItem.SelectedDate,
@@ -153,6 +175,8 @@ namespace Ajloun_Tour.Repositories.Implementations
                 return null;
 
             cartItem.TourId = updateCartItemDTO.TourId ?? cartItem.TourId;
+            cartItem.PackageId = updateCartItemDTO.PackageId ?? cartItem.PackageId;
+            cartItem.OfferId = updateCartItemDTO.OfferId ?? cartItem.OfferId;
             cartItem.Quantity = updateCartItemDTO.Quantity;
             cartItem.Price = updateCartItemDTO.Price;
             cartItem.SelectedDate = updateCartItemDTO.SelectedDate;
@@ -176,6 +200,8 @@ namespace Ajloun_Tour.Repositories.Implementations
                 CartItemId = cartItem.CartItemId,
                 CartId = cartItem.CartId,
                 TourId = cartItem.TourId,
+                PackageId = cartItem.PackageId,
+                OfferId = cartItem.OfferId,
                 Quantity = cartItem.Quantity,
                 Price = cartItem.Price,
                 SelectedDate = cartItem.SelectedDate,
@@ -224,6 +250,8 @@ namespace Ajloun_Tour.Repositories.Implementations
                 CartItemId = ci.CartItemId,
                 CartId = ci.CartId,
                 TourId = ci.TourId,
+                PackageId = ci.PackageId,
+                OfferId = ci.OfferId,
                 Quantity = ci.Quantity,
                 Price = ci.Price,
                 SelectedDate = ci.SelectedDate,

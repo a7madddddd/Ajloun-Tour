@@ -7,7 +7,7 @@ namespace Ajloun_Tour.Models
     {
         public int CartItemId { get; set; }
         public int CartId { get; set; }
-        public int TourId { get; set; }
+        public int? TourId { get; set; }
         public int? Quantity { get; set; }
         public decimal Price { get; set; }
         public DateTime SelectedDate { get; set; }

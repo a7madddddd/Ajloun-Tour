@@ -6,7 +6,9 @@ namespace Ajloun_Tour.DTOs2.CartItemsDTOs
     {
         [Required]
         public int CartId { get; set; }
-        public int TourId { get; set; }
+        public int? TourId { get; set; }
+        public int? PackageId { get; set; }
+        public int? OfferId { get; set; }
         [Required]
         public int Quantity { get; set; }
         [Required]
@@ -23,5 +25,8 @@ namespace Ajloun_Tour.DTOs2.CartItemsDTOs
         public decimal? Option2Price { get; set; }
         public decimal? Option3Price { get; set; }
         public decimal? Option4Price { get; set; }
+
+        public int? BookingId { get; set; }  // Add this line
+
     }
 }

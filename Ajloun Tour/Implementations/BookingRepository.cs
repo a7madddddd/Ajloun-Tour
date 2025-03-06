@@ -1,6 +1,7 @@
 ﻿using Ajloun_Tour.DTOs.BookingsDTOs;
 using Ajloun_Tour.DTOs2.BookingOptionsDTOs;
 using Ajloun_Tour.DTOs2.BookingOptionSelectionDTOs;
+using Ajloun_Tour.DTOs2.TourCartDTOs;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
 using Microsoft.EntityFrameworkCore;
@@ -11,17 +12,20 @@ namespace Ajloun_Tour.Implementations
     {
         private readonly MyDbContext _context;
         private readonly ICartItemRepository _cartItemRepository;
+        private readonly ITourCartRepository _tourCartRepository;
         private readonly IBookingOptionRepository _bookingOptionRepository;
 
-        public BookingRepository(MyDbContext context, ICartItemRepository cartItemRepository, IBookingOptionRepository bookingOptionRepository)
+        public BookingRepository(MyDbContext context, ICartItemRepository cartItemRepository, IBookingOptionRepository bookingOptionRepository, TourCartRepository tourCartRepository)
 
         {
             _context = context;
             _cartItemRepository = cartItemRepository;
             _bookingOptionRepository = bookingOptionRepository;
+            _tourCartRepository = tourCartRepository;
         }
         public async Task<IEnumerable<BookingDTO>> GetAllBookings()
         {
+
             var bookings = await _context.Bookings.ToListAsync();
             var bookingDTOs = new List<BookingDTO>();
 
@@ -43,7 +47,7 @@ namespace Ajloun_Tour.Implementations
             var options = await _bookingOptionRepository.GetOptionsByBookingIdAsync(id);
             return MapBookingToDTO(booking, options.ToList());
         }
-        
+
 
 
         public async Task<BookingDTO> GetBookingById(int id)
@@ -74,23 +78,18 @@ namespace Ajloun_Tour.Implementations
         public async Task<List<BookingDTO>> GetBookingByUserId(int userId)
         {
             var bookings = await _context.Bookings
-                .Where(b => b.UserId == userId) // ✅ استبدال BookingId بـ UserId
-                .Select(b => new BookingDTO
-                {
-                    BookingId = b.BookingId,
-                    TourId = b.TourId,
-                    PackageId = b.PackageId,
-                    OfferId = b.OfferId,
-                    UserId = b.UserId,
-                    BookingDate = b.BookingDate,
-                    NumberOfPeople = b.NumberOfPeople,
-                    TotalPrice = b.TotalPrice,
-                    Status = b.Status,
-                    CreatedAt = b.CreatedAt
-                })
-                .ToListAsync(); // ✅ إرجاع قائمة بدلاً من عنصر واحد فقط
+                .Where(b => b.UserId == userId)
+                .ToListAsync();
 
-            return bookings;
+            var bookingDTOs = new List<BookingDTO>();
+
+            foreach (var booking in bookings)
+            {
+                var options = await _bookingOptionRepository.GetOptionsByBookingIdAsync(booking.BookingId);
+                bookingDTOs.Add(MapBookingToDTO(booking, options.ToList()));
+            }
+
+            return bookingDTOs;
         }
 
 
@@ -250,13 +249,8 @@ namespace Ajloun_Tour.Implementations
 
         }
 
-        public Task<BookingDTO> CreateBookingFromCartAsync(CreateBooking createBooking)
-        {
-            throw new NotImplementedException();
-        }
 
-
-        private async Task<BookingOptionsDTO> GetOrCreateBookingOptionAsync(string optionName, decimal optionPrice)
+        public async Task<BookingOptionsDTO> GetOrCreateBookingOptionAsync(string optionName, decimal optionPrice)
         {
             // Check if option already exists
             var existingOption = await _context.BookingOptions
@@ -304,9 +298,28 @@ namespace Ajloun_Tour.Implementations
                 TotalPrice = booking.TotalPrice,
                 Status = booking.Status,
                 CreatedAt = booking.CreatedAt,
-                BookingOptions = options
             };
         }
+        public async Task<Booking> CreateBookingAsync(int userId, Booking newBooking)
+        {
+            // Check if the user already has bookings
+            bool isFirstBooking = !await _context.Bookings.AnyAsync(b => b.UserId == userId);
+
+            // Create the booking
+            _context.Bookings.Add(newBooking);
+            await _context.SaveChangesAsync();
+
+            // If it's the user's first booking, create a cart for them
+            if (isFirstBooking)
+            {
+                // Automatically create a cart for the user when it's their first booking
+                await _tourCartRepository.AddCart(new CreateTourCart { UserID = userId, Status = "Pending" });
+            }
+
+            return newBooking;
+        }
+
     }
 }
-}
+
+

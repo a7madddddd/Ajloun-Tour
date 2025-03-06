@@ -3,6 +3,8 @@
     public class UpdateCartItemDTO
     {
         public int? TourId { get; set; }
+        public int? PackageId { get; set; }
+        public int? OfferId { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
         public DateTime SelectedDate { get; set; }

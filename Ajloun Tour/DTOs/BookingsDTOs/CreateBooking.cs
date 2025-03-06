@@ -6,6 +6,10 @@
         public int? UserId { get; set; }
         public int? PackageId { get; set; }
         public int? OfferId { get; set; }
+        public int SelectionId { get; set; }
+        public int CartId { get; set; }
+        public int CartItemId { get; set; }
+
         public DateTime BookingDate { get; set; }
         public int NumberOfPeople { get; set; }
         public decimal TotalPrice { get; set; }

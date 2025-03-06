@@ -1,4 +1,6 @@
-﻿namespace Ajloun_Tour.DTOs2.BookingOptionSelectionDTOs
+﻿using Ajloun_Tour.Models;
+
+namespace Ajloun_Tour.DTOs2.BookingOptionSelectionDTOs
 {
     public class BookingOptionSelectionDTO
     {
@@ -7,6 +9,7 @@
         public int OptionId { get; set; }
         public string? OptionName { get; set; }
         public decimal? OptionPrice { get; set; }
+        public BookingOption ? bookingOption { get; set; }
 
     }
 }

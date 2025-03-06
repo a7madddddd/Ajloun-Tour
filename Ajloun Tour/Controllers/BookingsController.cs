@@ -36,18 +36,18 @@ namespace Ajloun_Tour.Controllers
         }
 
         [HttpGet("userId")]
-        public async Task<IActionResult> GetUserBookingByUserId(int userId)
+        public async Task<ActionResult<List<BookingDTO>>> GetBookingByUserId([FromQuery] int userId)
         {
             var bookings = await _bookingRepository.GetBookingByUserId(userId);
-
-            if (bookings == null)
-            {
-                return NotFound(new { message = "No bookings found for this user." }); // ✅ تحسين الاستجابة
-            }
-
             return Ok(bookings);
         }
 
+        //[HttpPost("from-cart")]
+        //public async Task<ActionResult<BookingDTO>> CreateBookingFromCart(CreateBooking createBooking)
+        //{
+        //    var booking = await _bookingRepository.CreateBookingFromCartAsync(createBooking);
+        //    return CreatedAtAction(nameof(GetBookingById), new { id = booking.BookingId }, booking);
+        //}
 
         [HttpPost]
         public async Task<ActionResult<BookingDTO>> AddBookingAsync([FromForm]CreateBooking createBooking)
