@@ -34,6 +34,7 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Testomonial> Testomonials { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
         public virtual DbSet<TourOffer> TourOffers { get; set; } = null!;
+
         public virtual DbSet<TourPackage> TourPackages { get; set; } = null!;
         public virtual DbSet<TourProgram> TourPrograms { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
@@ -172,65 +173,82 @@ namespace Ajloun_Tour.Models
 
             modelBuilder.Entity<CartItem>(entity =>
             {
-                entity.HasIndex(e => e.CartId, "IX_CartItems_CartID");
-
-                entity.HasIndex(e => e.TourId, "IX_CartItems_TourID");
-
                 entity.Property(e => e.CartItemId).HasColumnName("CartItemID");
-
-                entity.Property(e => e.BikeRentPrice)
-                    .HasColumnType("decimal(10, 2)")
-                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.CartId).HasColumnName("CartID");
 
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
 
-                entity.Property(e => e.DinnerPrice)
+                entity.Property(e => e.OfferId).HasColumnName("OfferID");
+
+                entity.Property(e => e.Option1)
+                    .HasMaxLength(255)
+                    .HasColumnName("option1");
+
+                entity.Property(e => e.Option1Price)
                     .HasColumnType("decimal(10, 2)")
-                    .HasDefaultValueSql("((0))");
+                    .HasColumnName("option1Price");
 
-                entity.Property(e => e.HasBikeRent).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Option2)
+                    .HasMaxLength(255)
+                    .HasColumnName("option2");
 
-                entity.Property(e => e.HasDinner).HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.HasInsurance).HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.HasTourGuide).HasDefaultValueSql("((0))");
-
-                entity.Property(e => e.InsurancePrice)
+                entity.Property(e => e.Option2Price)
                     .HasColumnType("decimal(10, 2)")
-                    .HasDefaultValueSql("((0))");
+                    .HasColumnName("option2Price");
+
+                entity.Property(e => e.Option3)
+                    .HasMaxLength(255)
+                    .HasColumnName("option3");
+
+                entity.Property(e => e.Option3Price)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasColumnName("option3Price");
+
+                entity.Property(e => e.Option4)
+                    .HasMaxLength(255)
+                    .HasColumnName("option4");
+
+                entity.Property(e => e.Option4Price)
+                    .HasColumnType("decimal(10, 2)")
+                    .HasColumnName("option4Price");
+
+                entity.Property(e => e.PackageId).HasColumnName("PackageID");
 
                 entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
 
-                entity.Property(e => e.Quantity).HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.SelectedDate).HasColumnType("date");
-
-                entity.Property(e => e.TourGuidePrice)
-                    .HasColumnType("decimal(10, 2)")
-                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.TourId).HasColumnName("TourID");
 
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Booking)
+                    .WithMany(p => p.CartItems)
+                    .HasForeignKey(d => d.BookingId)
+                    .HasConstraintName("FK_CartItems_Booking");
 
                 entity.HasOne(d => d.Cart)
                     .WithMany(p => p.CartItems)
                     .HasForeignKey(d => d.CartId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__CartItems__CartI__3587F3E0");
+                    .HasConstraintName("FK_CartItems_Cart");
+
+                entity.HasOne(d => d.Offer)
+                    .WithMany(p => p.CartItems)
+                    .HasForeignKey(d => d.OfferId)
+                    .HasConstraintName("FK_CartItems_Offer");
+
+                entity.HasOne(d => d.Package)
+                    .WithMany(p => p.CartItems)
+                    .HasForeignKey(d => d.PackageId)
+                    .HasConstraintName("FK_CartItems_Package");
 
                 entity.HasOne(d => d.Tour)
                     .WithMany(p => p.CartItems)
                     .HasForeignKey(d => d.TourId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__CartItems__TourI__367C1819");
+                    .HasConstraintName("FK_CartItems_Tour");
             });
 
             modelBuilder.Entity<ContactMessage>(entity =>
@@ -509,6 +527,7 @@ namespace Ajloun_Tour.Models
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK__testomoni__UserI__619B8048");
             });
+
 
             modelBuilder.Entity<Tour>(entity =>
             {

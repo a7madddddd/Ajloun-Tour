@@ -37,7 +37,7 @@ namespace Ajloun_Tour.Implementations
               })
               .ToListAsync();
         }
-        public async Task<ToursOffersDTO> GetTourOfferById(int tourId, int offerId)
+        public async Task<ToursOffersDTO?> GetTourOfferById(int tourId, int offerId)
         {
             return await _context.TourOffers
                        .Include(to => to.Tour)

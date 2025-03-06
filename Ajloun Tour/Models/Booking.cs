@@ -8,6 +8,7 @@ namespace Ajloun_Tour.Models
         public Booking()
         {
             BookingOptionSelections = new HashSet<BookingOptionSelection>();
+            CartItems = new HashSet<CartItem>();
         }
 
         public int BookingId { get; set; }
@@ -26,5 +27,6 @@ namespace Ajloun_Tour.Models
         public virtual Tour? Tour { get; set; }
         public virtual User? User { get; set; }
         public virtual ICollection<BookingOptionSelection> BookingOptionSelections { get; set; }
+        public virtual ICollection<CartItem> CartItems { get; set; }
     }
 }

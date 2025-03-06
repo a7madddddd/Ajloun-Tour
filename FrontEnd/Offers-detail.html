@@ -32,23 +32,6 @@
     <link rel="stylesheet" type="text/css" href="style/style.css">
     <title>Travele | Travel & Tour HTML5 template </title>
     <style>
-        .star-rating {
-            display: inline-flex;
-            gap: 5px;
-            padding: 10px 0;
-        }
-
-        .star-rating i {
-            color: #ddd;
-            font-size: 24px;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .star-rating i.active {
-            color: #ffd700;
-        }
-
         .comment-form input[readonly] {
             background-color: #f8f9fa;
             cursor: not-allowed;
@@ -77,12 +60,18 @@
         .comment-form input[type="submit"]:hover {
             background: #ff5252;
         }
-        
-.booking-form .input-date-picker {
-    background-color: #fff;
-    cursor: pointer;
-}
 
+        .booking-form .input-date-picker {
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        .rating-star #stars2 {
+
+            color: #fff !important;
+            font-size: 24px;
+            margin-right: 2px;
+        }
     </style>
 </head>
 
@@ -339,7 +328,8 @@
                             <div class="single-tour-inner">
                                 <h2>EXPERIENCE THE NATURAL BEAUTY OF ISLAND</h2>
                                 <figure class="feature-image">
-                                    <img src="assets/images/img27.jpg" alt="" style="width: 100% !important; height: 60vh !important;">
+                                    <img src="assets/images/img27.jpg" alt=""
+                                        style="width: 100% !important; height: 60vh !important;">
                                     <div class="package-meta text-center">
                                         <ul>
                                             <li>
@@ -490,8 +480,8 @@
                                         </div>
                                         <div class="tab-pane" id="map" role="tabpanel" aria-labelledby="map-tab">
                                             <div class="map-area">
-                                                <iframe
-                                                  id="tour-map"  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d60998820.06503915!2d95.3386452160086!3d-21.069765827214972!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2b2bfd076787c5df%3A0x538267a1955b1352!2sAustralia!5e0!3m2!1sen!2snp!4v1579777829477!5m2!1sen!2snp"
+                                                <iframe id="tour-map"
+                                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d60998820.06503915!2d95.3386452160086!3d-21.069765827214972!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2b2bfd076787c5df%3A0x538267a1955b1352!2sAustralia!5e0!3m2!1sen!2snp!4v1579777829477!5m2!1sen!2snp"
                                                     height="450" allowfullscreen=""></iframe>
                                             </div>
                                         </div>
@@ -528,11 +518,11 @@
                             <div class="sidebar">
                                 <div class="package-price">
                                     <h5 class="price">
-                                        <span>$649</span> / per person
+                                        <span id="offer-price"></span> / per person
                                     </h5>
                                     <div class="start-wrap">
-                                        <div class="rating-start" title="Rated 5 out of 5">
-                                            <span style="width: 60%"></span>
+                                        <div class="rating-star" id=".rating-star" style="color: white !important;">
+
                                         </div>
                                     </div>
                                 </div>
@@ -554,7 +544,8 @@
                                             </div>
                                             <div class="col-sm-12">
                                                 <div class="form-group">
-                                                    <input name="price" type="text" placeholder="Price" id=".tour-price" disabled>
+                                                    <input name="price" type="text" placeholder="Price" id=".tour-price"
+                                                        disabled>
                                                 </div>
                                             </div>
                                             <div class="col-sm-12">

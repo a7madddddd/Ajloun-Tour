@@ -116,7 +116,6 @@ builder.Services.AddScoped<IBookingOptionRepository, BookingOptionRepository>();
 builder.Services.AddScoped<IBookingOptionsSelectionRepository, BookingOptionsSelectionRepository>();
 builder.Services.AddScoped<IToursProgramRepository, ToursProgramRepository>();
 builder.Services.AddScoped<ITourCartRepository, TourCartRepository>();
-builder.Services.AddScoped<ITourCartItemsRepository, TourCartItemsRepository>();
 builder.Services.AddScoped<IPackagesRepository, PackagesRepository>();
 builder.Services.AddScoped<IOffersRepository, OffersRepository>();
 builder.Services.AddScoped<ITourProgramServiceRepository, TourProgramServiceRepository>();

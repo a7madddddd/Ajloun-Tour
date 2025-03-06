@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Ajloun_Tour.Models
+﻿namespace Ajloun_Tour.DTOs2.CartItemsDTOs
 {
-    public partial class CartItem
+    public class CartItemDTO
     {
         public int CartItemId { get; set; }
         public int CartId { get; set; }
-        public int TourId { get; set; }
+        public int? TourId { get; set; }
         public int? Quantity { get; set; }
         public decimal Price { get; set; }
         public DateTime SelectedDate { get; set; }
@@ -22,14 +19,7 @@ namespace Ajloun_Tour.Models
         public decimal? Option4Price { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public int? PackageId { get; set; }
-        public int? OfferId { get; set; }
         public int? BookingId { get; set; }
 
-        public virtual Booking? Booking { get; set; }
-        public virtual Cart Cart { get; set; } = null!;
-        public virtual Offer? Offer { get; set; }
-        public virtual Package? Package { get; set; }
-        public virtual Tour Tour { get; set; } = null!;
     }
 }

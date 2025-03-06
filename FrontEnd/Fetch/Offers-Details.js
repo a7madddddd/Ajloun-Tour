@@ -104,9 +104,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 Discount: ${data.discountPercentage}%
             </li>
         `;
-        let price2 = document.getElementById('.tour-price');
-            price2.value = `$${ data.discountPercentage } for this Offer`;
-        let Map = document.getElementById('tour-map');
+
+            let price3 = document.getElementById('offer-price');
+            price3.innerHTML = `$${data.price}`;
+            
+            let price2 = document.getElementById('.tour-price');
+            price2.value = `$${data.price} for this Offer`;
+            let Map = document.getElementById('tour-map');
             Map.src = data.map;
 
             // Add additional details if needed
@@ -224,6 +228,8 @@ async function fetchReviews(offerId) {
 
         // Update only the reviews section
         const summaryReview = document.querySelector('.summary-review');
+        const summaryReview2 = document.getElementById('.rating-star');
+        summaryReview2.innerHTML = `<span style="width: 60%;" id="stars2">${generateStars(averageRating)}</span>`;
         summaryReview.innerHTML = `
             <div class="review-score">
                 <span>${averageRating}</span>
@@ -327,11 +333,17 @@ const styles = `
         margin-bottom: 10px;
     }
 
-    .star {
+    .rating-stars .star {
         color: #ff6b6b;
         font-size: 24px;
         margin-right: 2px;
     }
+        .stars .star {
+
+        color: #ff6b6b;
+        font-size: 24px;
+        margin-right: 2px;
+        }
 
     .star.empty {
         color: #ddd;
@@ -661,8 +673,9 @@ async function handleBookingSubmission(e) {
             throw new Error('Failed to fetch offer details');
         }
 
+        
         const offerData = await offerResponse.json();
-
+        
         const formData = new FormData();
         formData.append('UserId', userInfo.id);
         formData.append('OfferId', offerId);
@@ -671,6 +684,9 @@ async function handleBookingSubmission(e) {
         formData.append('NumberOfPeople', offerData.peapole.toString());
         formData.append('TotalPrice', offerData.price.toString());
         formData.append('Status', 'Pending');
+
+
+        
 
         const response = await fetch('https://localhost:44357/api/Bookings/By Offerid', {
             method: 'POST',
@@ -682,6 +698,7 @@ async function handleBookingSubmission(e) {
 
         if (response.ok) {
             const bookingData = await response.json();
+
 
             Swal.fire({
                 title: 'Booking Successful!',
@@ -731,24 +748,24 @@ async function handleBookingSubmission(e) {
 
 
 
-                                            // <div class="col-sm-12">
-                                            //     <h4 class="">Add Options</h4>
-                                            // </div>
-                                            // <div class="col-sm-6">
-                                            //     <div class="form-group">
-                                            //         <label class="checkbox-list">
-                                            //             <input type="checkbox" name="s">
-                                            //             <span class="custom-checkbox"></span>
-                                            //             Tour guide
-                                            //         </label>
-                                            //     </div>
-                                            // </div>
-                                            // <div class="col-sm-6">
-                                            //     <div class="form-group">
-                                            //         <label class="checkbox-list">
-                                            //             <input type="checkbox" name="s">
-                                            //             <span class="custom-checkbox"></span>
-                                            //             Dinner
-                                            //         </label>
-                                            //     </div>
-                                            // </div>
+// <div class="col-sm-12">
+//     <h4 class="">Add Options</h4>
+// </div>
+// <div class="col-sm-6">
+//     <div class="form-group">
+//         <label class="checkbox-list">
+//             <input type="checkbox" name="s">
+//             <span class="custom-checkbox"></span>
+//             Tour guide
+//         </label>
+//     </div>
+// </div>
+// <div class="col-sm-6">
+//     <div class="form-group">
+//         <label class="checkbox-list">
+//             <input type="checkbox" name="s">
+//             <span class="custom-checkbox"></span>
+//             Dinner
+//         </label>
+//     </div>
+// </div>

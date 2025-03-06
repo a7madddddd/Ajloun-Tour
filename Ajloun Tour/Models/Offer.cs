@@ -8,6 +8,7 @@ namespace Ajloun_Tour.Models
         public Offer()
         {
             Bookings = new HashSet<Booking>();
+            CartItems = new HashSet<CartItem>();
             OfferPrograms = new HashSet<OfferProgram>();
             Reviews = new HashSet<Review>();
             Tours = new HashSet<Tour>();
@@ -25,6 +26,7 @@ namespace Ajloun_Tour.Models
         public string? Description { get; set; }
 
         public virtual ICollection<Booking> Bookings { get; set; }
+        public virtual ICollection<CartItem> CartItems { get; set; }
         public virtual ICollection<OfferProgram> OfferPrograms { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
 

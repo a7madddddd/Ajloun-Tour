@@ -1,4 +1,5 @@
 ﻿using Ajloun_Tour.DTOs2.BookingOptionsDTOs;
+using Ajloun_Tour.DTOs2.BookingOptionSelectionDTOs;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
 using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
@@ -41,6 +42,23 @@ namespace Ajloun_Tour.Implementations
             };
         }
 
+        public async Task<IEnumerable<BookingOptionSelectionDTO>> GetOptionsByBookingIdAsync(int bookingId)
+        {
+            return await _context.BookingOptionSelections
+                .Where(os => os.BookingId == bookingId)
+                .Join(_context.BookingOptions,
+                    os => os.OptionId,
+                    o => o.OptionId,
+                    (os, o) => new BookingOptionSelectionDTO
+                    {
+                        SelectionId = os.SelectionId,
+                        BookingId = os.BookingId,
+                        OptionId = os.OptionId,
+                        OptionName = o.OptionName,
+                        OptionPrice = o.OptionPrice,
+                    })
+                .ToListAsync();
+        }
 
         public async Task<BookingOptionsDTO> CreateAsync(CreateBookingOption createBookingOption)
         {
@@ -90,6 +108,7 @@ namespace Ajloun_Tour.Implementations
             _context.BookingOptions.Remove(option);
             await _context.SaveChangesAsync();
         }
+
 
     }
 }
