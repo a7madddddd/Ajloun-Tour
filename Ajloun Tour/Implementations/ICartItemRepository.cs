@@ -1,4 +1,6 @@
-﻿using Ajloun_Tour.DTOs2.CartItemsDTOs;
+﻿using Ajloun_Tour.DTOs.BookingsDTOs;
+using Ajloun_Tour.DTOs2.BookingOptionSelectionDTOs;
+using Ajloun_Tour.DTOs2.CartItemsDTOs;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
 using Microsoft.EntityFrameworkCore;
@@ -76,8 +78,19 @@ namespace Ajloun_Tour.Repositories.Implementations
 
         public async Task<IEnumerable<CartItemDTO>> GetCartItemsByCartIdAsync(int cartId)
         {
-            return await _context.CartItems
+            // Get the user ID associated with this cart
+            var userId = await _context.Carts
+                .Where(tc => tc.CartId == cartId)
+                .Select(tc => tc.UserId)
+                .FirstOrDefaultAsync();
+
+            if (userId == null)
+                return new List<CartItemDTO>();
+
+            // Get existing cart items
+            var cartItems = await _context.CartItems
                 .Where(ci => ci.CartId == cartId)
+                .Include(ci => ci.Booking)
                 .Select(ci => new CartItemDTO
                 {
                     CartItemId = ci.CartItemId,
@@ -99,11 +112,83 @@ namespace Ajloun_Tour.Repositories.Implementations
                     Option4Price = ci.Option4Price,
                     CreatedAt = ci.CreatedAt,
                     UpdatedAt = ci.UpdatedAt,
-                    BookingId = ci.BookingId
+                    BookingId = ci.BookingId,
+                    BookingDetails = ci.Booking != null ? new BookingDTO
+                    {
+                        BookingId = ci.Booking.BookingId,
+                        TourId = ci.Booking.TourId,
+                        PackageId = ci.Booking.PackageId,
+                        OfferId = ci.Booking.OfferId,
+                        UserId = ci.Booking.UserId,
+                        BookingDate = ci.Booking.BookingDate,
+                        NumberOfPeople = ci.Booking.NumberOfPeople,
+                        TotalPrice = ci.Booking.TotalPrice,
+                        Status = ci.Booking.Status,
+                        CreatedAt = ci.Booking.CreatedAt,
+                        SelectedOptions = _context.BookingOptionSelections
+                            .Where(bos => bos.BookingId == ci.Booking.BookingId)
+                            .Include(bos => bos.Option)
+                            .Select(bos => new BookingOptionSelectionDTO
+                            {
+                                BookingId = bos.BookingId,
+                                OptionId = bos.OptionId,
+                                SelectionId = bos.SelectionId,
+                                OptionName = bos.Option.OptionName,
+                                OptionPrice = bos.Option.OptionPrice
+                            })
+                            .ToList()
+                    } : null
                 })
                 .ToListAsync();
-        }
 
+            // Get bookings that aren't associated with cart items
+            var bookingsNotInCart = await _context.Bookings
+                .Where(b => b.UserId == userId && !_context.CartItems.Any(ci => ci.BookingId == b.BookingId))
+                .Select(b => new CartItemDTO
+                {
+                    CartItemId = 0,
+                    CartId = cartId,
+                    TourId = b.TourId,
+                    PackageId = b.PackageId,
+                    OfferId = b.OfferId,
+                    Quantity = 1,
+                    Price = b.TotalPrice,
+                    SelectedDate = b.BookingDate,
+                    NumberOfPeople = b.NumberOfPeople,
+                    CreatedAt = b.CreatedAt,
+                    UpdatedAt = b.CreatedAt,
+                    BookingId = b.BookingId,
+                    IsFromBooking = true,
+                    BookingDetails = new BookingDTO
+                    {
+                        BookingId = b.BookingId,
+                        TourId = b.TourId,
+                        PackageId = b.PackageId,
+                        OfferId = b.OfferId,
+                        UserId = b.UserId,
+                        BookingDate = b.BookingDate,
+                        NumberOfPeople = b.NumberOfPeople,
+                        TotalPrice = b.TotalPrice,
+                        Status = b.Status,
+                        CreatedAt = b.CreatedAt,
+                        SelectedOptions = _context.BookingOptionSelections
+                            .Where(bos => bos.BookingId == b.BookingId)
+                            .Include(bos => bos.Option)
+                            .Select(bos => new BookingOptionSelectionDTO
+                            {
+                                BookingId = bos.BookingId,
+                                OptionId = bos.OptionId,
+                                SelectionId = bos.SelectionId,
+                                OptionName = bos.Option.OptionName,
+                                OptionPrice = bos.Option.OptionPrice
+                            })
+                            .ToList()
+                    }
+                })
+                .ToListAsync();
+
+            return cartItems.Concat(bookingsNotInCart);
+        }
         public async Task<CartItemDTO> AddCartItemAsync(CreateCartItemDTO createCartItemDTO)
         {
             // Retrieve the booking using the provided BookingId
@@ -120,9 +205,9 @@ namespace Ajloun_Tour.Repositories.Implementations
             var cartItem = new CartItem
             {
                 CartId = createCartItemDTO.CartId,
-                TourId = booking.TourId ?? 0,  
-                PackageId = booking.PackageId ?? 0,  
-                OfferId = booking.OfferId ?? 0, 
+                TourId = booking.TourId ?? 0,  // If TourId is null, default to 0
+                PackageId = booking.PackageId ?? 0,  // Default to 0 if PackageId is null
+                OfferId = booking.OfferId ?? 0,  // Default to 0 if OfferId is null
                 Quantity = createCartItemDTO.Quantity,
                 Price = createCartItemDTO.Price,
                 SelectedDate = createCartItemDTO.SelectedDate,
@@ -137,12 +222,14 @@ namespace Ajloun_Tour.Repositories.Implementations
                 Option4Price = createCartItemDTO.Option4Price,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                BookingId = createCartItemDTO.BookingId 
+                BookingId = booking.BookingId // Set the BookingId correctly
             };
 
+            // Add the CartItem to the context
             _context.CartItems.Add(cartItem);
             await _context.SaveChangesAsync();
 
+            // Return the CartItemDTO after saving to the database
             return new CartItemDTO
             {
                 CartItemId = cartItem.CartItemId,

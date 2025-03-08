@@ -40,6 +40,32 @@ namespace Ajloun_Tour.Implementations
             };
         }
 
+        public async Task<List<BookingOptionSelectionDTO>> GetByBookingIdAsync(int bookingId)
+        {
+            // Query to fetch all selections for the given BookingId, including related Option entity
+            var selections = await _context.BookingOptionSelections
+                                            .Where(bos => bos.BookingId == bookingId)
+                                            .Include(bos => bos.Option)  // Ensure that related Option entity is loaded
+                                            .ToListAsync();
+
+            if (selections == null || selections.Count == 0)
+                return null;
+
+            // Map the selections to the BookingOptionSelectionDTO, including Option data
+            var selectionDTOs = selections.Select(selection => new BookingOptionSelectionDTO
+            {
+                BookingId = selection.BookingId,
+                OptionId = selection.OptionId,
+                SelectionId = selection.SelectionId,
+                OptionName = selection.Option?.OptionName,  // Assuming Option entity has Name property
+                OptionPrice = selection.Option?.OptionPrice, // Assuming Option entity has Price property
+            }).ToList();
+
+            return selectionDTOs;
+        }
+
+
+
         public async Task<BookingOptionSelectionDTO> CreateAsync(CreateBookingOptionsSelection createBookingOptionsSelection)
         {
             var bookingExists = await _context.Bookings.AnyAsync(b => b.BookingId == createBookingOptionsSelection.BookingId);

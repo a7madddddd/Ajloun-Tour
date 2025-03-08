@@ -1,7 +1,10 @@
-﻿using Ajloun_Tour.DTOs2.BookingOptionsDTOs;
+﻿using Ajloun_Tour.DTOs.BookingsDTOs;
+using Ajloun_Tour.DTOs2.BookingOptionsDTOs;
 using Ajloun_Tour.DTOs2.BookingOptionSelectionDTOs;
+using Ajloun_Tour.DTOs2.CartItemsDTOs;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
+using Ajloun_Tour.Repositories.Implementations;
 using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow;
 using Microsoft.EntityFrameworkCore;
 
@@ -109,6 +112,5 @@ namespace Ajloun_Tour.Implementations
             await _context.SaveChangesAsync();
         }
 
-
-    }
+  }
 }

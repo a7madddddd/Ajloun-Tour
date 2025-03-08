@@ -37,6 +37,19 @@ namespace Ajloun_Tour.Controllers
             return Ok(bookingOption);
         }
 
+        [HttpGet("byBooking/{bookingId}")]
+        public async Task<ActionResult<List<BookingOptionSelectionDTO>>> GetBookingOptionSelectionByBooking(int bookingId)
+        {
+            var bookingOptions = await _bookingOptionsSelectionRepository.GetByBookingIdAsync(bookingId);
+
+            if (bookingOptions == null || bookingOptions.Count == 0)
+            {
+                return NotFound(new { message = "Booking option selection not found." });
+            }
+
+            return Ok(bookingOptions);
+        }
+
         [HttpPost]
         public async Task<ActionResult<BookingOptionSelectionDTO>> AddBookingOptionsSelections([FromBody] CreateBookingOptionsSelection createBookingOptionsSelection)
         {

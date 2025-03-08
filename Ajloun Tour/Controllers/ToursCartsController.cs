@@ -39,7 +39,7 @@ namespace Ajloun_Tour.Controllers
         [HttpGet("user/{userId}")]
         public async Task<ActionResult<TourCartDTO>> GetCartByUserId(int userId)
         {
-            var cart = await _tourCartRepository.GetCartById(userId);
+            var cart = await _tourCartRepository.GetCartIdByUserIdAsync(userId);
             if (cart == null)
             {
                 return NotFound($"No cart found for User ID {userId}.");

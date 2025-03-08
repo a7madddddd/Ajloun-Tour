@@ -26,7 +26,7 @@ namespace Ajloun_Tour.DTOs2.CartItemsDTOs
         public decimal? Option3Price { get; set; }
         public decimal? Option4Price { get; set; }
 
-        public int? BookingId { get; set; }  // Add this line
+        public int? BookingId { get; set; }  
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Ajloun_Tour.DTOs2.BookingOptionsDTOs;
+using Ajloun_Tour.DTOs2.BookingOptionSelectionDTOs;
 using Ajloun_Tour.DTOs2.ToursProgramDTOs;
 using Ajloun_Tour.Models;
 
@@ -16,6 +17,7 @@ namespace Ajloun_Tour.DTOs.BookingsDTOs
         public decimal? TotalPrice { get; set; }
         public string? Status { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public List<BookingOptionSelectionDTO> SelectedOptions { get; set; }
 
 
 

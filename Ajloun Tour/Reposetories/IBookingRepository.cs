@@ -1,5 +1,6 @@
 ﻿using Ajloun_Tour.DTOs.BookingsDTOs;
 using Ajloun_Tour.DTOs2.BookingOptionsDTOs;
+using Ajloun_Tour.Models;
 
 namespace Ajloun_Tour.Reposetories
 {
@@ -12,9 +13,9 @@ namespace Ajloun_Tour.Reposetories
         Task<BookingDTO> AddPackBookingAsync(CreateBooking createBooking);
         Task<BookingDTO> AddOfferBookingAsync(CreateBooking createBooking);
         Task<BookingDTO> UpdateBookingAsync(int id, CreateBooking createBooking);
-        Task DeleteBookingAsync(int id);
+        Task<BookingDTO> GetBookingFromCartAsync(CreateBooking createBooking);
+        Task<Booking> DeleteBookingAsync(int id);
 
-         Task<BookingOptionsDTO> GetOrCreateBookingOptionAsync(string optionName, decimal optionPrice);
 
 
     }

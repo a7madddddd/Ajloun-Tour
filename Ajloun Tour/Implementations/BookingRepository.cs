@@ -1,6 +1,7 @@
 ﻿using Ajloun_Tour.DTOs.BookingsDTOs;
 using Ajloun_Tour.DTOs2.BookingOptionsDTOs;
 using Ajloun_Tour.DTOs2.BookingOptionSelectionDTOs;
+using Ajloun_Tour.DTOs2.CartItemsDTOs;
 using Ajloun_Tour.DTOs2.TourCartDTOs;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
@@ -15,7 +16,7 @@ namespace Ajloun_Tour.Implementations
         private readonly ITourCartRepository _tourCartRepository;
         private readonly IBookingOptionRepository _bookingOptionRepository;
 
-        public BookingRepository(MyDbContext context, ICartItemRepository cartItemRepository, IBookingOptionRepository bookingOptionRepository, TourCartRepository tourCartRepository)
+        public BookingRepository(MyDbContext context, ICartItemRepository cartItemRepository, IBookingOptionRepository bookingOptionRepository, ITourCartRepository tourCartRepository)
 
         {
             _context = context;
@@ -53,25 +54,11 @@ namespace Ajloun_Tour.Implementations
         public async Task<BookingDTO> GetBookingById(int id)
         {
             var booking = await _context.Bookings.FindAsync(id);
-
             if (booking == null)
-            {
+                return null;
 
-                throw new Exception("This Booking Is Not Defined");
-            };
-
-            return new BookingDTO
-            {
-
-                BookingId = booking.BookingId,
-                TourId = booking.TourId,
-                UserId = booking.UserId,
-                BookingDate = booking.BookingDate,
-                CreatedAt = booking.CreatedAt,
-                NumberOfPeople = booking.NumberOfPeople,
-                TotalPrice = booking.TotalPrice,
-                Status = booking.Status
-            };
+            var options = await _bookingOptionRepository.GetOptionsByBookingIdAsync(id);
+            return MapBookingToDTO(booking, options.ToList());
         }
 
 
@@ -233,20 +220,43 @@ namespace Ajloun_Tour.Implementations
 
 
         }
-        public async Task DeleteBookingAsync(int id)
+        public async Task<Booking> DeleteBookingAsync(int id)
         {
-            var deletedbooking = await _context.ContactMessages.FindAsync(id);
-
-            if (deletedbooking == null)
+            // Find the booking by its ID
+            var booking = await _context.Bookings.FindAsync(id);
+            if (booking == null)
             {
-
-                throw new ArgumentNullException(nameof(deletedbooking));
-
+                return null; // Return null if booking not found
             }
 
-            _context.ContactMessages.Remove(deletedbooking);
+            // Delete associated booking options (BookingOptionSelections)
+            var bookingOptions = await _context.BookingOptionSelections
+                .Where(os => os.BookingId == id)
+                .ToListAsync();
+
+            if (bookingOptions.Any())
+            {
+                _context.BookingOptionSelections.RemoveRange(bookingOptions); // Remove associated options
+            }
+
+            // Remove booking reference from cart items
+            var cartItems = await _context.CartItems
+                .Where(ci => ci.BookingId == id)
+                .ToListAsync();
+
+            foreach (var cartItem in cartItems)
+            {
+                cartItem.BookingId = null; // Clear the booking reference
+                _context.Entry(cartItem).State = EntityState.Modified;
+            }
+
+            // Finally, remove the booking
+            _context.Bookings.Remove(booking);
+
+            // Save changes to the database
             await _context.SaveChangesAsync();
 
+            return booking; // Return the deleted booking
         }
 
 
@@ -319,7 +329,55 @@ namespace Ajloun_Tour.Implementations
             return newBooking;
         }
 
+        public async Task<BookingDTO> GetBookingFromCartAsync(CreateBooking createBooking)
+        {
+            try
+            {
+                var booking = await _context.Bookings
+                    .FirstOrDefaultAsync(b =>
+                        b.TourId == createBooking.TourId &&
+                        b.PackageId == createBooking.PackageId &&
+                        b.OfferId == createBooking.OfferId &&
+                        b.UserId == createBooking.UserId &&
+                        b.Status == createBooking.Status);
+
+                if (booking == null)
+                {
+                    return null; 
+                }
+
+                
+                IEnumerable<CartItemDTO> cartItems = new List<CartItemDTO>();
+
+                if (createBooking.CartId.HasValue)
+                {
+                    cartItems = await _cartItemRepository.GetCartItemsByCartIdAsync(createBooking.CartId.Value);
+                }
+                else if (createBooking.CartItemIds?.Count > 0)
+                {
+                    foreach (var itemId in createBooking.CartItemIds)
+                    {
+                        var item = await _cartItemRepository.GetCartItemByIdAsync(itemId);
+                        if (item != null)
+                            ((List<CartItemDTO>)cartItems).Add(item);
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException("Either CartId or CartItemIds must be provided");
+                }
+
+                var existingOptions = await _bookingOptionRepository.GetOptionsByBookingIdAsync(booking.BookingId);
+
+                return MapBookingToDTO(booking, existingOptions.ToList());
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error retrieving booking", ex);
+            }
+        }
     }
 }
+
 
 

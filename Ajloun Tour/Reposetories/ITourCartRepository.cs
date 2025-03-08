@@ -8,6 +8,8 @@ namespace Ajloun_Tour.Reposetories
         Task<IEnumerable<TourCartDTO>> GetCarts();
         Task<TourCartDTO> GetCartById(int cartId);
         Task<TourCartDTO> AddCart(CreateTourCart createTourCart);
+        Task<int?> GetCartIdByUserIdAsync(int userId);
+
         Task<TourCartDTO> UpdateCart(int cartId, CreateTourCart updateCartDTO);
         Task DeleteCart(int cartId);
     }

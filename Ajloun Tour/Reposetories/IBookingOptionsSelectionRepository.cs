@@ -10,6 +10,7 @@ namespace Ajloun_Tour.Reposetories
         Task<BookingOptionSelectionDTO> GetByIdAsync(int id);
         Task<BookingOptionSelectionDTO> CreateAsync(CreateBookingOptionsSelection createBookingOptionsSelection);
         Task<BookingOptionSelectionDTO> UpdateAsync(int id, CreateBookingOptionsSelection createBookingOptionsSelection);
+        Task<List<BookingOptionSelectionDTO>> GetByBookingIdAsync(int bookingId);
         Task DeleteAsync(int id);
     }
 }

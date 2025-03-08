@@ -1,4 +1,6 @@
-﻿namespace Ajloun_Tour.DTOs2.CartItemsDTOs
+﻿using Ajloun_Tour.DTOs.BookingsDTOs;
+
+namespace Ajloun_Tour.DTOs2.CartItemsDTOs
 {
     public class CartItemDTO
     {
@@ -22,6 +24,8 @@
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public int? BookingId { get; set; }
+        public BookingDTO BookingDetails { get; set; }
+        public bool IsFromBooking { get; set; }
 
     }
 }

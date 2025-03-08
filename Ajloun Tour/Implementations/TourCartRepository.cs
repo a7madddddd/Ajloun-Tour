@@ -120,5 +120,15 @@ namespace Ajloun_Tour.Implementations
             }
         }
 
+        public async Task<int?> GetCartIdByUserIdAsync(int userId)
+        {
+            var cart = await _context.Carts
+                                     .Where(c => c.UserId == userId)
+                                     .FirstOrDefaultAsync();
+
+            // If the cart is found, return the CartId; otherwise, return null.
+            return cart?.CartId;
+        }
+
     }
 }

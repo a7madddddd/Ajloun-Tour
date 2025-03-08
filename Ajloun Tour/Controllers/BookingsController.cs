@@ -42,6 +42,41 @@ namespace Ajloun_Tour.Controllers
             return Ok(bookings);
         }
 
+
+        [HttpGet("From-Cart")]
+        public async Task<ActionResult<BookingDTO>> GetBookingsFromCart(
+            [FromQuery] int tourId,
+            [FromQuery] int userId,
+            [FromQuery] int packageId,
+            [FromQuery] int offerId,
+            [FromQuery] string status,
+            [FromQuery] int? cartId = null,
+            [FromQuery] List<int>? cartItemIds = null)
+        {
+            var createBooking = new CreateBooking
+            {
+                TourId = tourId,
+                UserId = userId,
+                PackageId = packageId,
+                OfferId = offerId,
+                Status = status,
+                CartId = cartId,
+                CartItemIds = cartItemIds ?? new List<int>()
+            };
+
+            var booking = await _bookingRepository.GetBookingFromCartAsync(createBooking);
+
+            if (booking == null)
+            {
+                return NotFound("No booking found for the given criteria.");
+            }
+
+            return Ok(booking);
+        }
+
+
+
+
         //[HttpPost("from-cart")]
         //public async Task<ActionResult<BookingDTO>> CreateBookingFromCart(CreateBooking createBooking)
         //{
@@ -83,10 +118,17 @@ namespace Ajloun_Tour.Controllers
 
         }
 
-        [HttpDelete("id")]
-        public async void DeleteBookingAsync(int id) {
-        
-            await _bookingRepository.DeleteBookingAsync(id);
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBookingAsync(int id)
+        {
+            var result = await _bookingRepository.DeleteBookingAsync(id);
+            if (result == null)
+            {
+                return NotFound(new { message = "Booking not found" });
+            }
+            return NoContent(); // Successfully deleted
         }
+
+
     }
 }
