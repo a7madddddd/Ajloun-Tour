@@ -32,13 +32,22 @@ function showLoading() {
 }
 
 function showError(message) {
-  document.querySelector("table tbody").innerHTML = `
-        <tr>
-            <td colspan="5" class="text-center text-danger">
-                ${message}
-            </td>
-        </tr>
-    `;
+  const errorDiv = document.createElement('div');
+  errorDiv.className = 'alert alert-danger';
+  errorDiv.textContent = message;
+
+  // Remove any existing error messages
+  const existingErrors = document.querySelectorAll('.alert-danger');
+  existingErrors.forEach(error => error.remove());
+
+  // Add the new error message
+  const container = document.querySelector('.cart-list-inner');
+  container.insertBefore(errorDiv, container.firstChild);
+
+  // Remove the error message after 3 seconds
+  setTimeout(() => {
+    errorDiv.remove();
+  }, 3000);
 }
 
 // API Functions
@@ -244,17 +253,13 @@ async function createCartItemRow(item) {
                     </a>
                 </div>
             </td>
- <td data-column="Sub Total" class="total-column">
+            <td data-column="Sub Total" class="total-column">
                 <div class="price-info">
-                    <div class="main-price">$ ${(
-                      item.price * item.quantity
-                    ).toFixed(2)}</div>
+                    <div class="main-price">$ ${(item.price * item.quantity).toFixed(2)}</div>
                 </div>
-                <button class="checkout-btn" onclick="checkoutItem('cart', ${
-                  item.cartItemId
-                })">
+                <a class="checkout-btn" data-type="cart" data-id="${item.cartItemId}">
                     Checkout
-                </button>
+                </a>
             </td>
         </tr>
     `;
@@ -311,7 +316,7 @@ async function createBookingRow(item) {
             </td>
             <td data-column="Price">$ ${booking.totalPrice.toFixed(2)}</td>
             <td data-column="People">${booking.numberOfPeople}</td>
-            <td data-column="Total" class="total-column">
+              <td data-column="Total" class="total-column">
                 <div class="price-info">
                     <div class="main-price">$ ${booking.totalPrice.toFixed(2)}</div>
                     ${optionsTotal > 0 ? `
@@ -320,15 +325,12 @@ async function createBookingRow(item) {
                         </div>
                     ` : ''}
                     <div class="total-with-options">
-                        <strong>Total: </strong> $${(booking.totalPrice + optionsTotal).toFixed(2)}
+                        <strong>Total:</strong> $${(booking.totalPrice + optionsTotal).toFixed(2)}
                     </div>
                 </div>
-                <a class="checkout-btn" onclick="checkoutItem('booking', ${
-        booking.bookingId
-                })">
+                <a class="checkout-btn" data-type="booking" data-id="${booking.bookingId}">
                     Checkout
-                </a>                    
-                </button>
+                </a>
             </td>
         </tr>
     `;
@@ -340,43 +342,90 @@ function encryptIds(ids) {
 }
 
 // Single unified checkout function
-function checkoutItem(type, id) {
+async function checkoutItem(type, id) {
   try {
-    const data = {
-      type: type,
-      ids: [id],
-    };
+    let data;
 
-    const encryptedData = encryptIds(data);
-      window.location.href = `booking.html?data=${encryptedData}`;
+    if (type === 'booking') {
+      // Fetch booking details
+      const bookingResponse = await fetch(`${API_BASE_URL}/api/Bookings/id?id=${id}`);
+      if (!bookingResponse.ok) throw new Error('Failed to fetch booking');
+      const bookingData = await bookingResponse.json();
+
+      data = {
+        type: type,
+        ids: [id],
+        bookingDetails: bookingData
+      };
+    } else if (type === 'cart') {
+      data = {
+        type: type,
+        ids: [id]
+      };
+    }
+
+    // Encrypt and redirect
+    const encryptedData = btoa(JSON.stringify(data));
+    window.location.href = `booking.html?data=${encryptedData}`;
+
   } catch (error) {
     console.error("Error during checkout:", error);
-    alert("Failed to process checkout");
+    showError("Failed to process checkout");
   }
 }
 
 // Function for checking out all items
+// Function for checking out all items
 async function checkoutAll() {
   try {
-    const cartItems = document.querySelectorAll(".cart-item");
-    const bookingItems = document.querySelectorAll(".booking-item");
+    const cartItems = document.querySelectorAll('.cart-item');
+    const bookingItems = document.querySelectorAll('.booking-item');
 
     if (cartItems.length === 0 && bookingItems.length === 0) {
-      alert("No items to checkout");
+      showError('No items to checkout');
       return;
     }
 
+    // Get IDs from data attributes
+    const cartIds = Array.from(cartItems)
+      .map(item => item.getAttribute('data-id'))
+      .filter(id => id);
+
+    const bookingIds = Array.from(bookingItems)
+      .map(item => item.getAttribute('data-id'))
+      .filter(id => id);
+
+    // Fetch details for all bookings
+    const bookingsData = await Promise.all(
+      bookingIds.map(async (id) => {
+        try {
+          // Fetch booking details
+          const bookingResponse = await fetch(`${API_BASE_URL}/api/Bookings/id?id=${id}`);
+          if (!bookingResponse.ok) throw new Error(`Failed to fetch booking ${id}`);
+          const bookingData = await bookingResponse.json();
+
+          // The options are already included in the booking data
+          // No need to fetch them separately
+          return bookingData;
+        } catch (error) {
+          console.error(`Error fetching booking ${id}:`, error);
+          return null;
+        }
+      })
+    );
+
+    // Filter out any null values from failed fetches
+    const validBookings = bookingsData.filter(booking => booking !== null);
+
     const data = {
-      cart: Array.from(cartItems)
-        .map((item) => item.dataset.id)
-        .filter((id) => id),
-      bookings: Array.from(bookingItems)
-        .map((item) => item.dataset.id)
-        .filter((id) => id),
+      cart: cartIds,
+      bookings: validBookings
     };
 
-    const encryptedData = encryptIds(data);
+    // Encrypt and redirect
+    const encryptedData = btoa(JSON.stringify(data));
     window.location.href = `booking.html?data=${encryptedData}`;
+
   } catch (error) {
     console.error("Error during checkout:", error);
     showError("Failed to process checkout");
@@ -412,40 +461,31 @@ function updateTotals(cartItems) {
     }
   });
 
-  const subTotal = cartTotal + bookingsTotal + optionsTotal;
-  const vat = subTotal * 0.05;
-  const grandTotal = subTotal + vat;
+  const grandTotal = cartTotal + bookingsTotal + optionsTotal;
 
   document.querySelector(".totalAmountArea").innerHTML = `
         <ul class="list-unstyled">
-            ${
-              cartTotal > 0
-                ? `<li><strong>Cart Items Total</strong> <span>$ ${cartTotal.toFixed(
-                    2
-                  )}</span></li>`
-                : ""
-            }
-            ${
-              bookingsTotal > 0
-                ? `<li><strong>Bookings Total</strong> <span>$ ${bookingsTotal.toFixed(
-                    2
-                  )}</span></li>`
-                : ""
-            }
-            ${
-              optionsTotal > 0
-                ? `<li><strong>Options Total</strong> <span>$ ${optionsTotal.toFixed(
-                    2
-                  )}</span></li>`
-                : ""
-            }
-            <li><strong>Sub Total</strong> <span>$ ${subTotal.toFixed(
-              2
-            )}</span></li>
-            <li><strong>Vat</strong> <span>$ ${vat.toFixed(2)}</span></li>
-            <li><strong>Grand Total</strong> <span class="grandTotal">$ ${grandTotal.toFixed(
-              2
-            )}</span></li>
+            ${cartTotal > 0
+      ? `<li><strong>Cart Items Total</strong> <span>$ ${cartTotal.toFixed(
+        2
+      )}</span></li>`
+      : ""
+    }
+            ${bookingsTotal > 0
+      ? `<li><strong>Bookings Total</strong> <span>$ ${bookingsTotal.toFixed(
+        2
+      )}</span></li>`
+      : ""
+    }
+            ${optionsTotal > 0
+      ? `<li><strong>Options Total</strong> <span>$ ${optionsTotal.toFixed(
+        2
+      )}</span></li>`
+      : ""
+    }
+            <li><strong>Total cost</strong> <span class="grandTotal">$ ${grandTotal.toFixed(
+      2
+    )}</span></li>
         </ul>
     `;
 }
@@ -528,6 +568,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cartId = await getCartByUserId();
     if (cartId) {
       await fetchCartItems(cartId);
+      setupCheckoutButtons(); // Setup checkout buttons after content is loaded
     } else {
       showError("No cart found");
     }
@@ -535,13 +576,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error initializing cart:", error);
     showError("Failed to load cart");
   }
+
+  // Main checkout button
+  const mainCheckoutBtn = document.querySelector('.checkBtnArea .button-primary');
+  if (mainCheckoutBtn) {
+    mainCheckoutBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      await checkoutAll();
+    });
+  }
 });
 
 // Handle checkout button
-document
-  .querySelector(".checkBtnArea .button-primary")
-  .addEventListener("click", async (e) => {
-    e.preventDefault();
-    // Add your checkout logic here
-    console.log("Proceeding to checkout...");
+// Update the click handlers
+function setupCheckoutButtons() {
+  // Individual checkout buttons
+  document.querySelectorAll('.checkout-btn').forEach(button => {
+    button.addEventListener('click', function (e) {
+      e.preventDefault();
+      const type = this.getAttribute('data-type');
+      const id = this.getAttribute('data-id');
+      if (type && id) {
+        checkoutItem(type, id);
+      }
+    });
   });
+}

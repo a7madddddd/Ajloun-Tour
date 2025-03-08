@@ -101,6 +101,7 @@ namespace Ajloun_Tour.Implementations
                 {
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.MobilePhone, user.Phone),
                 new Claim(ClaimTypes.Name, user.FullName),
             }),
                 Expires = DateTime.UtcNow.AddHours(Convert.ToInt32(_configuration["JwtSettings:ExpiryInHours"])),

@@ -8,6 +8,7 @@ namespace Ajloun_Tour.Models
         public Cart()
         {
             CartItems = new HashSet<CartItem>();
+            Payments = new HashSet<Payment>();
         }
 
         public int CartId { get; set; }
@@ -18,5 +19,6 @@ namespace Ajloun_Tour.Models
 
         public virtual User User { get; set; } = null!;
         public virtual ICollection<CartItem> CartItems { get; set; }
+        public virtual ICollection<Payment> Payments { get; set; }
     }
 }

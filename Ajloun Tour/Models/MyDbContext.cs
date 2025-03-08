@@ -28,13 +28,16 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<OfferProgram> OfferPrograms { get; set; } = null!;
         public virtual DbSet<Package> Packages { get; set; } = null!;
         public virtual DbSet<PackageProgram> PackagePrograms { get; set; } = null!;
+        public virtual DbSet<Payment> Payments { get; set; } = null!;
+        public virtual DbSet<PaymentDetail> PaymentDetails { get; set; } = null!;
+        public virtual DbSet<PaymentGateway> PaymentGateways { get; set; } = null!;
+        public virtual DbSet<PaymentHistory> PaymentHistories { get; set; } = null!;
         public virtual DbSet<Program> Programs { get; set; } = null!;
         public virtual DbSet<Project> Projects { get; set; } = null!;
         public virtual DbSet<Review> Reviews { get; set; } = null!;
         public virtual DbSet<Testomonial> Testomonials { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
         public virtual DbSet<TourOffer> TourOffers { get; set; } = null!;
-
         public virtual DbSet<TourPackage> TourPackages { get; set; } = null!;
         public virtual DbSet<TourProgram> TourPrograms { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
@@ -420,6 +423,165 @@ namespace Ajloun_Tour.Models
                     .HasConstraintName("FK_PackagePrograms_Programs");
             });
 
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
+
+                entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.BookingId).HasColumnName("BookingID");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.GatewayId).HasColumnName("GatewayID");
+
+                entity.Property(e => e.PaymentMethod)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PaymentStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.TransactionId)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("TransactionID");
+
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
+
+                entity.HasOne(d => d.Booking)
+                    .WithMany(p => p.Payments)
+                    .HasForeignKey(d => d.BookingId)
+                    .HasConstraintName("FK__Payments__Bookin__1C873BEC");
+
+                entity.HasOne(d => d.Cart)
+                    .WithMany(p => p.Payments)
+                    .HasForeignKey(d => d.CartId)
+                    .HasConstraintName("FK__Payments__CartId__1F63A897");
+
+                entity.HasOne(d => d.Gateway)
+                    .WithMany(p => p.Payments)
+                    .HasForeignKey(d => d.GatewayId)
+                    .HasConstraintName("FK__Payments__Gatewa__1E6F845E");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Payments)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK__Payments__UserID__1D7B6025");
+            });
+
+            modelBuilder.Entity<PaymentDetail>(entity =>
+            {
+                entity.Property(e => e.PaymentDetailId).HasColumnName("PaymentDetailID");
+
+                entity.Property(e => e.BillingAddress)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BillingCity)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BillingCountry)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BillingZipCode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CardHolderName)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CardNumber)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Cvv)
+                    .HasMaxLength(255)
+                    .IsUnicode(false)
+                    .HasColumnName("CVV");
+
+                entity.Property(e => e.ExpiryDate)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
+
+                entity.HasOne(d => d.Payment)
+                    .WithMany(p => p.PaymentDetails)
+                    .HasForeignKey(d => d.PaymentId)
+                    .HasConstraintName("FK__PaymentDe__Payme__22401542");
+            });
+
+            modelBuilder.Entity<PaymentGateway>(entity =>
+            {
+                entity.HasKey(e => e.GatewayId)
+                    .HasName("PK__PaymentG__66BCD88047240090");
+
+                entity.Property(e => e.GatewayId).HasColumnName("GatewayID");
+
+                entity.Property(e => e.ApiKey)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Environment)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.GatewayName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.SecretKey)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+
+                entity.Property(e => e.WebhookUrl)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<PaymentHistory>(entity =>
+            {
+                entity.ToTable("PaymentHistory");
+
+                entity.Property(e => e.PaymentHistoryId).HasColumnName("PaymentHistoryID");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Message)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Payment)
+                    .WithMany(p => p.PaymentHistories)
+                    .HasForeignKey(d => d.PaymentId)
+                    .HasConstraintName("FK__PaymentHi__Payme__2610A626");
+            });
+
             modelBuilder.Entity<Program>(entity =>
             {
                 entity.Property(e => e.CreatedAt)
@@ -527,6 +689,7 @@ namespace Ajloun_Tour.Models
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK__testomoni__UserI__619B8048");
             });
+
 
 
             modelBuilder.Entity<Tour>(entity =>

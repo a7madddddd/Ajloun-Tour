@@ -126,10 +126,10 @@ builder.Services.AddScoped<IPackageProgramRepository, PackageProgramRepository>(
 builder.Services.AddScoped<IOffersProgramRepository, OffersProgramRepository>();
 builder.Services.AddScoped<IOfferProgramServiceRepository, OfferProgramServiceRepository>();
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
-
-
-
-
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IPaymentGatewayRepository, PaymentGatewayRepository>();
+builder.Services.AddScoped<IPaymentDetailRepository, PaymentDetailRepository>();
+builder.Services.AddScoped<IPaymentHistoryRepository, PaymentHistoryRepository>();
 
 
 builder.Services.AddAuthorization();
