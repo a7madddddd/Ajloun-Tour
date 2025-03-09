@@ -12,7 +12,7 @@ namespace Ajloun_Tour.Models
 
         public int GatewayId { get; set; }
         public string? GatewayName { get; set; }
-        public bool IsActive { get; set; }
+        public bool? IsActive { get; set; }
         public string? ApiKey { get; set; }
         public string? SecretKey { get; set; }
         public string? WebhookUrl { get; set; }

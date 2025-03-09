@@ -38,6 +38,7 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Testomonial> Testomonials { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
         public virtual DbSet<TourOffer> TourOffers { get; set; } = null!;
+
         public virtual DbSet<TourPackage> TourPackages { get; set; } = null!;
         public virtual DbSet<TourProgram> TourPrograms { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
@@ -517,6 +518,7 @@ namespace Ajloun_Tour.Models
                 entity.HasOne(d => d.Payment)
                     .WithMany(p => p.PaymentDetails)
                     .HasForeignKey(d => d.PaymentId)
+                    .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("FK__PaymentDe__Payme__22401542");
             });
 
@@ -579,6 +581,7 @@ namespace Ajloun_Tour.Models
                 entity.HasOne(d => d.Payment)
                     .WithMany(p => p.PaymentHistories)
                     .HasForeignKey(d => d.PaymentId)
+                    .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("FK__PaymentHi__Payme__2610A626");
             });
 
@@ -689,7 +692,6 @@ namespace Ajloun_Tour.Models
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("FK__testomoni__UserI__619B8048");
             });
-
 
 
             modelBuilder.Entity<Tour>(entity =>
