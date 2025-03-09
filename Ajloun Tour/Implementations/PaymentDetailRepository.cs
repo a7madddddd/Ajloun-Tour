@@ -14,28 +14,32 @@ namespace Ajloun_Tour.Implementations
             _context = context;
         }
 
-        private string MaskCardNumber(string cardNumber)
+        private static string MaskCardNumber(string cardNumber)
         {
             if (string.IsNullOrEmpty(cardNumber)) return "";
             return "XXXX-XXXX-XXXX-" + cardNumber.Substring(cardNumber.Length - 4);
         }
 
+
         public async Task<IEnumerable<PaymentDetailDTO>> GetAllPaymentDetails()
         {
-            return await _context.PaymentDetails
-                .Select(pd => new PaymentDetailDTO
-                {
-                    PaymentDetailId = pd.PaymentDetailId,
-                    PaymentId = pd.PaymentId,
-                    CardHolderName = pd.CardHolderName,
-                    CardNumber = MaskCardNumber(pd.CardNumber),
-                    ExpiryDate = pd.ExpiryDate,
-                    BillingAddress = pd.BillingAddress,
-                    BillingCity = pd.BillingCity,
-                    BillingCountry = pd.BillingCountry,
-                    BillingZipCode = pd.BillingZipCode
-                })
-                .ToListAsync();
+            var paymentDetails = await _context.PaymentDetails
+                .ToListAsync();  
+
+            return paymentDetails.Select(pd => new PaymentDetailDTO
+            {
+                PaymentDetailId = pd.PaymentDetailId,
+                PaymentId = pd.PaymentId,
+                CardHolderName = pd.CardHolderName,
+                CardNumber = MaskCardNumber(pd.CardNumber),  
+                ExpiryDate = pd.ExpiryDate,
+                BillingAddress = pd.BillingAddress,
+                BillingCity = pd.BillingCity,
+                BillingCountry = pd.BillingCountry,
+                BillingZipCode = pd.BillingZipCode,
+                AdditionalNotes = pd.AdditionalNotes,
+                Cvv = pd.Cvv,
+            }).ToList();
         }
 
         public async Task<PaymentDetailDTO> GetPaymentDetailById(int id)
@@ -56,7 +60,9 @@ namespace Ajloun_Tour.Implementations
                 BillingAddress = detail.BillingAddress,
                 BillingCity = detail.BillingCity,
                 BillingCountry = detail.BillingCountry,
-                BillingZipCode = detail.BillingZipCode
+                BillingZipCode = detail.BillingZipCode,
+                AdditionalNotes = detail.AdditionalNotes,
+                Cvv = detail.Cvv,
             };
         }
 
@@ -78,7 +84,9 @@ namespace Ajloun_Tour.Implementations
                 BillingAddress = detail.BillingAddress,
                 BillingCity = detail.BillingCity,
                 BillingCountry = detail.BillingCountry,
-                BillingZipCode = detail.BillingZipCode
+                BillingZipCode = detail.BillingZipCode,
+                AdditionalNotes = detail.AdditionalNotes,
+                Cvv = detail.Cvv,
             };
         }
 
@@ -94,7 +102,8 @@ namespace Ajloun_Tour.Implementations
                 BillingAddress = createDetail.BillingAddress,
                 BillingCity = createDetail.BillingCity,
                 BillingCountry = createDetail.BillingCountry,
-                BillingZipCode = createDetail.BillingZipCode
+                BillingZipCode = createDetail.BillingZipCode,
+                AdditionalNotes = createDetail.AdditionalNotes,
             };
 
             _context.PaymentDetails.Add(detail);
@@ -110,7 +119,8 @@ namespace Ajloun_Tour.Implementations
                 BillingAddress = detail.BillingAddress,
                 BillingCity = detail.BillingCity,
                 BillingCountry = detail.BillingCountry,
-                BillingZipCode = detail.BillingZipCode
+                BillingZipCode = detail.BillingZipCode,
+                AdditionalNotes = detail.AdditionalNotes,
             };
         }
 
@@ -128,6 +138,7 @@ namespace Ajloun_Tour.Implementations
             detail.BillingCity = createDetail.BillingCity;
             detail.BillingCountry = createDetail.BillingCountry;
             detail.BillingZipCode = createDetail.BillingZipCode;
+            detail.AdditionalNotes = createDetail.AdditionalNotes;
 
             await _context.SaveChangesAsync();
 
@@ -141,7 +152,8 @@ namespace Ajloun_Tour.Implementations
                 BillingAddress = detail.BillingAddress,
                 BillingCity = detail.BillingCity,
                 BillingCountry = detail.BillingCountry,
-                BillingZipCode = detail.BillingZipCode
+                BillingZipCode = detail.BillingZipCode,
+                AdditionalNotes = detail.AdditionalNotes,
             };
         }
 

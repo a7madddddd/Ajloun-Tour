@@ -693,7 +693,6 @@ namespace Ajloun_Tour.Models
                     .HasConstraintName("FK__testomoni__UserI__619B8048");
             });
 
-
             modelBuilder.Entity<Tour>(entity =>
             {
                 entity.Property(e => e.TourId).HasColumnName("TourID");
@@ -750,6 +749,27 @@ namespace Ajloun_Tour.Models
 
             });
 
+            modelBuilder.Entity<TourPackage>(entity =>
+            {
+                entity.HasKey(e => new { e.TourId, e.PackageId })
+                    .HasName("PK__TourPack__DD2EFF48ADCDAF59");
+
+                entity.Property(e => e.TourId).HasColumnName("tour_id");
+
+                entity.Property(e => e.PackageId).HasColumnName("package_id");
+
+                entity.Property(e => e.IsActive).HasColumnName("isActive");
+
+                entity.HasOne(d => d.Package)
+                    .WithMany(p => p.TourPackages)
+                    .HasForeignKey(d => d.PackageId)
+                    .HasConstraintName("FK__TourPacka__packa__0B91BA14");
+
+                entity.HasOne(d => d.Tour)
+                    .WithMany(p => p.TourPackages)
+                    .HasForeignKey(d => d.TourId)
+                    .HasConstraintName("FK__TourPacka__tour___0A9D95DB");
+            });
             modelBuilder.Entity<TourPackage>(entity =>
             {
                 entity.HasKey(e => new { e.TourId, e.PackageId })

@@ -15,6 +15,7 @@ namespace Ajloun_Tour.Models
         public string? BillingCity { get; set; }
         public string? BillingCountry { get; set; }
         public string? BillingZipCode { get; set; }
+        public string? AdditionalNotes { get; set; }
 
         public virtual Payment? Payment { get; set; }
     }

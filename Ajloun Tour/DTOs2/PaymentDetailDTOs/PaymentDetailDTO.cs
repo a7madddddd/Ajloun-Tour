@@ -12,5 +12,7 @@
         public string? BillingCity { get; set; }
         public string? BillingCountry { get; set; }
         public string? BillingZipCode { get; set; }
+        public string? AdditionalNotes { get; set; }
+
     }
 }

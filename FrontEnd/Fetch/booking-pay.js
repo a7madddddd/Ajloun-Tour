@@ -612,6 +612,7 @@ async function addPaymentDetails(paymentId, formData) {
         const expiryYear = formData.expiryYear.length === 4 ?
             formData.expiryYear.slice(-2) :
             formData.expiryYear.padStart(2, '0');
+        const additionalNotes = document.getElementById('note').value.trim();
 
         const expiryDate = `${expiryMonth}/${expiryYear}`;
 
@@ -624,7 +625,9 @@ async function addPaymentDetails(paymentId, formData) {
             BillingAddress: formData.billingAddress,
             BillingCity: formData.billingCity,
             BillingCountry: formData.billingCountry,
-            BillingZipCode: formData.billingZipCode
+            BillingZipCode: formData.billingZipCode,
+            AdditionalNotes: additionalNotes 
+
         };
 
         console.log('Payment details data to be sent:', paymentDetailsData);
@@ -1099,7 +1102,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             const urlParams = new URLSearchParams(window.location.search);
             const encryptedData = urlParams.get('data');
             const bookingData = JSON.parse(atob(encryptedData));
-
+            
             // Handle multiple bookings
             const bookings = bookingData.bookings || [bookingData.bookingDetails];
 
@@ -1128,7 +1131,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                 city: document.querySelector('input[name="city_booking"]').value.trim(),
                 state: document.querySelector('input[name="state_booking"]').value.trim(),
                 country: document.querySelector('#country').value.trim(),
-                zipCode: document.querySelector('input[name="postal_code"]').value.trim()
+                zipCode: document.querySelector('input[name="postal_code"]').value.trim(),
+                additionalNotes: document.getElementById('note').value.trim()
+
             };
 
             // Create payment record
@@ -1154,6 +1159,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     state: billingDetails.state,
                     city: billingDetails.city,
                     zipCode: billingDetails.zipCode,
+
                     address: [
                         billingDetails.street1,
                         billingDetails.street2,

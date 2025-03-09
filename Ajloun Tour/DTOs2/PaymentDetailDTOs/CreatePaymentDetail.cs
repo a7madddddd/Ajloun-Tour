@@ -34,5 +34,7 @@ namespace Ajloun_Tour.DTOs2.PaymentDetailDTOs
 
         [Required]
         public string BillingZipCode { get; set; }
+        public string? AdditionalNotes { get; set; }
+
     }
 }
