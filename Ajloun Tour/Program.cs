@@ -1,4 +1,7 @@
 using Ajloun_Tour;
+using Ajloun_Tour.EmailService.Classes;
+using Ajloun_Tour.EmailService.Implemantations;
+using Ajloun_Tour.EmailService.Interfaces;
 using Ajloun_Tour.Implementations;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
@@ -67,6 +70,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Add JWT settings configuration
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 // Get JWT settings
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
@@ -130,6 +134,7 @@ builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IPaymentGatewayRepository, PaymentGatewayRepository>();
 builder.Services.AddScoped<IPaymentDetailRepository, PaymentDetailRepository>();
 builder.Services.AddScoped<IPaymentHistoryRepository, PaymentHistoryRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 builder.Services.AddAuthorization();

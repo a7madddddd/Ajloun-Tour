@@ -1,4 +1,5 @@
 ﻿using Ajloun_Tour.DTOs2.PaymentDTOs;
+using Ajloun_Tour.EmailService.Interfaces;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +9,11 @@ namespace Ajloun_Tour.Implementations
     public class PaymentRepository : IPaymentRepository
     {
         private readonly MyDbContext _context;
-
-        public PaymentRepository(MyDbContext context)
+        private readonly IEmailService _emailService;
+        public PaymentRepository(MyDbContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         public async Task<IEnumerable<PaymentDTO>> GetAllPayments()
@@ -97,14 +99,14 @@ namespace Ajloun_Tour.Implementations
                 Amount = createPayment.Amount,
                 PaymentMethod = createPayment.PaymentMethod,
                 PaymentStatus = createPayment.PaymentStatus ?? "Pending",
-                TransactionId = createPayment.TransactionId, // Add this line
+                TransactionId = createPayment.TransactionId,
                 CreatedAt = DateTime.UtcNow
             };
 
             _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
 
-            return new PaymentDTO
+            var paymentDTO = new PaymentDTO
             {
                 PaymentId = payment.PaymentId,
                 BookingId = payment.BookingId,
@@ -114,11 +116,36 @@ namespace Ajloun_Tour.Implementations
                 Amount = payment.Amount,
                 PaymentStatus = payment.PaymentStatus,
                 PaymentMethod = payment.PaymentMethod,
-                TransactionId = payment.TransactionId, // Make sure this is included
+                TransactionId = payment.TransactionId,
                 CreatedAt = payment.CreatedAt,
                 UpdatedAt = payment.UpdatedAt
             };
+
+            // Send confirmation email
+            try
+            {
+                var user = await _context.Users.FindAsync(payment.UserId);
+                if (user != null)
+                {
+                    await _emailService.SendPaymentConfirmationEmailAsync(
+                        user.Email,
+                        user.FullName,
+                        paymentDTO
+                    );
+                }
+            }
+            catch (Exception emailEx)
+            {
+                // Log the email error but don't throw it
+                // This allows the payment process to continue even if email fails
+                Console.WriteLine($"Email sending failed: {emailEx.Message}");
+            }
+
+            return paymentDTO;
         }
+
+
+
         public async Task<PaymentDTO> UpdatePayment(int id, CreatePayment createPayment)
         {
             var payment = await _context.Payments.FindAsync(id);
