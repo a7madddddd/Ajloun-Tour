@@ -479,7 +479,8 @@
                               <div class="col-12">
                                  <div class="form-group">
                                     <label>Name on card*</label>
-                                    <input type="text" class="form-control" name="firstname_booking">
+                                    <input type="text" class="form-control" name="card_holder_name"
+                                       id="card_holder_name" required>
                                  </div>
                               </div>
                               <div class="col-12">
@@ -503,13 +504,15 @@
                                           <div class="col-md-6">
                                              <div class="form-group">
                                                 <input type="text" id="expire_month" name="expire_month"
-                                                   class="form-control" placeholder="MM">
+                                                   class="form-control" placeholder="MM" maxlength="2"
+                                                   pattern="0[1-9]|1[0-2]" required>
                                              </div>
                                           </div>
                                           <div class="col-md-6">
                                              <div class="form-group">
                                                 <input type="text" id="expire_year" name="expire_year"
-                                                   class="form-control" placeholder="Year">
+                                                   class="form-control" placeholder="YY" maxlength="2"
+                                                   pattern="[0-9]{2}" required>
                                              </div>
                                           </div>
                                        </div>
@@ -538,7 +541,7 @@
                               <h4>Or checkout with Paypal</h4>
                               <p>Lorem ipsum dolor sit amet, vim id accusata sensibus, id ridens quaeque qui. Ne qui
                                  vocent ornatus molestie, reque fierent dissentiunt mel ea.</p>
-                                 <div id="paypal-button-container" style="width: 100% !important; margin: 10px 0;"></div>
+                              <div id="paypal-button-container" style="width: 100% !important; margin: 10px 0;"></div>
 
                               <a href="#">
                                  <img src="assets/images/paypal_bt.html" alt="">
@@ -846,7 +849,8 @@
    <!-- PayPal SDK -->
    <script
       src="https://www.paypal.com/sdk/js?client-id=AcgdFbOoo7IcBvf1cniK4LbHPhZbOTwuaxe-hL55tKttEggJlKqQJSbTQmqoU9QXmmRWyW-VExN3DHBA&currency=USD"></script>
-   <script src="https://www.paypal.com/sdk/js?client-id=AcgdFbOoo7IcBvf1cniK4LbHPhZbOTwuaxe-hL55tKttEggJlKqQJSbTQmqoU9QXmmRWyW-VExN3DHBA&currency=USD"></script>
+   <script
+      src="https://www.paypal.com/sdk/js?client-id=AcgdFbOoo7IcBvf1cniK4LbHPhZbOTwuaxe-hL55tKttEggJlKqQJSbTQmqoU9QXmmRWyW-VExN3DHBA&currency=USD"></script>
 </body>
 
 <!-- Mirrored from demo.bosathemes.com/html/travele/booking.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 22 Feb 2025 18:25:01 GMT -->

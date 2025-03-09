@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Update the summary with options
         await updateSummary(confirmationData);
+        updatePaymentDetails(confirmationData);
+        updateViewBookingDetails(confirmationData);
+
 
         // Show success message
         showSuccessMessage(confirmationData.userDetails.email);
@@ -53,54 +56,61 @@ async function updateSummary(confirmationData) {
     try {
         console.log('Full confirmation data:', confirmationData);
 
-        // Get all bookings
-        const bookings = confirmationData.booking.bookings || [];
+        // Handle both single booking and multiple bookings
+        const bookings = confirmationData.booking.bookings ||
+            [confirmationData.booking.bookingDetails];
+
         let summaryHTML = '';
         let totalAmount = 0;
 
         // Process each booking
         for (const booking of bookings) {
-            // Fetch options for this booking
-            let selectedOptions = [];
-            try {
-                const optionsResponse = await fetch(`${API_BASE_URL}/api/BookingOptionsSelections/byBooking/${booking.bookingId}`);
-                if (optionsResponse.ok) {
-                    const optionsData = await optionsResponse.json();
-                    selectedOptions = optionsData.$values || [];
-                }
-            } catch (error) {
-                console.error(`Error fetching options for booking ${booking.bookingId}:`, error);
-            }
+            if (!booking) continue;
+
+            const basePrice = booking.totalPrice || 0;
 
             // Add booking row
             summaryHTML += `
                 <tr>
                     <td><strong>Booking #${booking.bookingId}</strong></td>
-                    <td class="text-right">$${booking.totalPrice.toFixed(2)}</td>
+                    <td class="text-right">$${basePrice.toFixed(2)}</td>
                 </tr>`;
 
-            // Add selected options if any
-            let optionsTotal = 0;
-            if (selectedOptions.length > 0) {
-                summaryHTML += `
-                    <tr>
-                        <td>
-                            <strong>Selected Options for Booking #${booking.bookingId}:</strong>
-                            <ul style="list-style: none; margin: 5px 0; padding-left: 15px;">
-                                ${selectedOptions.map(option => {
-                    optionsTotal += parseFloat(option.optionPrice);
-                    return `<li>• ${option.optionName} - $${parseFloat(option.optionPrice).toFixed(2)}</li>`;
-                }).join('')}
-                            </ul>
-                        </td>
-                        <td class="text-right">$${optionsTotal.toFixed(2)}</td>
-                    </tr>`;
-            }
+            // Fetch and add selected options
+            try {
+                const optionsResponse = await fetch(`${API_BASE_URL}/api/BookingOptionsSelections/byBooking/${booking.bookingId}`);
+                if (optionsResponse.ok) {
+                    const optionsData = await optionsResponse.json();
+                    const selectedOptions = optionsData.$values || [];
+                    let optionsTotal = 0;
 
-            totalAmount += booking.totalPrice + optionsTotal;
+                    if (selectedOptions.length > 0) {
+                        summaryHTML += `
+                            <tr>
+                                <td>
+                                    <strong>Selected Options for Booking #${booking.bookingId}:</strong>
+                                    <ul style="list-style: none; margin: 5px 0; padding-left: 15px;">
+                                        ${selectedOptions.map(option => {
+                            optionsTotal += parseFloat(option.optionPrice);
+                            return `<li>• ${option.optionName} - $${parseFloat(option.optionPrice).toFixed(2)}</li>`;
+                        }).join('')}
+                                    </ul>
+                                </td>
+                                <td class="text-right">$${optionsTotal.toFixed(2)}</td>
+                            </tr>`;
+                    }
+
+                    totalAmount += basePrice + optionsTotal;
+                } else {
+                    totalAmount += basePrice;
+                }
+            } catch (error) {
+                console.error(`Error fetching options for booking ${booking.bookingId}:`, error);
+                totalAmount += basePrice;
+            }
         }
 
-        // Calculate final tax and total
+        // Calculate tax and total
         const tax = totalAmount * 0.01; // 1% tax
         const total = totalAmount + tax;
 
@@ -199,16 +209,32 @@ function updateBookingDetails(confirmationData, userDetails) {
 
 
 
-function updatePaymentDetails(payment) {
-    const paymentDesc = document.querySelector('.payment-details .details-desc');
-    if (paymentDesc) {
-        paymentDesc.innerHTML = `
-            <p>Payment is successful via ${payment.paymentMethod}</p>
-            <p>Transaction ID: ${payment.transactionId}</p>
-        `;
+
+
+function updatePaymentDetails(confirmationData) {
+    // Get the payment details section
+    const paymentSection = document.querySelector('.payment-details .details-desc');
+    if (paymentSection) {
+        const payment = confirmationData.payment;
+        const paymentMethod = payment.paymentMethod === 'PayPal' ? 'PayPal' : 'Master card';
+
+        paymentSection.innerHTML = `<p>Payment is successful via ${paymentMethod}</p>`;
     }
 }
 
+function updateViewBookingDetails(confirmationData) {
+    // Get the first booking ID (or the relevant one)
+    const bookingId = confirmationData.booking.bookings?.[0]?.bookingId ||
+        confirmationData.booking.bookingDetails?.bookingId;
+
+    // Get the view booking details section
+    const viewBookingSection = document.querySelector('.details:not(.payment-details) .details-desc');
+    if (viewBookingSection) {
+        viewBookingSection.innerHTML = `
+            <p><a href="#">https://www.travele.com/sadsd-f646556</a></p>
+        `;
+    }
+}
 
 
 function generateFormattedBookingId(id) {

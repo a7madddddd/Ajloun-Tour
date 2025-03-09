@@ -350,7 +350,7 @@ function populateFormFields() {
         'firstname_booking': firstName,
         'lastname_booking': lastName,
         'email_booking': claims.email,
-        'phone_booking': claims.phone
+        'phone_booking': claims.phone,
     };
 
     for (const [fieldName, value] of Object.entries(fields)) {
@@ -381,35 +381,23 @@ async function processPayment() {
 
         showLoading();
 
-        // Format the full address
-        const street1 = document.querySelector('input[name="street_1"]').value.trim();
-        const street2 = document.querySelector('input[name="street_2"]')?.value.trim();
-        const city = document.querySelector('input[name="city_booking"]').value.trim();
-        const state = document.querySelector('input[name="state_booking"]').value.trim();
-        const country = document.querySelector('#country').value.trim();
-        const zipCode = document.querySelector('input[name="postal_code"]').value.trim();
-
-        const addressParts = [street1];
-        if (street2) addressParts.push(street2);
-        if (city) addressParts.push(city);
-        if (state) addressParts.push(state);
-        if (country) addressParts.push(country);
-
-        const fullAddress = addressParts.join(', ');
-
-        // Get form data
+        // Get form data with correct card holder name
         const formData = {
-            cardHolderName: document.querySelector('input[name="firstname_booking"]').value + ' ' +
-                document.querySelector('input[name="lastname_booking"]').value,
+            cardHolderName: document.querySelector('#card_holder_name').value.trim(),
             cardNumber: document.querySelector('#card_number').value.replace(/\s/g, ''),
-            expiryMonth: document.querySelector('#expire_month').value.padStart(2, '0'),
-            expiryYear: document.querySelector('#expire_year').value,
-            cvv: document.querySelector('#ccv').value,
-            billingAddress: fullAddress,
-            billingCity: city,
-            billingCountry: country,
-            billingZipCode: zipCode
+            expiryMonth: document.querySelector('#expire_month').value.trim(),
+            expiryYear: document.querySelector('#expire_year').value.trim(),
+            cvv: document.querySelector('#ccv').value.trim(),
+            billingAddress: document.querySelector('input[name="street_1"]').value.trim(),
+            billingCity: document.querySelector('input[name="city_booking"]').value.trim(),
+            billingCountry: document.querySelector('#country').value.trim(),
+            billingZipCode: document.querySelector('input[name="postal_code"]').value.trim()
         };
+
+        // Validate card holder name specifically
+        if (!formData.cardHolderName) {
+            throw new Error('Card holder name is required');
+        }
 
         // Get booking data from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -424,34 +412,19 @@ async function processPayment() {
 
         console.log('Payment created:', payment);
 
-        // Create confirmation data
-        const confirmationData = {
-            payment: {
-                paymentId: payment.paymentId,
-                paymentMethod: 'card',
-                paymentStatus: payment.paymentStatus,
-                transactionId: payment.transactionId
-            },
-            booking: bookingData,
-            userDetails: getClaimsFromToken(),
-            billingDetails: {
-                country: country,
-                state: state,
-                city: city,
-                zipCode: zipCode,
-                address: fullAddress
-            }
-        };
+        // Add payment details with correct case for properties
+        const paymentDetails = await addPaymentDetails(payment.paymentId, {
+            ...formData,
+            CardHolderName: formData.cardHolderName // Ensure correct case for API
+        });
 
-        // Add payment details
-        const paymentDetails = await addPaymentDetails(payment.paymentId, formData);
         if (!paymentDetails) {
             throw new Error('Failed to add payment details');
         }
 
         console.log('Payment details added:', paymentDetails);
 
-        // Add initial payment history
+        // Add payment history
         try {
             await addPaymentHistory(payment.paymentId, 'Processing', 'Payment is being processed');
             console.log('Payment history added successfully');
@@ -462,9 +435,27 @@ async function processPayment() {
         // Update payment status
         await updatePaymentStatus(payment.paymentId, 'Completed');
 
-        // Store confirmation data and redirect
+        // Create confirmation data
+        const confirmationData = {
+            payment: {
+                paymentId: payment.paymentId,
+                paymentMethod: 'card',
+                paymentStatus: 'Completed',
+                cardNumber: formData.cardNumber
+            },
+            booking: bookingData,
+            userDetails: getClaimsFromToken(),
+            billingDetails: {
+                country: formData.billingCountry,
+                state: document.querySelector('input[name="state_booking"]').value.trim(),
+                city: formData.billingCity,
+                zipCode: formData.billingZipCode,
+                address: formData.billingAddress
+            }
+        };
+
+        // Redirect to confirmation page
         const encryptedConfirmationData = btoa(JSON.stringify(confirmationData));
-        sessionStorage.setItem('confirmationData', encryptedConfirmationData);
         window.location.href = `confirmation.html?data=${encryptedConfirmationData}`;
 
     } catch (error) {
@@ -621,15 +612,22 @@ async function createPaymentRecord(bookingData, formData) {
 
 async function addPaymentDetails(paymentId, formData) {
     try {
-        // Log the input data
         console.log('Adding payment details for payment ID:', paymentId);
         console.log('Form data:', formData);
 
+        // Format expiry date to MM/YY format
+        const expiryMonth = formData.expiryMonth.padStart(2, '0');
+        const expiryYear = formData.expiryYear.length === 4 ?
+            formData.expiryYear.slice(-2) :
+            formData.expiryYear.padStart(2, '0');
+
+        const expiryDate = `${expiryMonth}/${expiryYear}`;
+
         const paymentDetailsData = {
-            PaymentID: paymentId,
-            CardHolderName: formData.cardHolderName,
-            CardNumber: formData.cardNumber,
-            ExpiryDate: `${formData.expiryMonth}/${formData.expiryYear}`,
+            PaymentID: parseInt(paymentId),
+            CardHolderName: formData.cardHolderName, // Make sure this is present
+            CardNumber: formData.cardNumber.replace(/\s+/g, ''),
+            ExpiryDate: expiryDate,
             CVV: formData.cvv,
             BillingAddress: formData.billingAddress,
             BillingCity: formData.billingCity,
@@ -651,6 +649,11 @@ async function addPaymentDetails(paymentId, formData) {
         if (!response.ok) {
             const errorData = await response.json();
             console.error('Payment Details API Error:', errorData);
+            if (errorData.errors) {
+                console.error('Validation errors:', errorData.errors);
+                const errorMessages = Object.values(errorData.errors).flat().join(', ');
+                throw new Error(`Validation failed: ${errorMessages}`);
+            }
             throw new Error(errorData.message || 'Failed to add payment details');
         }
 
@@ -888,7 +891,59 @@ document.addEventListener('DOMContentLoaded', async function () {
         showError('Please log in again');
     }
 
+    const expireMonth = document.getElementById('expire_month');
+    if (expireMonth) {
+        expireMonth.addEventListener('input', function (e) {
+            let value = e.target.value;
+            // Remove non-digits
+            value = value.replace(/\D/g, '');
+            // Ensure it's a valid month
+            if (value.length === 2) {
+                const month = parseInt(value);
+                if (month < 1) value = '01';
+                if (month > 12) value = '12';
+            }
+            e.target.value = value;
+        });
+    }
 
+    // Format expiry year input
+    const expireYear = document.getElementById('expire_year');
+    if (expireYear) {
+        expireYear.addEventListener('input', function (e) {
+            let value = e.target.value;
+            // Remove non-digits
+            value = value.replace(/\D/g, '');
+            // Keep only last two digits if more are entered
+            if (value.length > 2) {
+                value = value.slice(-2);
+            }
+            e.target.value = value;
+        });
+    }
+
+    // Add validation before form submission
+    function validateExpiryDate() {
+        const month = expireMonth.value.padStart(2, '0');
+        const year = expireYear.value.padStart(2, '0');
+
+        // Check if date is in the past
+        const today = new Date();
+        const expiry = new Date(2000 + parseInt(year), parseInt(month) - 1);
+
+        if (expiry < today) {
+            showError('Card has expired');
+            return false;
+        }
+
+        return true;
+    }
+
+    // Add this validation to your validateForm function
+    const originalValidateForm = validateForm;
+    validateForm = function () {
+        return originalValidateForm() && validateExpiryDate();
+    };
     // Remove any existing error messages
     const existingErrors = document.querySelectorAll('.alert-danger');
     existingErrors.forEach(error => error.remove());
