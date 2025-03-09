@@ -381,6 +381,22 @@ async function processPayment() {
 
         showLoading();
 
+        // Format the full address
+        const street1 = document.querySelector('input[name="street_1"]').value.trim();
+        const street2 = document.querySelector('input[name="street_2"]')?.value.trim();
+        const city = document.querySelector('input[name="city_booking"]').value.trim();
+        const state = document.querySelector('input[name="state_booking"]').value.trim();
+        const country = document.querySelector('#country').value.trim();
+        const zipCode = document.querySelector('input[name="postal_code"]').value.trim();
+
+        const addressParts = [street1];
+        if (street2) addressParts.push(street2);
+        if (city) addressParts.push(city);
+        if (state) addressParts.push(state);
+        if (country) addressParts.push(country);
+
+        const fullAddress = addressParts.join(', ');
+
         // Get form data
         const formData = {
             cardHolderName: document.querySelector('input[name="firstname_booking"]').value + ' ' +
@@ -389,10 +405,10 @@ async function processPayment() {
             expiryMonth: document.querySelector('#expire_month').value.padStart(2, '0'),
             expiryYear: document.querySelector('#expire_year').value,
             cvv: document.querySelector('#ccv').value,
-            billingAddress: document.querySelector('input[name="street_1"]').value,
-            billingCity: document.querySelector('input[name="city_booking"]').value,
-            billingCountry: document.querySelector('#country').value,
-            billingZipCode: document.querySelector('input[name="postal_code"]').value
+            billingAddress: fullAddress,
+            billingCity: city,
+            billingCountry: country,
+            billingZipCode: zipCode
         };
 
         // Get booking data from URL
@@ -400,6 +416,15 @@ async function processPayment() {
         const encryptedData = urlParams.get('data');
         const bookingData = JSON.parse(atob(encryptedData));
 
+        // Create payment record
+        const payment = await createPaymentRecord(bookingData, formData);
+        if (!payment) {
+            throw new Error('Failed to create payment record');
+        }
+
+        console.log('Payment created:', payment);
+
+        // Create confirmation data
         const confirmationData = {
             payment: {
                 paymentId: payment.paymentId,
@@ -410,25 +435,13 @@ async function processPayment() {
             booking: bookingData,
             userDetails: getClaimsFromToken(),
             billingDetails: {
-                country: document.querySelector('#country').value,
-                zipCode: document.querySelector('input[name="postal_code"]').value,
-                address: document.querySelector('input[name="street_1"]').value +
-                    (document.querySelector('input[name="street_2"]').value ?
-                        ', ' + document.querySelector('input[name="street_2"]').value : '') +
-                    ', ' + document.querySelector('input[name="city_booking"]').value
+                country: country,
+                state: state,
+                city: city,
+                zipCode: zipCode,
+                address: fullAddress
             }
         };
-        const encryptedData2 = btoa(JSON.stringify(confirmationData));
-        sessionStorage.setItem('confirmationData', encryptedData2);
-
-
-        // Create payment record
-        const payment = await createPaymentRecord(bookingData, formData);
-        if (!payment) {
-            throw new Error('Failed to create payment record');
-        }
-
-        console.log('Payment created:', payment);
 
         // Add payment details
         const paymentDetails = await addPaymentDetails(payment.paymentId, formData);
@@ -444,15 +457,16 @@ async function processPayment() {
             console.log('Payment history added successfully');
         } catch (historyError) {
             console.error('Failed to add payment history:', historyError);
-            // Continue with the process even if history creation fails
         }
 
         // Update payment status
         await updatePaymentStatus(payment.paymentId, 'Completed');
 
-        // Redirect to confirmation page
-        // In your processPayment and processPayPalPayment functions, update the redirect:
-        window.location.href = `confirmation.html?data=${encryptedData2}`;
+        // Store confirmation data and redirect
+        const encryptedConfirmationData = btoa(JSON.stringify(confirmationData));
+        sessionStorage.setItem('confirmationData', encryptedConfirmationData);
+        window.location.href = `confirmation.html?data=${encryptedConfirmationData}`;
+
     } catch (error) {
         console.error('Payment processing error:', error);
         showError('Payment processing failed: ' + error.message);
@@ -460,6 +474,8 @@ async function processPayment() {
         hideLoading();
     }
 }
+
+
 function validateForm() {
     // Remove any existing error messages first
     const existingErrors = document.querySelectorAll('.alert-danger');
@@ -475,6 +491,7 @@ function validateForm() {
         'ccv': 'CVV',
         'street_1': 'Billing Address',
         'city_booking': 'City',
+        'state_booking': 'State',
         'country': 'Country',
         'postal_code': 'Postal Code'
     };
@@ -487,7 +504,13 @@ function validateForm() {
         // Skip pre-filled fields
         if (skipFields.includes(fieldId)) continue;
 
-        const field = document.querySelector(`[name="${fieldId}"]`) || document.getElementById(fieldId);
+        let field;
+        if (fieldId === 'country') {
+            field = document.querySelector('#country');
+        } else {
+            field = document.querySelector(`[name="${fieldId}"]`) || document.getElementById(fieldId);
+        }
+
         if (!field || !field.value.trim()) {
             errorMessages.add(`${fieldName} is required`);
             isValid = false;
@@ -973,9 +996,55 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+    // Add this new validation function specifically for billing details
+    function validateBillingDetails() {
+        const requiredFields = {
+            'street_1': 'Billing Address',
+            'city_booking': 'City',
+            'state_booking': 'State',
+            'country': 'Country',
+            'postal_code': 'Postal Code'
+        };
+
+        let isValid = true;
+        let errorMessages = new Set();
+
+        for (const [fieldId, fieldName] of Object.entries(requiredFields)) {
+            let field;
+            if (fieldId === 'country') {
+                field = document.querySelector('#country');
+            } else {
+                field = document.querySelector(`[name="${fieldId}"]`);
+            }
+
+            if (!field || !field.value.trim()) {
+                errorMessages.add(`${fieldName} is required`);
+                isValid = false;
+                if (field) {
+                    field.classList.add('is-invalid');
+                }
+            } else {
+                if (field) {
+                    field.classList.remove('is-invalid');
+                }
+            }
+        }
+
+        if (!isValid) {
+            showError(Array.from(errorMessages).join('<br>'));
+        }
+
+        return isValid;
+    }
+
+
     // Process PayPal Payment
     async function processPayPalPayment(details) {
         try {
+            if (!validateBillingDetails()) {
+                return;
+            }
+
             showLoading();
 
             // Get booking data from URL
@@ -983,14 +1052,44 @@ document.addEventListener('DOMContentLoaded', async function () {
             const encryptedData = urlParams.get('data');
             const bookingData = JSON.parse(atob(encryptedData));
 
-            // Create payment record for PayPal
+            // Handle multiple bookings
+            const bookings = bookingData.bookings || [bookingData.bookingDetails];
+
+            // Fetch selected options for all bookings
+            const bookingsWithOptions = await Promise.all(bookings.map(async (booking) => {
+                try {
+                    const optionsResponse = await fetch(`${API_BASE_URL}/api/BookingOptionsSelections/byBooking/${booking.bookingId}`);
+                    if (optionsResponse.ok) {
+                        const options = await optionsResponse.json();
+                        return {
+                            ...booking,
+                            selectedOptions: options
+                        };
+                    }
+                    return booking;
+                } catch (error) {
+                    console.error(`Error fetching options for booking ${booking.bookingId}:`, error);
+                    return booking;
+                }
+            }));
+
+            // Get billing details
+            const billingDetails = {
+                street1: document.querySelector('input[name="street_1"]').value.trim(),
+                street2: document.querySelector('input[name="street_2"]')?.value.trim(),
+                city: document.querySelector('input[name="city_booking"]').value.trim(),
+                state: document.querySelector('input[name="state_booking"]').value.trim(),
+                country: document.querySelector('#country').value.trim(),
+                zipCode: document.querySelector('input[name="postal_code"]').value.trim()
+            };
+
+            // Create payment record
             const payment = await createPayPalPaymentRecord(bookingData, details);
             if (!payment) {
                 throw new Error('Failed to create PayPal payment record');
             }
 
-            console.log('PayPal payment created:', payment);
-
+            // Create confirmation data
             const confirmationData = {
                 payment: {
                     paymentId: payment.paymentId,
@@ -998,34 +1097,28 @@ document.addEventListener('DOMContentLoaded', async function () {
                     paymentStatus: 'Completed',
                     transactionId: details.id
                 },
-                booking: bookingData,
+                booking: {
+                    bookings: bookingsWithOptions // Include all bookings with their options
+                },
                 userDetails: getClaimsFromToken(),
                 billingDetails: {
-                    country: document.querySelector('#country').value,
-                    zipCode: document.querySelector('input[name="postal_code"]').value,
-                    address: document.querySelector('input[name="street_1"]').value +
-                        (document.querySelector('input[name="street_2"]').value ?
-                            ', ' + document.querySelector('input[name="street_2"]').value : '') +
-                        ', ' + document.querySelector('input[name="city_booking"]').value
+                    country: billingDetails.country,
+                    state: billingDetails.state,
+                    city: billingDetails.city,
+                    zipCode: billingDetails.zipCode,
+                    address: [
+                        billingDetails.street1,
+                        billingDetails.street2,
+                        billingDetails.city,
+                        billingDetails.state,
+                        billingDetails.country
+                    ].filter(Boolean).join(', ')
                 }
             };
-            const encryptedData1 = btoa(JSON.stringify(confirmationData));
-            sessionStorage.setItem('confirmationData', encryptedData1);
 
-            // Add payment history
-            await addPaymentHistory(payment.paymentId, 'Completed', 'Payment completed via PayPal');
-
-            // Update payment status
-            await updatePaymentStatus(payment.paymentId, 'Completed');
-
-            // Show success message
-            showSuccess('PayPal payment completed successfully!');
-
-            // Redirect to confirmation page
-            setTimeout(() => {
-                // In your processPayment and processPayPalPayment functions, update the redirect:
-                window.location.href = `confirmation.html?data=${encryptedData1}`;
-                        }, 2000);
+            const encryptedConfirmationData = btoa(JSON.stringify(confirmationData));
+            sessionStorage.setItem('confirmationData', encryptedConfirmationData);
+            window.location.href = `confirmation.html?data=${encryptedConfirmationData}`;
 
         } catch (error) {
             console.error('PayPal payment processing error:', error);
@@ -1034,6 +1127,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             hideLoading();
         }
     }
+
+
 
     // Create PayPal Payment Record
     async function createPayPalPaymentRecord(bookingData, paypalDetails) {

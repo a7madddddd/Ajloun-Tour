@@ -15,20 +15,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         const confirmationData = JSON.parse(atob(encryptedData));
         console.log('Confirmation data:', confirmationData);
 
-        // Get user details from token
-        const userDetails = getClaimsFromToken();
+        // Update the booking details
+        updateBookingDetails(confirmationData, confirmationData.userDetails);
 
-        // Update success notification
-        updateSuccessNotification(userDetails.email);
+        // Update the summary with options
+        await updateSummary(confirmationData);
 
-        // Update booking details
-        updateBookingDetails(confirmationData, userDetails);
-
-        // Update payment details
-        updatePaymentDetails(confirmationData.payment);
-
-        // Update summary
-        updateSummary(confirmationData.booking.bookingDetails);
+        // Show success message
+        showSuccessMessage(confirmationData.userDetails.email);
 
     } catch (error) {
         console.error('Error loading confirmation page:', error);
@@ -36,6 +30,103 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 });
 
+function showSuccessMessage(email) {
+    const successNotify = document.querySelector('.success-notify');
+    if (successNotify) {
+        successNotify.innerHTML = `
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="success-content">
+                <h3>PAYMENT CONFIRMED</h3>
+                <p>Thank you, your payment has been successful and your booking is now confirmed. 
+                   A confirmation email has been sent to ${email}.</p>
+            </div>
+        `;
+    }
+}
+
+async function updateSummary(confirmationData) {
+    const summaryTable = document.querySelector('.widget-table-summary tbody');
+    if (!summaryTable) return;
+
+    try {
+        console.log('Full confirmation data:', confirmationData);
+
+        // Get all bookings
+        const bookings = confirmationData.booking.bookings || [];
+        let summaryHTML = '';
+        let totalAmount = 0;
+
+        // Process each booking
+        for (const booking of bookings) {
+            // Fetch options for this booking
+            let selectedOptions = [];
+            try {
+                const optionsResponse = await fetch(`${API_BASE_URL}/api/BookingOptionsSelections/byBooking/${booking.bookingId}`);
+                if (optionsResponse.ok) {
+                    const optionsData = await optionsResponse.json();
+                    selectedOptions = optionsData.$values || [];
+                }
+            } catch (error) {
+                console.error(`Error fetching options for booking ${booking.bookingId}:`, error);
+            }
+
+            // Add booking row
+            summaryHTML += `
+                <tr>
+                    <td><strong>Booking #${booking.bookingId}</strong></td>
+                    <td class="text-right">$${booking.totalPrice.toFixed(2)}</td>
+                </tr>`;
+
+            // Add selected options if any
+            let optionsTotal = 0;
+            if (selectedOptions.length > 0) {
+                summaryHTML += `
+                    <tr>
+                        <td>
+                            <strong>Selected Options for Booking #${booking.bookingId}:</strong>
+                            <ul style="list-style: none; margin: 5px 0; padding-left: 15px;">
+                                ${selectedOptions.map(option => {
+                    optionsTotal += parseFloat(option.optionPrice);
+                    return `<li>• ${option.optionName} - $${parseFloat(option.optionPrice).toFixed(2)}</li>`;
+                }).join('')}
+                            </ul>
+                        </td>
+                        <td class="text-right">$${optionsTotal.toFixed(2)}</td>
+                    </tr>`;
+            }
+
+            totalAmount += booking.totalPrice + optionsTotal;
+        }
+
+        // Calculate final tax and total
+        const tax = totalAmount * 0.01; // 1% tax
+        const total = totalAmount + tax;
+
+        // Add tax and total rows
+        summaryHTML += `
+            <tr>
+                <td><strong>Tax (1%)</strong></td>
+                <td class="text-right">$${tax.toFixed(2)}</td>
+            </tr>
+            <tr class="total">
+                <td><strong>Total cost</strong></td>
+                <td class="text-right"><strong>$${total.toFixed(2)}</strong></td>
+            </tr>`;
+
+        summaryTable.innerHTML = summaryHTML;
+
+    } catch (error) {
+        console.error('Error updating summary:', error);
+        console.error('Error details:', error.message);
+        summaryTable.innerHTML = `
+            <tr class="total">
+                <td><strong>Error loading summary</strong></td>
+                <td class="text-right"><strong>--</strong></td>
+            </tr>`;
+    }
+}
 function updateSuccessNotification(email) {
     const successContent = document.querySelector('.success-content');
     if (successContent) {
@@ -47,8 +138,16 @@ function updateSuccessNotification(email) {
 
 function updateBookingDetails(confirmationData, userDetails) {
     const bookingTableBody = document.querySelector('.confirmation-details table tbody');
-    if (bookingTableBody) {
-        const bookingId = generateFormattedBookingId(confirmationData.booking.bookingDetails.bookingId);
+    if (!bookingTableBody) return;
+
+    try {
+        // Get the first booking ID for reference
+        const firstBookingId = confirmationData.booking.bookings ?
+            confirmationData.booking.bookings[0].bookingId :
+            confirmationData.booking.bookingDetails?.bookingId;
+
+        const bookingId = generateFormattedBookingId(firstBookingId);
+        const billingDetails = confirmationData.billingDetails || {};
 
         bookingTableBody.innerHTML = `
             <tr>
@@ -73,91 +172,54 @@ function updateBookingDetails(confirmationData, userDetails) {
             </tr>
             <tr>
                 <td>Country:</td>
-                <td>${confirmationData.billingDetails.country}</td>
+                <td>${billingDetails.country || 'Not provided'}</td>
+            </tr>
+            <tr>
+                <td>State:</td>
+                <td>${billingDetails.state || 'Not provided'}</td>
+            </tr>
+            <tr>
+                <td>City:</td>
+                <td>${billingDetails.city || 'Not provided'}</td>
             </tr>
             <tr>
                 <td>Zip Code:</td>
-                <td>${confirmationData.billingDetails.zipCode}</td>
+                <td>${billingDetails.zipCode || 'Not provided'}</td>
             </tr>
             <tr>
                 <td>Address:</td>
-                <td>${confirmationData.billingDetails.address}</td>
+                <td>${billingDetails.address || 'Not provided'}</td>
             </tr>
         `;
+    } catch (error) {
+        console.error('Error updating booking details:', error);
+        bookingTableBody.innerHTML = '<tr><td colspan="2">Error loading booking details</td></tr>';
     }
 }
+
+
 
 function updatePaymentDetails(payment) {
     const paymentDesc = document.querySelector('.payment-details .details-desc');
     if (paymentDesc) {
         paymentDesc.innerHTML = `
             <p>Payment is successful via ${payment.paymentMethod}</p>
+            <p>Transaction ID: ${payment.transactionId}</p>
         `;
     }
 }
 
-function updateSummary(bookingDetails) {
-    const summaryTable = document.querySelector('.widget-table-summary tbody');
-    if (summaryTable && bookingDetails) {
-        // Get the base booking price
-        const bookingPrice = bookingDetails.totalPrice || 0;
 
-        // Get selected options
-        const selectedOptions = bookingDetails.selectedOptions?.$values || [];
-        const optionsTotal = selectedOptions.reduce((sum, option) => sum + option.optionPrice, 0);
-
-        // Calculate tax (1%)
-        const subtotal = bookingPrice + optionsTotal;
-        const taxRate = 0.01; // 1%
-        const tax = subtotal * taxRate;
-        const total = subtotal + tax;
-
-        let summaryHTML = `
-            <tr>
-                <td><strong>Booking #${bookingDetails.bookingId}</strong></td>
-                <td class="text-right">$${bookingPrice.toFixed(2)}</td>
-            </tr>`;
-
-        // Add selected options if any
-        if (selectedOptions.length > 0) {
-            summaryHTML += `
-                <tr>
-                    <td>
-                        <strong>Selected Options:</strong>
-                        <ul style="list-style: none; padding-left: 15px;">
-                            ${selectedOptions.map(option =>
-                `<li>${option.optionName} - $${option.optionPrice.toFixed(2)}</li>`
-            ).join('')}
-                        </ul>
-                    </td>
-                    <td class="text-right">$${optionsTotal.toFixed(2)}</td>
-                </tr>`;
-        }
-
-        // Add tax and total
-        summaryHTML += `
-            <tr>
-                <td><strong>Tax (1%)</strong></td>
-                <td class="text-right">$${tax.toFixed(2)}</td>
-            </tr>
-            <tr class="total">
-                <td><strong>Total cost</strong></td>
-                <td class="text-right"><strong>$${total.toFixed(2)}</strong></td>
-            </tr>`;
-
-        summaryTable.innerHTML = summaryHTML;
-    }
-}
 
 function generateFormattedBookingId(id) {
-    if (!id) return '';
+    if (!id) return 'Not provided';
     return `999-QSDE-${id.toString().padStart(2, '0')}`;
 }
 
 function formatPhoneNumber(phone) {
-    if (!phone) return '';
+    if (!phone) return 'Not provided';
     const cleaned = phone.replace(/\D/g, '');
-    return cleaned.replace(/(\d{3})(\d{3})(\d{3})/, '$1 - $2 - $3');
+    return cleaned.replace(/(\d{3})(\d{3})(\d{4})/, '$1 - $2 - $3');
 }
 
 function showError(message) {
