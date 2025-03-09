@@ -125,44 +125,43 @@
 
 
       .is-invalid {
-    border-color: #dc3545 !important;
-    background-color: #fff8f8;
-}
+         border-color: #dc3545 !important;
+         background-color: #fff8f8;
+      }
 
-.alert-danger {
-    margin-bottom: 20px;
-    padding: 15px;
-    border-radius: 4px;
-    color: #721c24;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-}
+      .alert-danger {
+         margin-bottom: 20px;
+         padding: 15px;
+         border-radius: 4px;
+         color: #721c24;
+         background-color: #f8d7da;
+         border: 1px solid #f5c6cb;
+      }
 
 
-    input[readonly] {
-        background-color: #f8f9fa !important;
-        cursor: not-allowed;
-        color: #495057 !important;
-    }
+      input[readonly] {
+         background-color: #f8f9fa !important;
+         cursor: not-allowed;
+         color: #495057 !important;
+      }
 
-input[readonly] {
-    background-color: #f8f9fa !important;
-    cursor: not-allowed;
-}
+      input[readonly] {
+         background-color: #f8f9fa !important;
+         cursor: not-allowed;
+      }
 
-.is-invalid {
-    border-color: #dc3545;
-}
+      .is-invalid {
+         border-color: #dc3545;
+      }
 
-.alert-danger {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-    padding: 0.75rem 1.25rem;
-    margin-bottom: 1rem;
-    border-radius: 0.25rem;
-}
-
+      .alert-danger {
+         color: #721c24;
+         background-color: #f8d7da;
+         border-color: #f5c6cb;
+         padding: 0.75rem 1.25rem;
+         margin-bottom: 1rem;
+         border-radius: 0.25rem;
+      }
    </style>
 </head>
 
@@ -436,39 +435,40 @@ input[readonly] {
                               <span>1</span>
                               <h3>Your Details</h3>
                            </div>
-<div class="row">
-   <div class="col-sm-6">
-      <div class="form-group">
-         <label>First name*</label>
-         <input type="text" class="form-control" name="firstname_booking">
-      </div>
-   </div>
-   <div class="col-sm-6">
-      <div class="form-group">
-         <label>Last name*</label>
-         <input type="text" class="form-control" name="lastname_booking">
-      </div>
-   </div>
-   <div class="col-sm-6">
-      <div class="form-group">
-         <label>Email*</label>
-         <input type="email" class="form-control" name="email_booking">
-      </div>
-   </div>
-   <div class="col-sm-6">
-      <div class="form-group">
-         <label>Confirm Email*</label>
-         <input type="email" class="form-control" name="email_booking">
-      </div>
-   </div>
-   <div class="col-sm-6">
-<div class="form-group">
-   <label>Phone*</label>
-   <input type="text" class="form-control" name="phone_booking" id="phone-pay" readonly>
-</div>
+                           <div class="row">
+                              <div class="col-sm-6">
+                                 <div class="form-group">
+                                    <label>First name*</label>
+                                    <input type="text" class="form-control" name="firstname_booking">
+                                 </div>
+                              </div>
+                              <div class="col-sm-6">
+                                 <div class="form-group">
+                                    <label>Last name*</label>
+                                    <input type="text" class="form-control" name="lastname_booking">
+                                 </div>
+                              </div>
+                              <div class="col-sm-6">
+                                 <div class="form-group">
+                                    <label>Email*</label>
+                                    <input type="email" class="form-control" name="email_booking">
+                                 </div>
+                              </div>
+                              <div class="col-sm-6">
+                                 <div class="form-group">
+                                    <label>Confirm Email*</label>
+                                    <input type="email" class="form-control" name="email_booking">
+                                 </div>
+                              </div>
+                              <div class="col-sm-6">
+                                 <div class="form-group">
+                                    <label>Phone*</label>
+                                    <input type="text" class="form-control" name="phone_booking" id="phone-pay"
+                                       readonly>
+                                 </div>
 
-   </div>
-</div>
+                              </div>
+                           </div>
                         </div>
                         <div class="booking-content">
                            <div class="form-title">
@@ -538,6 +538,8 @@ input[readonly] {
                               <h4>Or checkout with Paypal</h4>
                               <p>Lorem ipsum dolor sit amet, vim id accusata sensibus, id ridens quaeque qui. Ne qui
                                  vocent ornatus molestie, reque fierent dissentiunt mel ea.</p>
+                                 <div id="paypal-button-container" style="width: 100% !important; margin: 10px 0;"></div>
+
                               <a href="#">
                                  <img src="assets/images/paypal_bt.html" alt="">
                               </a>
@@ -841,6 +843,10 @@ input[readonly] {
 
    <!-- my js -->
    <script src="Fetch/booking-pay.js"></script>
+   <!-- PayPal SDK -->
+   <script
+      src="https://www.paypal.com/sdk/js?client-id=AcgdFbOoo7IcBvf1cniK4LbHPhZbOTwuaxe-hL55tKttEggJlKqQJSbTQmqoU9QXmmRWyW-VExN3DHBA&currency=USD"></script>
+   <script src="https://www.paypal.com/sdk/js?client-id=AcgdFbOoo7IcBvf1cniK4LbHPhZbOTwuaxe-hL55tKttEggJlKqQJSbTQmqoU9QXmmRWyW-VExN3DHBA&currency=USD"></script>
 </body>
 
 <!-- Mirrored from demo.bosathemes.com/html/travele/booking.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 22 Feb 2025 18:25:01 GMT -->

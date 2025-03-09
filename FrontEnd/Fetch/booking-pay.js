@@ -492,7 +492,6 @@ async function createPaymentRecord(bookingData, formData) {
     try {
         console.log('Creating payment record with booking data:', bookingData);
 
-        // Calculate total amount
         const amount = calculateTotalAmount();
         console.log('Calculated amount:', amount);
 
@@ -500,27 +499,29 @@ async function createPaymentRecord(bookingData, formData) {
             throw new Error('Invalid amount calculated');
         }
 
-        // Get user ID
         const userId = getUserIdFromToken();
         console.log('User ID:', userId);
 
-        // Get booking ID from the data
+        // Get cart ID
+        const cartId = await getCartIdByUserId(userId);
+        console.log('Cart ID for payment:', cartId);
+
+        // Get booking ID
         let bookingId = null;
         if (bookingData.bookingDetails) {
             bookingId = bookingData.bookingDetails.bookingId;
         } else if (bookingData.bookings && bookingData.bookings.length > 0) {
-            // If multiple bookings, use the first one's ID
             bookingId = bookingData.bookings[0].bookingId;
         }
 
-        // Prepare payment data exactly matching the API requirements
         const paymentData = {
-            bookingID: bookingId,  // Make sure this matches the case in the API
-            userID: userId,        // Make sure this matches the case in the API
-            gatewayID: 1,         // Make sure this matches the case in the API
-            cartId: null,         // Make sure this matches the case in the API
-            amount: parseFloat(amount.toFixed(2)), // Format to 2 decimal places
-            paymentMethod: "paypal"
+            bookingID: bookingId,
+            userID: userId,
+            gatewayID: 1,
+            cartId: cartId, // Use the fetched cart ID
+            amount: parseFloat(amount.toFixed(2)),
+            paymentMethod: "card",
+            paymentStatus: "Pending"
         };
 
         console.log('Payment data to be sent:', paymentData);
@@ -536,14 +537,8 @@ async function createPaymentRecord(bookingData, formData) {
 
         if (!response.ok) {
             const errorData = await response.json();
-            console.error('Payment API Error Details:', errorData);
-
-            // Log validation errors if they exist
-            if (errorData.errors) {
-                console.error('Validation errors:', errorData.errors);
-            }
-
-            throw new Error(`Failed to create payment record: ${JSON.stringify(errorData.errors || errorData.title)}`);
+            console.error('Payment API Error:', errorData);
+            throw new Error(errorData.message || 'Failed to create payment record');
         }
 
         const responseData = await response.json();
@@ -807,6 +802,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     // First populate form fields
     populateFormFields();
 
+    initializePayPal();
+
+
     try {
         const amount = calculateTotalAmount();
         console.log('Initial amount calculation:', amount);
@@ -871,6 +869,206 @@ document.addEventListener('DOMContentLoaded', async function () {
         console.error('Error processing checkout data:', error);
         showError('Invalid checkout data');
     }
+
+    async function getCartIdByUserId(userId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/ToursCarts/user/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'accept': 'text/plain'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch cart ID');
+            }
+
+            const cartId = await response.json();
+            console.log('Retrieved cart ID:', cartId);
+            return cartId;
+        } catch (error) {
+            console.error('Error fetching cart ID:', error);
+            return null;
+        }
+    }
+
+    // paypal
+    // Add these new PayPal functions
+
+    // Initialize PayPal
+    function initializePayPal() {
+        try {
+            const amount = calculateTotalAmount();
+            console.log('Initializing PayPal with amount:', amount);
+
+            paypal.Buttons({
+                createOrder: function (data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: amount.toString()
+                            }
+                        }]
+                    });
+                },
+                onApprove: function (data, actions) {
+                    return actions.order.capture().then(function (details) {
+                        processPayPalPayment(details);
+                    });
+                },
+                onError: function (err) {
+                    console.error('PayPal Error:', err);
+                    showError('PayPal payment failed. Please try again.');
+                }
+            }).render('#paypal-button-container')
+                .catch(err => {
+                    console.error('PayPal render error:', err);
+                });
+        } catch (error) {
+            console.error('PayPal initialization error:', error);
+        }
+    }
+
+    // Process PayPal Payment
+    async function processPayPalPayment(details) {
+        try {
+            showLoading();
+
+            // Get booking data from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const encryptedData = urlParams.get('data');
+            const bookingData = JSON.parse(atob(encryptedData));
+
+            // Create payment record for PayPal
+            const payment = await createPayPalPaymentRecord(bookingData, details);
+            if (!payment) {
+                throw new Error('Failed to create PayPal payment record');
+            }
+
+            console.log('PayPal payment created:', payment);
+
+            // Add payment history
+            await addPaymentHistory(payment.paymentId, 'Completed', 'Payment completed via PayPal');
+
+            // Update payment status
+            await updatePaymentStatus(payment.paymentId, 'Completed');
+
+            // Show success message
+            showSuccess('PayPal payment completed successfully!');
+
+            // Redirect to confirmation page
+            setTimeout(() => {
+                window.location.href = 'confirmation.html';
+            }, 2000);
+
+        } catch (error) {
+            console.error('PayPal payment processing error:', error);
+            showError('PayPal payment processing failed: ' + error.message);
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // Create PayPal Payment Record
+    async function createPayPalPaymentRecord(bookingData, paypalDetails) {
+        try {
+            const amount = calculateTotalAmount();
+            const userId = getUserIdFromToken();
+
+            // Get cart ID
+            const cartId = await getCartIdByUserId(userId);
+            console.log('Cart ID for payment:', cartId);
+
+            // Get booking ID
+            let bookingId = null;
+            if (bookingData.bookingDetails) {
+                bookingId = bookingData.bookingDetails.bookingId;
+            } else if (bookingData.bookings && bookingData.bookings.length > 0) {
+                bookingId = bookingData.bookings[0].bookingId;
+            }
+
+            const paymentData = {
+                bookingID: bookingId,
+                userID: userId,
+                gatewayID: 1,
+                cartId: cartId, // Use the fetched cart ID
+                amount: parseFloat(amount.toFixed(2)),
+                paymentMethod: "PayPal",
+                paymentStatus: "Completed",
+                transactionId: paypalDetails.id
+            };
+
+            console.log('PayPal payment data to be sent:', paymentData);
+
+            const response = await fetch(`${API_BASE_URL}/api/Payments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'accept': 'text/plain'
+                },
+                body: JSON.stringify(paymentData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('PayPal Payment API Error:', errorData);
+                throw new Error(errorData.message || 'Failed to create PayPal payment record');
+            }
+
+            return await response.json();
+
+        } catch (error) {
+            console.error('Create PayPal Payment Error:', error);
+            throw error;
+        }
+    }
+
+
+    function showSuccess(message) {
+        // Remove any existing success or error messages
+        const existingMessages = document.querySelectorAll('.alert');
+        existingMessages.forEach(msg => msg.remove());
+
+        // Create new success message element
+        const successDiv = document.createElement('div');
+        successDiv.className = 'alert alert-success';
+        successDiv.style.cssText = `
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #d6e9c6;
+        border-radius: 4px;
+        color: #3c763d;
+        background-color: #dff0d8;
+    `;
+        successDiv.innerHTML = message;
+
+        // Insert the success message at the top of the form
+        const formWrap = document.querySelector('.booking-form-wrap');
+        if (formWrap) {
+            formWrap.insertBefore(successDiv, formWrap.firstChild);
+
+            // Scroll to the success message
+            successDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Optionally, remove the success message after a few seconds
+        setTimeout(() => {
+            if (successDiv && successDiv.parentNode) {
+                successDiv.remove();
+            }
+        }, 5000); // Remove after 5 seconds
+    }
+
+    // Initialize PayPal when the page loads
+    document.addEventListener('DOMContentLoaded', function () {
+        // Your existing DOMContentLoaded code remains here...
+
+        // Initialize PayPal
+        initializePayPal();
+    });
+
+
+
 });
 
 
