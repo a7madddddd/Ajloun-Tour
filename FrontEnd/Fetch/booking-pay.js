@@ -311,6 +311,28 @@ function getUserIdFromToken() {
     }
 }
 
+async function getCartIdByUserId(userId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/ToursCarts/user/${userId}`, {
+            method: 'GET',
+            headers: {
+                'accept': 'text/plain'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch cart ID');
+        }
+
+        const cartId = await response.json();
+        console.log('Retrieved cart ID:', cartId);
+        return cartId;
+    } catch (error) {
+        console.error('Error fetching cart ID:', error);
+        return null;
+    }
+}
+
 // Function to populate form fields
 function populateFormFields() {
     const claims = getClaimsFromToken();
