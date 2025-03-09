@@ -400,6 +400,28 @@ async function processPayment() {
         const encryptedData = urlParams.get('data');
         const bookingData = JSON.parse(atob(encryptedData));
 
+        const confirmationData = {
+            payment: {
+                paymentId: payment.paymentId,
+                paymentMethod: 'card',
+                paymentStatus: payment.paymentStatus,
+                transactionId: payment.transactionId
+            },
+            booking: bookingData,
+            userDetails: getClaimsFromToken(),
+            billingDetails: {
+                country: document.querySelector('#country').value,
+                zipCode: document.querySelector('input[name="postal_code"]').value,
+                address: document.querySelector('input[name="street_1"]').value +
+                    (document.querySelector('input[name="street_2"]').value ?
+                        ', ' + document.querySelector('input[name="street_2"]').value : '') +
+                    ', ' + document.querySelector('input[name="city_booking"]').value
+            }
+        };
+        const encryptedData2 = btoa(JSON.stringify(confirmationData));
+        sessionStorage.setItem('confirmationData', encryptedData2);
+
+
         // Create payment record
         const payment = await createPaymentRecord(bookingData, formData);
         if (!payment) {
@@ -429,8 +451,8 @@ async function processPayment() {
         await updatePaymentStatus(payment.paymentId, 'Completed');
 
         // Redirect to confirmation page
-        window.location.href = 'confirmation.html';
-
+        // In your processPayment and processPayPalPayment functions, update the redirect:
+        window.location.href = `confirmation.html?data=${encryptedData2}`;
     } catch (error) {
         console.error('Payment processing error:', error);
         showError('Payment processing failed: ' + error.message);
@@ -969,6 +991,27 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             console.log('PayPal payment created:', payment);
 
+            const confirmationData = {
+                payment: {
+                    paymentId: payment.paymentId,
+                    paymentMethod: 'PayPal',
+                    paymentStatus: 'Completed',
+                    transactionId: details.id
+                },
+                booking: bookingData,
+                userDetails: getClaimsFromToken(),
+                billingDetails: {
+                    country: document.querySelector('#country').value,
+                    zipCode: document.querySelector('input[name="postal_code"]').value,
+                    address: document.querySelector('input[name="street_1"]').value +
+                        (document.querySelector('input[name="street_2"]').value ?
+                            ', ' + document.querySelector('input[name="street_2"]').value : '') +
+                        ', ' + document.querySelector('input[name="city_booking"]').value
+                }
+            };
+            const encryptedData1 = btoa(JSON.stringify(confirmationData));
+            sessionStorage.setItem('confirmationData', encryptedData1);
+
             // Add payment history
             await addPaymentHistory(payment.paymentId, 'Completed', 'Payment completed via PayPal');
 
@@ -980,8 +1023,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             // Redirect to confirmation page
             setTimeout(() => {
-                window.location.href = 'confirmation.html';
-            }, 2000);
+                // In your processPayment and processPayPalPayment functions, update the redirect:
+                window.location.href = `confirmation.html?data=${encryptedData1}`;
+                        }, 2000);
 
         } catch (error) {
             console.error('PayPal payment processing error:', error);
