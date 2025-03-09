@@ -17,6 +17,7 @@ namespace Ajloun_Tour.DTOs2.PaymentDTOs
         [Required]
         public string PaymentMethod { get; set; }
         public string? PaymentStatus { get; set; }
+        public string? TransactionId { get; set; } 
 
     }
 }

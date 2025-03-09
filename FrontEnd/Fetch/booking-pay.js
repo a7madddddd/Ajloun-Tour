@@ -548,23 +548,14 @@ function showError(message) {
 
 async function createPaymentRecord(bookingData, formData) {
     try {
-        console.log('Creating payment record with booking data:', bookingData);
-
         const amount = calculateTotalAmount();
-        console.log('Calculated amount:', amount);
-
-        if (isNaN(amount) || amount <= 0) {
-            throw new Error('Invalid amount calculated');
-        }
-
         const userId = getUserIdFromToken();
-        console.log('User ID:', userId);
 
-        // Get cart ID
+        // Generate a transaction ID for card payments
+        const transactionId = `CARD_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
         const cartId = await getCartIdByUserId(userId);
-        console.log('Cart ID for payment:', cartId);
 
-        // Get booking ID
         let bookingId = null;
         if (bookingData.bookingDetails) {
             bookingId = bookingData.bookingDetails.bookingId;
@@ -575,11 +566,12 @@ async function createPaymentRecord(bookingData, formData) {
         const paymentData = {
             bookingID: bookingId,
             userID: userId,
-            gatewayID: 1,
-            cartId: cartId, // Use the fetched cart ID
+            gatewayID: 2, // Use a different gateway ID for card payments
+            cartId: cartId,
             amount: parseFloat(amount.toFixed(2)),
             paymentMethod: "card",
-            paymentStatus: "Pending"
+            paymentStatus: "Pending",
+            transactionId: transactionId // Add the generated transaction ID
         };
 
         console.log('Payment data to be sent:', paymentData);
@@ -717,7 +709,7 @@ async function updatePaymentStatus(paymentId, status) {
         }
         const currentPayment = await getResponse.json();
 
-        // Prepare the update data matching the CreatePayment model
+        // Prepare the update data
         const updateData = {
             bookingID: currentPayment.bookingId,
             userID: currentPayment.userId,
@@ -725,7 +717,8 @@ async function updatePaymentStatus(paymentId, status) {
             cartId: currentPayment.cartId,
             amount: currentPayment.amount,
             paymentMethod: currentPayment.paymentMethod,
-            paymentStatus: status // Include the new status
+            paymentStatus: status,
+            transactionId: currentPayment.transactionId // Make sure to include the transaction ID
         };
 
         console.log('Updating payment with data:', updateData);
@@ -734,7 +727,7 @@ async function updatePaymentStatus(paymentId, status) {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'accept': 'text/plain'  // Match the API specification
+                'accept': 'text/plain'
             },
             body: JSON.stringify(updateData)
         });
@@ -1203,15 +1196,25 @@ document.addEventListener('DOMContentLoaded', async function () {
                 bookingId = bookingData.bookings[0].bookingId;
             }
 
+            // Extract PayPal transaction ID
+            const transactionId = paypalDetails.id || // For newer PayPal SDK
+                paypalDetails.orderID || // Alternative property
+                paypalDetails.purchase_units?.[0]?.payments?.captures?.[0]?.id; // Deeper check
+
+            if (!transactionId) {
+                console.error('PayPal details:', paypalDetails);
+                throw new Error('No transaction ID found in PayPal response');
+            }
+
             const paymentData = {
                 bookingID: bookingId,
                 userID: userId,
                 gatewayID: 1,
-                cartId: cartId, // Use the fetched cart ID
+                cartId: cartId,
                 amount: parseFloat(amount.toFixed(2)),
                 paymentMethod: "PayPal",
                 paymentStatus: "Completed",
-                transactionId: paypalDetails.id
+                transactionId: transactionId // Set the transaction ID here
             };
 
             console.log('PayPal payment data to be sent:', paymentData);

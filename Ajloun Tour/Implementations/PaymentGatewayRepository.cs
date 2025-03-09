@@ -57,7 +57,7 @@ namespace Ajloun_Tour.Implementations
         public async Task<IEnumerable<PaymentGatewayDTO>> GetActiveGateways()
         {
             return await _context.PaymentGateways
-                .Where(g => g.IsActive)
+                .Where(g => g.IsActive == true)
                 .Select(g => new PaymentGatewayDTO
                 {
                     GatewayId = g.GatewayId,

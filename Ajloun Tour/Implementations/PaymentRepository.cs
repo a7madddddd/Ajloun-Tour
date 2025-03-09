@@ -81,13 +81,11 @@ namespace Ajloun_Tour.Implementations
 
         public async Task<PaymentDTO> AddPayment(CreatePayment createPayment)
         {
-
             // Check if gateway exists
             var gateway = await _context.PaymentGateways.FindAsync(createPayment.GatewayID);
             if (gateway == null)
             {
                 throw new Exception($"Payment gateway with ID {createPayment.GatewayID} not found");
-
             }
 
             var payment = new Payment
@@ -98,7 +96,8 @@ namespace Ajloun_Tour.Implementations
                 CartId = createPayment.CartId,
                 Amount = createPayment.Amount,
                 PaymentMethod = createPayment.PaymentMethod,
-                PaymentStatus = "Pending",
+                PaymentStatus = createPayment.PaymentStatus ?? "Pending",
+                TransactionId = createPayment.TransactionId, // Add this line
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -115,12 +114,11 @@ namespace Ajloun_Tour.Implementations
                 Amount = payment.Amount,
                 PaymentStatus = payment.PaymentStatus,
                 PaymentMethod = payment.PaymentMethod,
-                TransactionId = payment.TransactionId,
+                TransactionId = payment.TransactionId, // Make sure this is included
                 CreatedAt = payment.CreatedAt,
                 UpdatedAt = payment.UpdatedAt
             };
         }
-
         public async Task<PaymentDTO> UpdatePayment(int id, CreatePayment createPayment)
         {
             var payment = await _context.Payments.FindAsync(id);
@@ -133,7 +131,8 @@ namespace Ajloun_Tour.Implementations
             payment.CartId = createPayment.CartId;
             payment.Amount = createPayment.Amount;
             payment.PaymentMethod = createPayment.PaymentMethod;
-            payment.PaymentStatus = createPayment.PaymentStatus;  // Update the status
+            payment.PaymentStatus = createPayment.PaymentStatus;
+            payment.TransactionId = createPayment.TransactionId; // Add this line
             payment.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -148,12 +147,11 @@ namespace Ajloun_Tour.Implementations
                 Amount = payment.Amount,
                 PaymentStatus = payment.PaymentStatus,
                 PaymentMethod = payment.PaymentMethod,
-                TransactionId = payment.TransactionId,
+                TransactionId = payment.TransactionId, // Include in response
                 CreatedAt = payment.CreatedAt,
                 UpdatedAt = payment.UpdatedAt
             };
         }
-
         public async Task DeletePayment(int id)
         {
             var payment = await _context.Payments.FindAsync(id);
