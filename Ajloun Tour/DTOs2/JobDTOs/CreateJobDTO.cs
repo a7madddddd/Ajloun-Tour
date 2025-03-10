@@ -21,6 +21,9 @@ namespace Ajloun_Tour.DTOs2.JobDTOs
 
         public string Requirements { get; set; }
 
+        public string? Overview { get; set; }
+        public string? Experinces { get; set; }
+
         public List<IFormFile> Images { get; set; }
     }
 }

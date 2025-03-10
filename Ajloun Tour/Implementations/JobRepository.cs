@@ -13,25 +13,54 @@ namespace Ajloun_Tour.Implementations
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public JobRepository(
-            MyDbContext context,
-            IMapper mapper,
-            IWebHostEnvironment webHostEnvironment)
+        public JobRepository(MyDbContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
         }
 
+        private async Task<string> SaveImage(IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+                throw new Exception("Invalid image file");
+
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "JobsImages");
+
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(fileStream);
+            }
+
+            return $"/images/jobs/{fileName}";
+        }
+
+
+        private void DeleteImage(string imageUrl)
+        {
+            if (string.IsNullOrEmpty(imageUrl))
+                return;
+
+            var fileName = Path.GetFileName(imageUrl);
+            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "JobsImages", fileName);
+
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+        }
+
+
         public async Task<IEnumerable<JobDTO>> GetAllJobs(bool includeInactive = false)
         {
             var query = _context.Jobs
                 .Include(j => j.JobImages)
                 .AsQueryable();
-
-            if (!includeInactive)
-                query = query.Where(j => j.IsActive == true);
-
+            
             var jobs = await query.OrderByDescending(j => j.CreatedDate).ToListAsync();
             return _mapper.Map<IEnumerable<JobDTO>>(jobs);
         }
@@ -52,7 +81,7 @@ namespace Ajloun_Tour.Implementations
         {
             var jobs = await _context.Jobs
                 .Include(j => j.JobImages)
-                .Where(j => j.JobType == jobType && j.IsActive == true)
+                .Where(j => j.JobType == jobType )
                 .OrderByDescending(j => j.CreatedDate)
                 .ToListAsync();
 
@@ -63,7 +92,7 @@ namespace Ajloun_Tour.Implementations
         {
             var job = _mapper.Map<Job>(createJob);
             job.CreatedDate = DateTime.UtcNow;
-            job.IsActive = true;
+            job.IsActive = false;
 
             // Handle image uploads
             if (createJob.Images != null && createJob.Images.Any())
@@ -134,38 +163,7 @@ namespace Ajloun_Tour.Implementations
             await _context.SaveChangesAsync();
         }
 
-        private async Task<string> SaveImage(IFormFile image)
-        {
-            if (image == null || image.Length == 0)
-                throw new Exception("Invalid image file");
 
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
-            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "jobs");
-
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await image.CopyToAsync(fileStream);
-            }
-
-            return $"/images/jobs/{fileName}";
-        }
-
-        private void DeleteImage(string imageUrl)
-        {
-            if (string.IsNullOrEmpty(imageUrl))
-                return;
-
-            var fileName = Path.GetFileName(imageUrl);
-            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "jobs", fileName);
-
-            if (File.Exists(filePath))
-                File.Delete(filePath);
-        }
     }
 
 
