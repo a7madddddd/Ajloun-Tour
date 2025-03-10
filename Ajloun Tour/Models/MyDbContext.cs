@@ -23,6 +23,9 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Cart> Carts { get; set; } = null!;
         public virtual DbSet<CartItem> CartItems { get; set; } = null!;
         public virtual DbSet<ContactMessage> ContactMessages { get; set; } = null!;
+        public virtual DbSet<Job> Jobs { get; set; } = null!;
+        public virtual DbSet<JobApplication> JobApplications { get; set; } = null!;
+        public virtual DbSet<JobImage> JobImages { get; set; } = null!;
         public virtual DbSet<NewsletterSubscriber> NewsletterSubscribers { get; set; } = null!;
         public virtual DbSet<Offer> Offers { get; set; } = null!;
         public virtual DbSet<OfferProgram> OfferPrograms { get; set; } = null!;
@@ -37,6 +40,7 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Review> Reviews { get; set; } = null!;
         public virtual DbSet<Testomonial> Testomonials { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
+        
         public virtual DbSet<TourOffer> TourOffers { get; set; } = null!;
 
         public virtual DbSet<TourPackage> TourPackages { get; set; } = null!;
@@ -273,6 +277,83 @@ namespace Ajloun_Tour.Models
                 entity.Property(e => e.SubmittedAt)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+            });
+
+            modelBuilder.Entity<Job>(entity =>
+            {
+                entity.Property(e => e.JobId).HasColumnName("JobID");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Description).HasColumnType("ntext");
+
+                entity.Property(e => e.Experinces).HasColumnType("ntext");
+
+                entity.Property(e => e.IsActive).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.JobType).HasMaxLength(50);
+
+                entity.Property(e => e.Overview).HasColumnType("ntext");
+
+                entity.Property(e => e.Requirements).HasColumnType("ntext");
+
+                entity.Property(e => e.Salary).HasMaxLength(50);
+
+                entity.Property(e => e.Title).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<JobApplication>(entity =>
+            {
+                entity.HasKey(e => e.ApplicationId)
+                    .HasName("PK__JobAppli__C93A4F79E8A1C7C5");
+
+                entity.Property(e => e.ApplicationId).HasColumnName("ApplicationID");
+
+                entity.Property(e => e.ApplicantName).HasMaxLength(100);
+
+                entity.Property(e => e.ApplicationDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Cvpath)
+                    .HasMaxLength(255)
+                    .HasColumnName("CVPath");
+
+                entity.Property(e => e.Email).HasMaxLength(100);
+
+                entity.Property(e => e.JobId).HasColumnName("JobID");
+
+                entity.Property(e => e.Message).HasColumnType("ntext");
+
+                entity.Property(e => e.Phone).HasMaxLength(20);
+
+                entity.Property(e => e.Status).HasMaxLength(20);
+
+                entity.HasOne(d => d.Job)
+                    .WithMany(p => p.JobApplications)
+                    .HasForeignKey(d => d.JobId)
+                    .HasConstraintName("FK__JobApplic__JobID__2F9A1060");
+            });
+
+            modelBuilder.Entity<JobImage>(entity =>
+            {
+                entity.HasKey(e => e.ImageId)
+                    .HasName("PK__JobImage__7516F4ECA56E20F0");
+
+                entity.Property(e => e.ImageId).HasColumnName("ImageID");
+
+                entity.Property(e => e.ImageUrl)
+                    .HasMaxLength(255)
+                    .HasColumnName("ImageURL");
+
+                entity.Property(e => e.JobId).HasColumnName("JobID");
+
+                entity.HasOne(d => d.Job)
+                    .WithMany(p => p.JobImages)
+                    .HasForeignKey(d => d.JobId)
+                    .HasConstraintName("FK__JobImages__JobID__336AA144");
             });
 
             modelBuilder.Entity<NewsletterSubscriber>(entity =>
@@ -693,6 +774,7 @@ namespace Ajloun_Tour.Models
                     .HasConstraintName("FK__testomoni__UserI__619B8048");
             });
 
+
             modelBuilder.Entity<Tour>(entity =>
             {
                 entity.Property(e => e.TourId).HasColumnName("TourID");
@@ -749,27 +831,6 @@ namespace Ajloun_Tour.Models
 
             });
 
-            modelBuilder.Entity<TourPackage>(entity =>
-            {
-                entity.HasKey(e => new { e.TourId, e.PackageId })
-                    .HasName("PK__TourPack__DD2EFF48ADCDAF59");
-
-                entity.Property(e => e.TourId).HasColumnName("tour_id");
-
-                entity.Property(e => e.PackageId).HasColumnName("package_id");
-
-                entity.Property(e => e.IsActive).HasColumnName("isActive");
-
-                entity.HasOne(d => d.Package)
-                    .WithMany(p => p.TourPackages)
-                    .HasForeignKey(d => d.PackageId)
-                    .HasConstraintName("FK__TourPacka__packa__0B91BA14");
-
-                entity.HasOne(d => d.Tour)
-                    .WithMany(p => p.TourPackages)
-                    .HasForeignKey(d => d.TourId)
-                    .HasConstraintName("FK__TourPacka__tour___0A9D95DB");
-            });
             modelBuilder.Entity<TourPackage>(entity =>
             {
                 entity.HasKey(e => new { e.TourId, e.PackageId })

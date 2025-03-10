@@ -104,6 +104,8 @@ builder.Services.AddAuthentication(options =>
 
 
 //scoped here
+// Program.cs
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddScoped<IApplicationBuilder, ApplicationBuilder>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
@@ -135,6 +137,10 @@ builder.Services.AddScoped<IPaymentGatewayRepository, PaymentGatewayRepository>(
 builder.Services.AddScoped<IPaymentDetailRepository, PaymentDetailRepository>();
 builder.Services.AddScoped<IPaymentHistoryRepository, PaymentHistoryRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IJobRepository, JobRepository>();
+builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
+builder.Services.AddScoped<IJobImageRepository, JobImageRepository>();
+
 
 
 builder.Services.AddAuthorization();
