@@ -1089,6 +1089,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
 
+ 
+
     // Process PayPal Payment
     async function processPayPalPayment(details) {
         try {
@@ -1098,11 +1100,15 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             showLoading();
 
+            // Get summary data from the table
+            const summaryData = getSummaryData();
+            console.log('Retrieved summary data:', summaryData);
+
             // Get booking data from URL
             const urlParams = new URLSearchParams(window.location.search);
             const encryptedData = urlParams.get('data');
             const bookingData = JSON.parse(atob(encryptedData));
-            
+
             // Handle multiple bookings
             const bookings = bookingData.bookings || [bookingData.bookingDetails];
 
@@ -1133,11 +1139,10 @@ document.addEventListener('DOMContentLoaded', async function () {
                 country: document.querySelector('#country').value.trim(),
                 zipCode: document.querySelector('input[name="postal_code"]').value.trim(),
                 additionalNotes: document.getElementById('note').value.trim()
-
             };
 
             // Create payment record
-            const payment = await createPayPalPaymentRecord(bookingData, details);
+            const payment = await createPayPalPaymentRecord(bookingData, details, summaryData);
             if (!payment) {
                 throw new Error('Failed to create PayPal payment record');
             }
@@ -1151,7 +1156,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     transactionId: details.id
                 },
                 booking: {
-                    bookings: bookingsWithOptions // Include all bookings with their options
+                    bookings: bookingsWithOptions
                 },
                 userDetails: getClaimsFromToken(),
                 billingDetails: {
@@ -1159,7 +1164,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                     state: billingDetails.state,
                     city: billingDetails.city,
                     zipCode: billingDetails.zipCode,
-
                     address: [
                         billingDetails.street1,
                         billingDetails.street2,
@@ -1182,10 +1186,54 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+    function getSummaryData() {
+        try {
+            const summaryTable = document.querySelector('table tbody');
+            if (!summaryTable) {
+                console.error('Summary table not found');
+                return null;
+            }
 
+            const summaryData = {
+                items: [],
+                totalCost: 0
+            };
 
-    // Create PayPal Payment Record
-    async function createPayPalPaymentRecord(bookingData, paypalDetails) {
+            // Iterate through table rows
+            summaryTable.querySelectorAll('tr:not(.total)').forEach(row => {
+                const titleCell = row.querySelector('td strong');
+                const amountCell = row.querySelector('td.text-right');
+
+                if (titleCell && amountCell) {
+                    const title = titleCell.textContent.trim();
+                    const amount = parseFloat(amountCell.textContent.replace(/[^0-9.-]+/g, ''));
+
+                    summaryData.items.push({
+                        title: title,
+                        amount: amount
+                    });
+                }
+            });
+
+            // Get total cost
+            const totalRow = summaryTable.querySelector('tr.total');
+            if (totalRow) {
+                const totalCell = totalRow.querySelector('td.text-right strong');
+                if (totalCell) {
+                    summaryData.totalCost = parseFloat(totalCell.textContent.replace(/[^0-9.-]+/g, ''));
+                }
+            }
+
+            console.log('Parsed summary data:', summaryData);
+            return summaryData;
+
+        } catch (error) {
+            console.error('Error getting summary data:', error);
+            return null;
+        }
+    }
+
+    async function createPayPalPaymentRecord(bookingData, paypalDetails, summaryData) {
         try {
             const amount = calculateTotalAmount();
             const userId = getUserIdFromToken();
@@ -1203,14 +1251,17 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
 
             // Extract PayPal transaction ID
-            const transactionId = paypalDetails.id || // For newer PayPal SDK
-                paypalDetails.orderID || // Alternative property
-                paypalDetails.purchase_units?.[0]?.payments?.captures?.[0]?.id; // Deeper check
+            const transactionId = paypalDetails.id ||
+                paypalDetails.orderID ||
+                paypalDetails.purchase_units?.[0]?.payments?.captures?.[0]?.id;
 
             if (!transactionId) {
                 console.error('PayPal details:', paypalDetails);
                 throw new Error('No transaction ID found in PayPal response');
             }
+
+            // Log summary data for debugging
+            console.log('Summary Data:', summaryData);
 
             const paymentData = {
                 bookingID: bookingId,
@@ -1220,7 +1271,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 amount: parseFloat(amount.toFixed(2)),
                 paymentMethod: "PayPal",
                 paymentStatus: "Completed",
-                transactionId: transactionId // Set the transaction ID here
+                transactionId: transactionId,
+                bookingSummary: summaryData // Use the passed summaryData
             };
 
             console.log('PayPal payment data to be sent:', paymentData);
