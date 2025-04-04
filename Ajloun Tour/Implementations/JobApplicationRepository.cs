@@ -72,28 +72,59 @@ namespace Ajloun_Tour.Implementations
 
         public async Task<JobApplicationDTO> AddApplication(CreateApplication createApplication)
         {
-            // Verify job exists
-            var job = await _context.Jobs
-                .FirstOrDefaultAsync(j => j.JobId == createApplication.JobId);
+            try
+            {
+                // Verify job exists
+                var job = await _context.Jobs
+                    .FirstOrDefaultAsync(j => j.JobId == createApplication.JobId);
 
-            if (job == null)
-                throw new NotFoundException($"Job with ID {createApplication.JobId} not found");
+                if (job == null)
+                    throw new NotFoundException($"Job with ID {createApplication.JobId} not found");
 
-            if (!job.IsActive == true)
-                throw new Exception("This job is no longer accepting applications");
+                //if (job.IsActive ==false)
+                //    throw new BadHttpRequestException("This job is no longer accepting applications");
 
-            // Handle CV upload
-            var cvPath = await SaveCV(createApplication.CV);
+                // Create new application
+                var application = new JobApplication
+                {
+                    JobId = createApplication.JobId,
+                    ApplicantName = createApplication.ApplicantName,
+                    Email = createApplication.Email,
+                    Phone = createApplication.Phone,
+                    Message = createApplication.Message,
+                    ApplicationDate = DateTime.UtcNow,
+                    Status = "Pending",
+                    Cvpath = null // Default to null
+                };
 
-            var application = _mapper.Map<JobApplication>(createApplication);
-            application.Cvpath = cvPath;
-            application.ApplicationDate = DateTime.UtcNow;
-            application.Status = "Pending";
+                // Only process CV if it exists
+                if (createApplication.CV != null && createApplication.CV.Length > 0)
+                {
+                    application.Cvpath = await SaveCV(createApplication.CV);
+                }
 
-            _context.JobApplications.Add(application);
-            await _context.SaveChangesAsync();
+                _context.JobApplications.Add(application);
+                await _context.SaveChangesAsync();
 
-            return await GetApplicationById(application.ApplicationId);
+                // Map to DTO and return
+                return new JobApplicationDTO
+                {
+                    ApplicationId = application.ApplicationId,
+                    JobId = application.JobId ?? job.JobId,
+                    ApplicantName = application.ApplicantName,
+                    Email = application.Email,
+                    Phone = application.Phone,
+                    Message = application.Message,
+                    CVPath = application.Cvpath,
+                    ApplicationDate = application.ApplicationDate.GetValueOrDefault(),
+                    Status = application.Status
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in AddApplication: {Message}", ex.Message);
+                throw;
+            }
         }
 
         public async Task<JobApplicationDTO> UpdateApplicationStatus(int id, string status)

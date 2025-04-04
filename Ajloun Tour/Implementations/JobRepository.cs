@@ -38,7 +38,7 @@ namespace Ajloun_Tour.Implementations
                 await image.CopyToAsync(fileStream);
             }
 
-            return $"/images/jobs/{fileName}";
+            return fileName;
         }
 
 
@@ -74,8 +74,26 @@ namespace Ajloun_Tour.Implementations
             if (job == null)
                 throw new Exception($"Job with ID {id} not found");
 
-            return _mapper.Map<JobDTO>(job);
+            var jobDto = _mapper.Map<JobDTO>(job);
+
+            // ✅ Get the main image (first image in the list)
+            jobDto.MainImage = job.JobImages
+                .OrderBy(img => img.ImageId)  // Ensure consistent order
+                .Select(img => img.ImageUrl)
+                .FirstOrDefault() ?? "/JobsImages/default.jpg"; // Default if no images
+
+            // ✅ Get sub-images (all except the first)
+            jobDto.SubImages = job.JobImages
+                .OrderBy(img => img.ImageId)  // Ensure consistent order
+                .Skip(1) // Exclude the first image
+                .Select(img => img.ImageUrl)
+                .ToList();
+
+            return jobDto;
         }
+
+
+
 
         public async Task<IEnumerable<JobDTO>> GetJobsByType(string jobType)
         {

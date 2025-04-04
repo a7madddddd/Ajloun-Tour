@@ -71,32 +71,52 @@ namespace Ajloun_Tour.Controllers
         }
 
         [HttpPost]
+        [Consumes("multipart/form-data")]
         public async Task<ActionResult<JobApplicationDTO>> CreateApplication([FromForm] CreateApplication createApplication)
         {
             try
             {
+                _logger.LogInformation("Attempting to create application for job {JobId}", createApplication.JobId);
+
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogWarning("Invalid model state: {ModelState}",
+                        string.Join("; ", ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage)));
+                    return BadRequest(ModelState);
+                }
+
                 var application = await _applicationRepository.AddApplication(createApplication);
-                return CreatedAtAction(nameof(GetApplication), new { id = application.ApplicationId }, application);
+
+                _logger.LogInformation("Successfully created application {ApplicationId} for job {JobId}",
+                    application.ApplicationId, application.JobId);
+
+                return CreatedAtAction(
+                    nameof(GetApplication),
+                    new { id = application.ApplicationId },
+                    application);
             }
             catch (NotFoundException ex)
             {
+                _logger.LogWarning(ex, "Not found error while creating application");
                 return NotFound(ex.Message);
             }
             catch (BadHttpRequestException ex)
             {
+                _logger.LogWarning(ex, "Bad request error while creating application");
                 return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating new application");
-                return StatusCode(500, "An error occurred while creating the application");
+                _logger.LogError(ex, "Unexpected error while creating application: {Message}", ex.Message);
+                return StatusCode(500, $"An error occurred while creating the application: {ex.Message}");
             }
         }
 
+
         [HttpPut("{id}/status")]
         public async Task<ActionResult<JobApplicationDTO>> UpdateApplicationStatus(
-            int id,
-            [FromBody] UpdateJobApplication updateApplication)
+        int id,
+        [FromBody] UpdateJobApplication updateApplication)
         {
             try
             {

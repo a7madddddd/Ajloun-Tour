@@ -7,6 +7,7 @@ namespace Ajloun_Tour.Models
     {
         public Job()
         {
+            Employees = new HashSet<Employee>();
             JobApplications = new HashSet<JobApplication>();
             JobImages = new HashSet<JobImage>();
         }
@@ -23,6 +24,7 @@ namespace Ajloun_Tour.Models
         public bool? IsActive { get; set; }
         public DateTime? CreatedDate { get; set; }
 
+        public virtual ICollection<Employee> Employees { get; set; }
         public virtual ICollection<JobApplication> JobApplications { get; set; }
         public virtual ICollection<JobImage> JobImages { get; set; }
     }

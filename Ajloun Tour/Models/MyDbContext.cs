@@ -23,6 +23,7 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Cart> Carts { get; set; } = null!;
         public virtual DbSet<CartItem> CartItems { get; set; } = null!;
         public virtual DbSet<ContactMessage> ContactMessages { get; set; } = null!;
+        public virtual DbSet<Employee> Employees { get; set; } = null!;
         public virtual DbSet<Job> Jobs { get; set; } = null!;
         public virtual DbSet<JobApplication> JobApplications { get; set; } = null!;
         public virtual DbSet<JobImage> JobImages { get; set; } = null!;
@@ -40,10 +41,9 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Review> Reviews { get; set; } = null!;
         public virtual DbSet<Testomonial> Testomonials { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
-        
+        public virtual DbSet<TourPackage> TourPackages { get; set; } = null!;
         public virtual DbSet<TourOffer> TourOffers { get; set; } = null!;
 
-        public virtual DbSet<TourPackage> TourPackages { get; set; } = null!;
         public virtual DbSet<TourProgram> TourPrograms { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
 
@@ -277,6 +277,54 @@ namespace Ajloun_Tour.Models
                 entity.Property(e => e.SubmittedAt)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+            });
+
+            modelBuilder.Entity<Employee>(entity =>
+            {
+                entity.HasIndex(e => e.Email, "UQ__Employee__A9D105343C915A16")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.ApplicationId, "UQ__Employee__C93A4F78E0519C03")
+                    .IsUnique();
+
+                entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
+
+                entity.Property(e => e.ApplicationId).HasColumnName("ApplicationID");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FullName)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.HireDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.JobId).HasColumnName("JobID");
+
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Salary).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Application)
+                    .WithOne(p => p.Employee)
+                    .HasForeignKey<Employee>(d => d.ApplicationId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Employees_JobApplications");
+
+                entity.HasOne(d => d.Job)
+                    .WithMany(p => p.Employees)
+                    .HasForeignKey(d => d.JobId)
+                    .HasConstraintName("FK_Employees_Jobs");
             });
 
             modelBuilder.Entity<Job>(entity =>
@@ -774,7 +822,6 @@ namespace Ajloun_Tour.Models
                     .HasConstraintName("FK__testomoni__UserI__619B8048");
             });
 
-
             modelBuilder.Entity<Tour>(entity =>
             {
                 entity.Property(e => e.TourId).HasColumnName("TourID");
@@ -830,29 +877,6 @@ namespace Ajloun_Tour.Models
                 });
 
             });
-
-            modelBuilder.Entity<TourPackage>(entity =>
-            {
-                entity.HasKey(e => new { e.TourId, e.PackageId })
-                    .HasName("PK__TourPack__DD2EFF48ADCDAF59");
-
-                entity.Property(e => e.TourId).HasColumnName("tour_id");
-
-                entity.Property(e => e.PackageId).HasColumnName("package_id");
-
-                entity.Property(e => e.IsActive).HasColumnName("isActive");
-
-                entity.HasOne(d => d.Package)
-                    .WithMany(p => p.TourPackages)
-                    .HasForeignKey(d => d.PackageId)
-                    .HasConstraintName("FK__TourPacka__packa__0B91BA14");
-
-                entity.HasOne(d => d.Tour)
-                    .WithMany(p => p.TourPackages)
-                    .HasForeignKey(d => d.TourId)
-                    .HasConstraintName("FK__TourPacka__tour___0A9D95DB");
-            });
-
             modelBuilder.Entity<TourProgram>(entity =>
             {
                 entity.HasIndex(e => e.ProgramId, "IX_TourPrograms_ProgramId");

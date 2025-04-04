@@ -140,7 +140,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
 builder.Services.AddScoped<IJobImageRepository, JobImageRepository>();
-
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
 
 builder.Services.AddAuthorization();

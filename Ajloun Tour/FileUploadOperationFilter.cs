@@ -1,4 +1,8 @@
-﻿namespace Ajloun_Tour
+﻿using Ajloun_Tour.Models;
+using Microsoft.EntityFrameworkCore;
+using OpenQA.Selenium.BiDi.Modules.Script;
+
+namespace Ajloun_Tour
 {
     using Microsoft.OpenApi.Models;
     using Swashbuckle.AspNetCore.SwaggerGen;
@@ -32,7 +36,7 @@
                                 })
                         }
                     }
-                }
+                    }
                 };
             }
         }

@@ -105,7 +105,7 @@ namespace Ajloun_Tour.Implementations
                 throw new BadHttpRequestException("File size exceeds maximum limit of 5MB");
 
             var fileName = $"{Guid.NewGuid()}{fileExtension}";
-            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", "jobs");
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "JobsImages");
 
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
@@ -117,7 +117,7 @@ namespace Ajloun_Tour.Implementations
                 await image.CopyToAsync(fileStream);
             }
 
-            return $"/images/jobs/{fileName}";
+            return fileName;
         }
 
         private void DeleteImageFile(string imageUrl)

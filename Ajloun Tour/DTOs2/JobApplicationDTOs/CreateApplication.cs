@@ -18,8 +18,7 @@ namespace Ajloun_Tour.DTOs2.JobApplicationDTOs
         [Phone]
         public string Phone { get; set; }
 
-        [Required]
-        public IFormFile CV { get; set; }
+        public IFormFile? CV { get; set; }
 
         public string Message { get; set; }
     }

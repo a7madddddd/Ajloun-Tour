@@ -13,7 +13,8 @@
         public string? Experinces { get; set; }
         public bool? IsActive { get; set; }
         public DateTime? CreatedDate { get; set; }
-        public List<string> Images { get; set; }
+        public string MainImage { get; set; } 
+        public List<string> SubImages { get; set; }
 
 
 
