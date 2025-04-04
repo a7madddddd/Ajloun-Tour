@@ -39,11 +39,42 @@ namespace Ajloun_Tour.Controllers
             return Ok( newTesto);
         }
 
-        [HttpDelete("id")]
-        public async void DeleteTestoAsync(int id) {
-        
-            await _testomonialsRepository.DeleteTestoAsync( id );
-            
+        [HttpPut("{id}")]
+        public async Task<ActionResult<UpdateTestoDTO>> UpdateTesto(int id, UpdateTestoDTO updateTestoDto)
+        {
+            try
+            {
+                var updatedTesto = await _testomonialsRepository.UpdateTestoById(id, updateTestoDto);
+                return Ok(updatedTesto);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the testimonial.", error = ex.Message });
+            }
         }
+
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteTestoAsync(int id)
+        {
+            try
+            {
+                await _testomonialsRepository.DeleteTestoAsync(id); // Make sure to await the method here
+                return Ok(new { message = $"Testimonial with ID {id} deleted successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message }); // Return NotFound if the testimonial is not found
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while deleting the testimonial.", error = ex.Message });
+            }
+        }
+
     }
 }

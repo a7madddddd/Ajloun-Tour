@@ -11,5 +11,7 @@ namespace Ajloun_Tour.Reposetories
         Task<TestoDTO> AddTestoAsync(CreateTesto createTesto);
 
         Task DeleteTestoAsync(int id);
+
+        Task<UpdateTestoDTO> UpdateTestoById(int id, UpdateTestoDTO updateTestoDto);
     }
 }

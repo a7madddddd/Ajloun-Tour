@@ -22,6 +22,7 @@ namespace Ajloun_Tour.Implementations
                 TestomoId = x.TestomoId,
                 Message = x.Message,
                 UserId = x.UserId,
+                Accepted = x.Accepted,
             
             });
         }
@@ -40,6 +41,7 @@ namespace Ajloun_Tour.Implementations
                 TestomoId = test.TestomoId,
                 Message = test.Message,
                 UserId = test.UserId,
+                Accepted= test.Accepted,
             };
         }
         public async Task<TestoDTO> AddTestoAsync(CreateTesto createTesto)
@@ -48,33 +50,61 @@ namespace Ajloun_Tour.Implementations
             
                 Message = createTesto.Message,
                 UserId = createTesto.UserId,
+                Accepted = createTesto.Accepted = false,
             };
 
             _context.Testomonials.Add(testo);
             await _context.SaveChangesAsync();
 
-            return new TestoDTO {
-            
+            return new TestoDTO
+            {
+
                 TestomoId = testo.TestomoId,
                 Message = testo.Message,
                 UserId = testo.UserId,
+                Accepted = testo.Accepted 
             };
         }
 
         public async Task DeleteTestoAsync(int id)
         {
-            var test = await _context.Testomonials.FindAsync(id);
+            var testimonial = await _context.Testomonials.FindAsync(id);
 
-            if (test == null)
+            if (testimonial == null)
             {
-
-                throw new Exception("This Testmonial Is Not Defined");
+                throw new KeyNotFoundException($"Testimonial with ID {id} not found.");
             }
 
-            _context.Testomonials.Remove(test);
+            _context.Testomonials.Remove(testimonial);
             await _context.SaveChangesAsync();
         }
 
+        public async Task<UpdateTestoDTO> UpdateTestoById(int id, UpdateTestoDTO updateTestoDto)
+        {
+            // 1. Retrieve the testimonial by ID
+            var testimonial = await _context.Testomonials.FindAsync(id);
+
+            if (testimonial == null)
+            {
+                // If not found, return null or throw an exception
+                throw new KeyNotFoundException($"Testimonial with ID {id} not found.");
+            }
+
+            // 2. Update properties
+            if (updateTestoDto.Accepted.HasValue)
+            {
+                testimonial.Accepted = updateTestoDto.Accepted.Value;
+            }
+
+            // 3. Save changes back to the database
+            await _context.SaveChangesAsync();
+
+            // 4. Return the updated DTO
+            return new UpdateTestoDTO
+            {
+                Accepted = testimonial.Accepted
+            };
+        }
 
     }
 }

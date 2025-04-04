@@ -42,10 +42,9 @@ namespace Ajloun_Tour.Models
         public virtual DbSet<Testomonial> Testomonials { get; set; } = null!;
         public virtual DbSet<Tour> Tours { get; set; } = null!;
         public virtual DbSet<TourPackage> TourPackages { get; set; } = null!;
-        public virtual DbSet<TourOffer> TourOffers { get; set; } = null!;
-
         public virtual DbSet<TourProgram> TourPrograms { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
+        public virtual DbSet<TourOffer> TourOffers { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -877,6 +876,7 @@ namespace Ajloun_Tour.Models
                 });
 
             });
+
             modelBuilder.Entity<TourProgram>(entity =>
             {
                 entity.HasIndex(e => e.ProgramId, "IX_TourPrograms_ProgramId");
