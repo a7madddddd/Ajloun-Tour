@@ -25,11 +25,13 @@ namespace Ajloun_Tour.Models
         public int? PackageId { get; set; }
         public int? OfferId { get; set; }
         public int? BookingId { get; set; }
+        public int? ProductId { get; set; }
 
         public virtual Booking? Booking { get; set; }
         public virtual Cart Cart { get; set; } = null!;
         public virtual Offer? Offer { get; set; }
         public virtual Package? Package { get; set; }
+        public virtual Product? Product { get; set; }
         public virtual Tour Tour { get; set; } = null!;
     }
 }
