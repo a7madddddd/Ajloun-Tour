@@ -3,6 +3,7 @@ using Ajloun_Tour.DTOs2.BookingOptionSelectionDTOs;
 using Ajloun_Tour.DTOs2.CartItemsDTOs;
 using Ajloun_Tour.Models;
 using Ajloun_Tour.Reposetories;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ajloun_Tour.Repositories.Implementations
@@ -40,7 +41,8 @@ namespace Ajloun_Tour.Repositories.Implementations
                     Option4Price = ci.Option4Price,
                     CreatedAt = ci.CreatedAt,
                     UpdatedAt = ci.UpdatedAt,
-                    BookingId = ci.BookingId
+                    BookingId = ci.BookingId,
+                    ProductId = ci.ProductId
                 })
                 .ToListAsync();
         }
@@ -58,6 +60,7 @@ namespace Ajloun_Tour.Repositories.Implementations
                 TourId = cartItem.TourId,
                 PackageId = cartItem.PackageId,
                 OfferId = cartItem.OfferId,
+                ProductId = cartItem.ProductId,
                 Quantity = cartItem.Quantity,
                 Price = cartItem.Price,
                 SelectedDate = cartItem.SelectedDate,
@@ -98,6 +101,7 @@ namespace Ajloun_Tour.Repositories.Implementations
                     TourId = ci.TourId,
                     PackageId = ci.PackageId,
                     OfferId = ci.OfferId,
+                    ProductId = ci.ProductId,
                     Quantity = ci.Quantity,
                     Price = ci.Price,
                     SelectedDate = ci.SelectedDate,
@@ -113,6 +117,7 @@ namespace Ajloun_Tour.Repositories.Implementations
                     CreatedAt = ci.CreatedAt,
                     UpdatedAt = ci.UpdatedAt,
                     BookingId = ci.BookingId,
+
                     BookingDetails = ci.Booking != null ? new BookingDTO
                     {
                         BookingId = ci.Booking.BookingId,
@@ -191,23 +196,27 @@ namespace Ajloun_Tour.Repositories.Implementations
         }
         public async Task<CartItemDTO> AddCartItemAsync(CreateCartItemDTO createCartItemDTO)
         {
-            // Retrieve the booking using the provided BookingId
-            var booking = await _context.Bookings
-                .Where(b => b.BookingId == createCartItemDTO.BookingId)
-                .FirstOrDefaultAsync();
+            Booking booking = null;
 
-            if (booking == null)
+            if (createCartItemDTO.BookingId != null && createCartItemDTO.BookingId != 0)
             {
-                throw new Exception("Booking not found.");
+                booking = await _context.Bookings
+                    .Where(b => b.BookingId == createCartItemDTO.BookingId)
+                    .FirstOrDefaultAsync();
+
+                if (booking == null)
+                {
+                    throw new Exception($"لم يتم العثور على الحجز برقم BookingId = {createCartItemDTO.BookingId}");
+                }
             }
 
-            // Create a new CartItem based on the Booking information
             var cartItem = new CartItem
             {
                 CartId = createCartItemDTO.CartId,
-                TourId = booking.TourId ?? 0,  // If TourId is null, default to 0
-                PackageId = booking.PackageId ?? 0,  // Default to 0 if PackageId is null
-                OfferId = booking.OfferId ?? 0,  // Default to 0 if OfferId is null
+                TourId = (booking?.TourId != null && booking.TourId != 0) ? booking.TourId : null,
+                PackageId = (booking?.PackageId != null && booking.PackageId != 0) ? booking.PackageId : null,
+                OfferId = (booking?.OfferId != null && booking.OfferId != 0) ? booking.OfferId : null,
+                ProductId = createCartItemDTO.ProductId ?? 0,
                 Quantity = createCartItemDTO.Quantity,
                 Price = createCartItemDTO.Price,
                 SelectedDate = createCartItemDTO.SelectedDate,
@@ -222,14 +231,12 @@ namespace Ajloun_Tour.Repositories.Implementations
                 Option4Price = createCartItemDTO.Option4Price,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                BookingId = booking.BookingId // Set the BookingId correctly
+                BookingId = (createCartItemDTO.BookingId != 0) ? createCartItemDTO.BookingId : null
             };
 
-            // Add the CartItem to the context
             _context.CartItems.Add(cartItem);
             await _context.SaveChangesAsync();
 
-            // Return the CartItemDTO after saving to the database
             return new CartItemDTO
             {
                 CartItemId = cartItem.CartItemId,
@@ -255,6 +262,36 @@ namespace Ajloun_Tour.Repositories.Implementations
             };
         }
 
+        public async Task<CartItemDTO> AddCartItemByProductAsync(CreateCartItemWithProductDTO dto)
+        {
+            var cartItem = new CartItem
+            {
+                CartId = dto.CartId,
+                ProductId = dto.ProductId,
+                Quantity = dto.Quantity,
+                Price = dto.Price,
+                SelectedDate = dto.SelectedDate,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.CartItems.Add(cartItem);
+            await _context.SaveChangesAsync();
+
+            return new CartItemDTO
+            {
+                CartItemId = cartItem.CartItemId,
+                CartId = cartItem.CartId,
+                ProductId = cartItem.ProductId ,
+                Quantity = cartItem.Quantity,
+                Price = cartItem.Price,
+                SelectedDate = cartItem.SelectedDate,
+                CreatedAt = cartItem.CreatedAt,
+                UpdatedAt = cartItem.UpdatedAt
+            };
+        }
+
+
         public async Task<CartItemDTO> UpdateCartItemAsync(int id, UpdateCartItemDTO updateCartItemDTO)
         {
             var cartItem = await _context.CartItems.FindAsync(id);
@@ -278,6 +315,7 @@ namespace Ajloun_Tour.Repositories.Implementations
             cartItem.Option4Price = updateCartItemDTO.Option4Price;
             cartItem.UpdatedAt = DateTime.UtcNow;
             cartItem.BookingId = updateCartItemDTO.BookingId;
+            cartItem.ProductId  = updateCartItemDTO.ProductId;
 
             _context.Entry(cartItem).State = EntityState.Modified;
             await _context.SaveChangesAsync();

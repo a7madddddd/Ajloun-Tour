@@ -45,6 +45,14 @@ namespace Ajloun_Tour.Controllers
             return CreatedAtAction(nameof(GetCartItemById), new { id = cartItem.CartItemId }, cartItem);
         }
 
+        [HttpPost("AddByProduct")]
+        public async Task<ActionResult<CartItemDTO>> AddCartItemByProduct(CreateCartItemWithProductDTO dto)
+        {
+            var result = await _cartItemRepository.AddCartItemByProductAsync(dto);
+            return Ok(result);
+        }
+
+
         [HttpPut("{id}")]
         public async Task<ActionResult<CartItemDTO>> UpdateCartItem(int id, UpdateCartItemDTO updateCartItemDTO)
         {

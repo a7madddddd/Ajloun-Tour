@@ -32,7 +32,7 @@ namespace Ajloun_Tour.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting images for job ID: {JobId}", jobId);
+                _logger.LogError(ex, $"Error getting images for job ID: {jobId}", jobId);
                 return StatusCode(500, "An error occurred while retrieving images");
             }
         }
@@ -57,7 +57,7 @@ namespace Ajloun_Tour.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error adding image for job ID: {JobId}", jobId);
+                _logger.LogError(ex, $"Error adding image for job ID: {jobId}", jobId);
                 return StatusCode(500, "An error occurred while adding the image");
             }
         }
@@ -76,7 +76,7 @@ namespace Ajloun_Tour.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting image ID: {ImageId} for job ID: {JobId}", imageId, jobId);
+                _logger.LogError(ex, $"Error deleting image ID: {imageId} for job ID: {jobId}", imageId, jobId);
                 return StatusCode(500, "An error occurred while deleting the image");
             }
         }

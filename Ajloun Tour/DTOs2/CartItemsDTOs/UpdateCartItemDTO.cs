@@ -18,5 +18,7 @@
         public decimal? Option3Price { get; set; }
         public decimal? Option4Price { get; set; }
         public int? BookingId { get; set; }
+        public int? ProductId { get; set; }
+
     }
 }

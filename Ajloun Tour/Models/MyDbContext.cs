@@ -264,7 +264,6 @@ namespace Ajloun_Tour.Models
                 entity.HasOne(d => d.Tour)
                     .WithMany(p => p.CartItems)
                     .HasForeignKey(d => d.TourId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_CartItems_Tour");
             });
 

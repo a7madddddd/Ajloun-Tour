@@ -8,6 +8,7 @@ namespace Ajloun_Tour.Reposetories
         Task<CartItemDTO> GetCartItemByIdAsync(int id);
         Task<IEnumerable<CartItemDTO>> GetCartItemsByCartIdAsync(int cartId);
         Task<CartItemDTO> AddCartItemAsync(CreateCartItemDTO createCartItemDTO);
+        Task<CartItemDTO> AddCartItemByProductAsync(CreateCartItemWithProductDTO dto);
         Task<CartItemDTO> UpdateCartItemAsync(int id, UpdateCartItemDTO updateCartItemDTO);
         Task DeleteCartItemAsync(int id);
         Task<IEnumerable<CartItemDTO>> UpdateCartItemsBookingIdAsync(int[] cartItemIds, int bookingId);

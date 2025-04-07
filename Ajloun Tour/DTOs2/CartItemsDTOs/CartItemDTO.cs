@@ -26,6 +26,8 @@ namespace Ajloun_Tour.DTOs2.CartItemsDTOs
         public int? BookingId { get; set; }
         public BookingDTO BookingDetails { get; set; }
         public bool IsFromBooking { get; set; }
+        public int? ProductId { get; set; }
+
 
     }
 }
