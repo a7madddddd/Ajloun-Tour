@@ -11,6 +11,7 @@
         public int? PackageId { get; set; }
         public int? OfferId { get; set; }
         public bool? IsActive { get; set; }
+        public int? ProductId { get; set; }
 
 
     }

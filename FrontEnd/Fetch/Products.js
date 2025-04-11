@@ -273,7 +273,7 @@ function createProductHTML(product) {
                 </figure>
                 <div class="product-content">
                     <h3 class="product-title">
-                        <a href="#">${product.name}</a>
+                        <a href="product-detail.html?id=${product.productId}">${product.name}</a>
                     </h3>
                     <div class="product-price">
                         ${hasDiscount

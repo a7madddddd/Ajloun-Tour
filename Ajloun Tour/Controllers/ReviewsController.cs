@@ -73,6 +73,19 @@ namespace Ajloun_Tour.Controllers
             return Ok(reviews);
         }
 
+        [HttpGet("getReviewByProductId")]
+        public async Task<ActionResult<IEnumerable<ReviewsDTO>>> GetReviewByProductId(int productId)
+        {
+            var reviews = await _reviewsRepository.getReviewByProductId(productId);
+
+            if (reviews == null)
+            {
+                return NotFound("No reviews found for this Pack.");
+            }
+
+            return Ok(reviews);
+        }
+
         [HttpPost]
         public async Task<ActionResult> AddReviewAsync([FromForm]CreateReview createReview)
         {

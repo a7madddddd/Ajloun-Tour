@@ -27,6 +27,7 @@ namespace Ajloun_Tour.Implementations
                 UserId = r.UserId,
                 OfferId = r.OfferId,
                 PackageId = r.PackageId,
+                ProductId = r.ProductId,
                 Rating = r.Rating,
                 Comment = r.Comment,
                 Subject = r.Subject,
@@ -52,6 +53,7 @@ namespace Ajloun_Tour.Implementations
                 UserId = review.UserId,
                 PackageId = review.PackageId,
                 OfferId = review.OfferId,
+                ProductId=review.ProductId,
                 Rating = review.Rating,
                 Comment = review.Comment,
                 Subject = review.Subject,
@@ -148,7 +150,8 @@ namespace Ajloun_Tour.Implementations
                 Comment = createReview.Comment,
                 IsActive = createReview.IsActive ?? false,
                 Subject = createReview.Subject,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                ProductId = createReview.ProductId,
             };
 
             _context.Reviews.Add(review);
@@ -161,6 +164,7 @@ namespace Ajloun_Tour.Implementations
                 UserId = review.UserId,
                 OfferId = review.OfferId,
                 PackageId = review.PackageId,
+                ProductId = review.ProductId,
                 Rating = review.Rating,
                 Comment = review.Comment,
                 Subject = review.Subject,
@@ -208,6 +212,29 @@ namespace Ajloun_Tour.Implementations
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<ReviewsDTO>> getReviewByProductId(int productId)
+        {
+            if (productId <= 0)
+            {
+                throw new ArgumentException("Invalid product ID.");
+            }
 
+            var reviews = await _context.Reviews
+                .Where(r => r.ProductId == productId)
+                .Select(r => new ReviewsDTO
+                {
+                    Id = r.Id,
+                    UserId = r.UserId,
+                    OfferId = r.ProductId,
+                    Rating = r.Rating,
+                    Subject = r.Subject,
+                    Comment = r.Comment,
+                    IsActive = r.IsActive,
+                    CreatedAt = r.CreatedAt
+                })
+                .ToListAsync();
+
+            return reviews;
+        }
     }
 }
